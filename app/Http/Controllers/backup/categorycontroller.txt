@@ -1,0 +1,19 @@
+    public function managecategory(Request $request, $id = '')
+    {
+        if ($id > 0) {
+            $arr = Category::where(['id' => $id])->get();
+
+            $result['category_name'] = $arr['0']->category_name;
+            $result['category_slug'] = $arr['0']->category_slug;
+            $result['id'] = $arr['0']->id;
+        } else {
+            $result['category_name'] = '';
+            $result['category_slug'] = '';
+            $result['id'] = 0;
+        }
+        // creating new category
+        // echo "<pre>";
+        // print_r($result['data']);
+        // die();
+        return view('admin.manage_category', $result);
+    }

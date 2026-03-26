@@ -1,0 +1,18 @@
+    public function manageSize(Request $request, $id = '')
+    {
+        if ($id > 0) {
+            $arr = Size::where(['id' => $id])->get();
+
+            $result['size'] = $arr['0']->size;
+            $result['status'] = $arr['0']->status;
+            $result['id'] = $arr['0']->id;
+        } else {
+            $result['size'] = '';
+            $result['status'] = '';
+            $result['id'] = 0;
+        }
+
+        return view('admin.size.manage_size', $result);
+
+        // echo "This is for manage size";
+    }

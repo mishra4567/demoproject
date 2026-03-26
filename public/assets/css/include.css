@@ -1,0 +1,25 @@
+.table-earning tbody tr:hover td{
+    color : #ebba34 !important;
+}
+/* include ui  */
+/* Hide submenu by default */
+.js-sub-list {
+    display: none;
+}
+
+/* Show when active */
+.has-sub.active>.js-sub-list {
+    display: block;
+}
+
+/* Highlight active parent */
+.has-sub.active>a {
+    /* background: #2f6fad; */
+    color: #fff;
+}
+
+/* Highlight active child */
+.js-sub-list li.active>a {
+    color: #fff;
+    font-weight: 600;
+}

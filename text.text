@@ -1,0 +1,177 @@
+command
+    create new laravel project :-
+        laravel new myproject
+    create model migration controller and Resource :-
+        php artisan make:model ModelName -mcr
+        particuter folder for migration :-
+            php artisan migrate --path=/database/migrations/foldername
+    Dump Autoload :-
+        composer dump-autoload
+    creating mddleware :-
+        php artisan make:middleware Middlewarename
+    creating migretion :-
+        php artisan make:migration create_(linkproducts_table)
+    creating migretion Seeders :-
+        php artisan make:seeder (name_table)Seeder
+    creating migretion With Seeders :-
+        php artisan migrate:fresh --seed
+    Seeder Run --
+        Run All Seeders:-
+            php artisan db:seed
+        Run Specific Seeder :-
+            php artisan db:seed --class=(name_table)Seeder
+    Storage link (Publik folder link):-
+        php artisan storage:link
+
+/****  In Admin Controller
+            Please add
+                   php artisan make:model FolderName/ModelName -mcr
+                   php artisan make:controller Admin/SizeController
+This time i using clodinary for upload image and vodeo
+        clodinary installation command:-
+            composer require cloudinary-labs/cloudinary-laravel
+        public config command:-
+                php artisan vendor:publish --tag=cloudinary
+                php artisan optimize:clear
+
+
+
+
+
+
+
+
+/******** Not The List **********\
+To Create own Artisan command to automatically create:-
+    * (Name) Controller
+    * Model
+    * migration
+    * (optional) routes/views
+       Commend:-
+            php artisan make:command NameOfTheCommand
+       Code :-
+            <?php
+
+                namespace App\Console\Commands;
+
+                use Illuminate\Console\Command;
+                use Illuminate\Support\Str;
+                use Illuminate\Support\Facades\Artisan;
+
+                class MakeAdminCrud extends Command
+                {
+                    protected $signature = 'make:admin {name}';
+                    protected $description = 'Create Admin Model, Controller, Migration';
+
+                    public function handle()
+                    {
+                        $name = Str::studly($this->argument('name'));
+
+                        // Create Model + Migration
+                        Artisan::call("make:model {$name} -m");
+
+                        // Create Admin Controller
+                        Artisan::call("make:controller Admin/{$name}Controller");
+
+                        $this->info("Admin CRUD created for {$name}");
+                    }
+                }
+            ?>
+    /*********
+        For your Custom Command to work
+                Write the command in terminal:-
+                    php artisan make:signatureName madelName
+        For My Project command are
+               php artisan make:admin laptop
+               php artisan make:website laptop
+               php artisan make:api laptop
+    **********\
+
+
+\********************************/
+model for size:-
+    php artisan make:model Size -mcr
+
+constants.php
+config/constants.php
+
+
+have post methode to delete any data
+    in datashow.blade.php
+        <form action="{{ route('category.delete', $category->id) }}" method="POST">
+            @csrf
+            @method('DELETE')
+
+            <button type="submit"
+                class="btn btn-danger btn-sm"
+                onclick="return confirm('Are you sure you want to delete this category?')">
+                Delete
+            </button>
+        </form>
+    in web.php
+        Route::delete(
+                    'admin/category/delete/{id}',
+                    [CategoryController::class, 'delete']
+                )->name('category.delete');
+
+
+
+
+Wrong but efective methode
+    Category Control(insert and update)
+    public function managecategoryprocess(Request $request)
+    {
+        // $request->validate([
+        //     'category_name' => 'required',
+        //     'category_slug' => 'required|unique:categories,category_slug,'. $request->post('id'),
+        // ], [
+        //     'category_slug.unique' => 'This category slug is already used',
+        // ]);
+
+        // if ($request->post('id')>0) {
+        //     // updating
+        //     $id = $request->post('id');
+        //     $model = Category::where(['id'=>$id])->first();
+        //     $msg="Category Updated ...";
+        // } {
+        //     // inserting
+        //     $model = new Category();
+        //     $msg = "Category Inserted ...";
+        // }
+        // $model->category_name = $request->post('category_name');
+        // $model->category_slug = $request->post('category_slug');
+        // $model->save();
+
+        // return redirect('admin/category')->with('success', $msg);
+    }
+
+
+
+
+For notification
+Loved to add this methode anther any day
+    https://chatgpt.com/s/t_6970b1cfb56c81919f6ac5e52dd35b51
+
+
+
+admincontroller.php
+    public function auth(Request $request)
+    {
+        //this is for admin authentication
+        $email = $request->post('email');
+        $password = $request->post('password');
+
+        $result = Admin::where(['email' => $email, 'password' => $password])->first();
+        if ($result) {
+            $request->session()->put('ADMIN_LOGIN', true);
+            $request->session()->put('ADMIN_ID', $request->id);
+            return redirect('admin/dashboard')->with('success', 'You are logged in successfully');
+        } else {
+            return redirect('admin')->with('error', 'Please enter valid details');
+        }
+    }
+
+
+
+
+

@@ -1,0 +1,286 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Product;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+
+
+class ProductController extends Controller
+{
+    /**
+     * Index Page for Product
+     */
+    public function index()
+    {
+        // $result['data'] = Product::all();
+        $result['data'] = DB::table('products')
+            ->leftJoin('create_media_tables', 'products.media_ids', '=', 'create_media_tables.id')
+            ->select('products.*', 'create_media_tables.file_name')
+            // ->where('products.status', 1)
+            ->get();
+        return view('admin.product.product', $result);
+        // return view('admin.product.product', );
+    }
+
+    /**
+     * Index Pages for Manage product
+     */
+
+    public function manageproduct(Request $request, $id = null)
+    {
+        if (!empty($id) && is_numeric($id)) {
+
+            $product = DB::table('products')
+                ->leftJoin('create_media_tables', 'products.media_ids', '=', 'create_media_tables.id')
+                ->select('products.*', 'create_media_tables.file_name')
+                ->where('products.id', $id)
+                ->first();
+
+            if (!$product) {
+                abort(404);
+            }
+            // $productAttrArr = DB::table('product_attr')->where('product_id', $id)->get();
+            // $productImagesArr = DB::table('product_images')->where('product_id', $id)->get();
+            $result = [
+                'category_id' => $product->category_id,
+                'name' => $product->name,
+                'slug' => $product->slug,
+                'image' => $product->file_name,
+                'brand' => $product->brand,
+                'model' => $product->model,
+                'short_desc' => $product->short_desc,
+                'desc' => $product->desc,
+                'keywords' => $product->keywords,
+                'technical_specification' => $product->technical_specification,
+                'uses' => $product->uses,
+                'warranty' => $product->warranty,
+                'status' => $product->status,
+                'id' => $product->id,
+                // 'productAttrArr' => $productAttrArr,
+                // 'productImagesArr' => $productImagesArr,
+            ];
+            // if (!isset($productImagesArr[0])) {
+            //     $result['productImagesArr']['0']['id'] = '';
+            //     $request['productImagesArr']['0']['images'] = '';
+            // } else {
+            //     $result['productImagesArrr'] = $productImagesArr;
+            // }
+        } else {
+
+            $result = [
+                'category_id' => '',
+                'name' => '',
+                'slug' => '',
+                'image' => '',
+                'brand' => '',
+                'model' => '',
+                'short_desc' => '',
+                'desc' => '',
+                'keywords' => '',
+                'technical_specification' => '',
+                'uses' => '',
+                'warranty' => '',
+                'status' => '',
+                'id' => 0,
+                // 'productAttrArr' => [
+                //     [
+                //         'id' => '',
+                //         'product_id' => '',
+                //         'sku' => '',
+                //         'attr_image' => '',
+                //         'mrp' => '',
+                //         'price' => '',
+                //         'qty' => '',
+                //         'size_id' => '',
+                //         'color_id' => '',
+                //     ]
+                // ],
+                'productImagesArr' => [
+                    [
+                        'id' => '',
+                        'product_id' => '',
+                        'images' => '',
+                    ]
+                ]
+            ];
+        }
+        // echo "<pre>";
+        // print_r($result);
+        // echo "</pre";
+
+
+        // dropdown data
+        $result['category'] = DB::table('categories')->where('status', 1)->get();
+        $result['sizes']    = DB::table('sizes')->where('status', 1)->get();
+        $result['colors']   = DB::table('colors')->where('status', 1)->get();
+        $result['media']    = DB::table('create_media_tables')->where('status', 1)->get();
+
+        return view('admin.product.manage_product', $result);
+    }
+
+
+    /**
+     * Validate and Insert Product Data
+     *
+     * Later i want to add activate or deactivate
+     */
+    public function manageproductprocess(Request $request)
+    {
+        // return $request->post();
+        // die();
+        // echo "<pre>";
+        // print_r($request->post());
+        // echo "</pre>";
+        // die();
+        // Code frome chatgpt
+        $id = $request->id;
+
+        $request->validate([
+            'name' => 'required',
+            'media_id' => $id ? 'nullable' : 'required',
+            // 'slug' => [
+            //     'required',
+            //     Rule::unique('products', 'slug')->ignore($id),
+            // ],
+            // Attribute Image Validation
+            'attr_image.*' => 'nullable|mimes:png,jpg,jpeg,webp',
+        ], [
+            'slug.unique' => 'This Product already exists',
+        ]);
+
+        // Insert Or Update
+        $product = $id ? Product::findOrFail($id) : new Product();
+
+        //  Image Media Id upload
+        if ($request->media_id) {
+            $product->media_ids = $request->media_id;
+        }
+        $product->category_id = $request->category_id;
+        $product->name = $request->name;
+        $product->slug = $request->slug;
+        $product->brand = $request->brand;
+        $product->model = $request->model;
+        $product->short_desc = $request->short_desc;
+        $product->desc = $request->desc;
+        $product->keywords = $request->keywords;
+        $product->technical_specification = $request->technical_specification;
+        $product->uses = $request->uses;
+        $product->warranty = $request->warranty;
+        $product->status = 1;
+        $product->save();
+        return redirect('admin/product')
+            ->with('success', $id ? 'Product Updated Successfully' : 'Product Inserted Successfully');
+
+
+        // // return $request->post();
+    }
+
+
+    /**
+     * Display the specified resource.
+     *
+     * Later i want add delete to show or not show
+     */
+    public function delete(Request $request, $id)
+    {
+
+        $product = Product::find($id);
+
+        if (!$product) {
+            return redirect('admin/product')
+                ->with('error', 'Product not found');
+        }
+
+        //  1. Delete Main Product Image
+        // if ($product->image && file_exists(public_path('/storage/media/' . $product->image))) {
+        //     unlink(public_path('/storage/media/' . $product->image));
+        // }
+
+        //  2. Get All Product Attributes
+        // $attributes = DB::table('product_attr')
+        //     ->where('product_id', $id)
+        //     ->get();
+
+        // 3. Delete Attribute Images
+        // foreach ($attributes as $attr) {
+        //     if ($attr->attr_image && file_exists(public_path('/storage/media/' . $attr->attr_image))) {
+        //         unlink(public_path('/storage/media/' . $attr->attr_image));
+        //     }
+        // }
+
+        // 4. Delete Attribute Records
+        // DB::table('product_attr')
+        //     ->where('product_id', $id)
+        //     ->delete();
+
+        // 5. Delete Product
+        $product->delete();
+
+        return redirect('admin/product')
+            ->with('success', 'Product Deleted Successfully...');
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function status($id)
+    {
+        $model = Product::find($id);
+
+        // toggle between 1 and 0
+        $model->status = ($model->status == 1) ? 0 : 1;
+        $model->save();
+
+        return redirect()->back()->with('success', 'Status Updated');
+    }
+    // public function product_attr_delete(Request $request, $paid, $pid)
+    // {
+    //     // Get attribute
+    //     $attr = DB::table('product_attr')->where('id', $paid)->first();
+
+    //     // Delete image if exists
+    //     if ($attr && $attr->attr_image) {
+
+    //         $imagePath = public_path('/storage/media/' . $attr->attr_image);
+
+    //         if (file_exists($imagePath)) {
+    //             unlink($imagePath);
+    //         }
+    //     }
+
+    //     // Delete database record
+    //     DB::table('product_attr')->where('id', $paid)->delete();
+
+    //     return redirect('admin/product/manageproduct/' . $pid)
+    //         ->with('success', 'Product Attribute Deleted Successfully...');
+
+    //     // echo "product deleted" ;
+    // }
+    // public function product_images_delete(Request $request, $piid, $pid)
+    // {
+    //     // Get Product images
+    //     $images = DB::table('product_images')->where('id', $piid)->first();
+
+    //     // Delete image if exists
+    //     if ($images && $images->image) {
+
+    //         $imagePath = public_path('/storage/media/' . $images->image);
+
+    //         if (file_exists($imagePath)) {
+    //             unlink($imagePath);
+    //         }
+    //     }
+
+    //     // Delete database record
+    //     DB::table('product_images')->where('id', $piid)->delete();
+
+    //     return redirect('admin/product/manageproduct/' . $pid)
+    //         ->with('success', 'Product Image Deleted Successfully...');
+
+    //     // echo "product deleted" ;
+    // }
+}

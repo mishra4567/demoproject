@@ -1,0 +1,90 @@
+include.js
+####################  06.03.2026
+/**
+ * For Add Product Attribute
+ */
+var loop_count = 1;
+function add_more() {
+    loop_count++;
+
+    let html = `
+    <input type="text" name="paid[]" id="paid" value="">
+    <div class="mb-3" id="product_attr_${loop_count}">
+                        <div class="row">`;
+    // for sku
+    html += `
+            <div class="col-md-2">
+                <label for="sku" class="control-label mb-1">Sku
+                </label>
+                <input type="text" class="form-control" name="sku[]" id="sku" required>
+            </div>`;
+    // for mrp
+    html += `<div class="col-md-2">
+                <label for="mrp" class="control-label mb-1">mrp
+                </label>
+                <input type="text" class="form-control" name="mrp[]" id="mrp">
+            </div>`;
+    // for price
+    html += `<div class="col-md-2">
+                <label for="price" class="control-label mb-1">price
+                </label>
+                <input type="text" class="form-control" name="price[]" id="price">
+            </div>`;
+    // for size
+    let size_id_html = jQuery("#size_id").html();
+    size_id_html = size_id_html.replace("selected", "");
+    html += `
+            <div class="col-md-2">
+                <label for="size_is" class="control-label mb-1">Select size
+                </label>
+                <select id="size_id" name="size_id[]" class="form-control">
+                ${size_id_html}
+                </select>
+            </div>`;
+    // for color
+    let color_id_html = jQuery("#color_id").html();
+    color_id_html = color_id_html.replace("selected", "");
+    html += `
+            <div class="col-md-2">
+                <label for="color_id" class="control-label mb-1">Select Color
+                </label>
+                <select name="color_id[]" id="color_id" class="form-control">
+                    ${color_id_html}
+                </select>
+            </div>`;
+    // for qty
+    html += `
+            <div class="col-md-2">
+                <label for="qty" class="control-label mb-1">qty
+                </label>
+                <input type="text" class="form-control" name="qty[]" id="qty">
+            </div>`;
+    // for image
+    html += `
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="attr_image" class="control-label mb-1">Product image
+                        </label>
+                        <input id="attr_image" name="attr_image[]" type="file" class="form-control">
+                    </div>
+                </div>`;
+    // for add button
+    html += `<div class="col-md-2">
+                    <div class="mb-3 mt-4">
+                        <button id="" type="button" class="btn btn-sm btn-danger"
+                            onclick=remove_more("${loop_count}")>
+                            <i class="fa fa-magic"></i>
+                            Remove Attribute
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+
+    html += `</div></div>`;
+    jQuery("#product_attr_1").append(html);
+}
+function remove_more(loop_count) {
+    jQuery("#product_attr_" + loop_count).remove();
+}
+

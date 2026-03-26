@@ -1,0 +1,111 @@
+<?php
+// backup for manageproductprocess
+    // this time i use clodinary
+    // this code is semple
+
+
+    public function manageproductprocess(Request $request)
+    {
+        // Code frome chatgpt
+        $id = $request->post('id');
+
+        if($request->post('id')>0){
+            $image_validation = 'mimes:png,jpg,jpeg';
+        }else{
+            $image_validation = 'required|mimes:png,jpg,jp,webp';
+        }
+
+        $request->validate([
+            'name' => 'required',
+            'image' => $image_validation,
+            'slug' => [
+                'required',
+                Rule::unique('products', 'slug')->ignore($id),
+            ],
+        ], [
+            'slug.unique' => 'This Product already exists',
+        ]);
+
+        $model = $id ? Product::findOrFail($id) : new Product();
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $ext = $image->extension();
+            $image_name = time() . '.' . $ext;
+            $image->move(public_path('/storage/media'), $image_name);
+            $model->image = $image_name;
+        }
+
+        $model->category_id = $request->category_id;
+        $model->name = $request->name;
+        $model->slug = $request->slug;
+        $model->brand = $request->brand;
+        $model->model = $request->model;
+        $model->short_desc = $request->short_desc;
+        $model->desc = $request->desc;
+        $model->keywords = $request->keywords;
+        $model->technical_specification = $request->technical_specification;
+        $model->uses = $request->uses;
+        $model->warranty = $request->warranty;
+        $model->status = 1;
+        $model->save();
+
+        return redirect('admin/product')
+            ->with('success', $id ? 'Product Updated Successfully' : 'Product Inserted Successfully');
+
+
+        // // return $request->post();
+    }
+
+
+
+
+
+--------------------------------------------------------------------------------------------
+    public function manageproduct(Request $request, $id = '')
+    {
+        if ($id > 0) {
+            $arr = Product::where(['id' => $id])->get();
+
+            $result['category_id'] = $arr['0']->category_id;
+            $result['name'] = $arr['0']->name;
+            $result['slug'] = $arr['0']->slug;
+            $result['image'] = $arr['0']->image;
+            $result['brand'] = $arr['0']->brand;
+            $result['model'] = $arr['0']->model;
+            $result['short_desc'] = $arr['0']->short_desc;
+            $result['desc'] = $arr['0']->desc;
+            $result['keywords'] = $arr['0']->keywords;
+            $result['technical_specification'] = $arr['0']->technical_specification;
+            $result['uses'] = $arr['0']->uses;
+            $result['warranty'] = $arr['0']->warranty;
+            $result['status'] = $arr['0']->status;
+            $result['id'] = $arr['0']->id;
+        } else {
+            $result['category_id'] = '';
+            $result['name'] = '';
+            $result['slug'] = '';
+            $result['image'] = '';
+            $result['brand'] = '';
+            $result['model'] = '';
+            $result['short_desc'] = '';
+            $result['desc'] = '';
+            $result['keywords'] = '';
+            $result['technical_specification'] = '';
+            $result['uses'] = '';
+            $result['warranty'] = '';
+            $result['status'] = '';
+            $result['id'] = 0;
+        }
+        $result['category'] = DB::table('categories')->where(['status' => 1])->get();
+        $result['sizes'] = DB::table('sizes')->where(['status' => 1])->get();
+        $result['colors'] = DB::table('colors')->where(['status' => 1])->get();
+        // creating new product
+        // echo "<pre>";
+        // print_r($result['data']);
+        // die();
+        return view('admin.product.manage_product', $result);
+    }
+
+
+
+

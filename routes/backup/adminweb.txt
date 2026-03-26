@@ -1,0 +1,122 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ColorController;
+use App\Http\Controllers\Admin\CouponController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\RouteSearchController;
+use App\Http\Controllers\Admin\SizeController;
+
+// Route::get('admin', [AdminController::class, 'index']);
+Route::get('admin', [AdminController::class, 'index']);
+Route::post('admin/auth', [AdminController::class, 'auth'])
+    ->name('admin.auth');
+Route::get('admin/search-routes', [RouteSearchController::class, 'ajaxSearch'])
+    ->name('admin.ajax.search');
+Route::group(['middleware' => 'admin_auth'], function () {
+    /**
+     * Admin Routes
+     */
+    Route::get('admin/dashboard', [AdminController::class, 'dashboard'])
+        ->name('dashboard');
+    Route::get('admin/updatepassword', [AdminController::class, 'updatepassword']);
+    Route::get('/admin/logout', [AdminController::class, 'logout']);
+    /**
+     * Category Routes
+     */
+    Route::get('admin/category', [CategoryController::class, 'index'])
+        ->name('category');
+    Route::get('admin/category/managecategory', [CategoryController::class, 'managecategory'])
+        ->name('category.add_category');
+    // insert category
+    Route::post('admin/category/managecategoryprocess', [CategoryController::class, 'managecategoryprocess'])
+        ->name('category.manage_category_process');
+    // edit category
+    Route::get('admin/category/managecategory/{id}', [CategoryController::class, 'managecategory'])
+        ->name('category.edit_category');
+    // Status change category
+    Route::get('admin/category/status/{id}', [CategoryController::class, 'status'])
+        ->name('category.status');
+    // delete category
+    Route::get('admin/category/delete/{id}', [CategoryController::class, 'delete'])
+        ->name('category.delete');
+    /**
+     * Coupon Routes
+     */
+    Route::get('admin/coupons', [CouponController::class, 'index'])
+        ->name('coupons');
+    // insert coupons
+    Route::get('admin/coupons/managecoupons', [CouponController::class, 'managecoupons'])
+        ->name('coupons.add_coupons');
+    Route::post('admin/coupons/managecouponsprocess', [CouponController::class, 'managecouponsprocess'])
+        ->name('coupons.manage_coupons_process');
+    // edit coupons
+    Route::get('admin/coupons/managecoupons/{id}', [CouponController::class, 'managecoupons'])
+        ->name('coupons.edit_coupons');
+    // Status change coupons
+    Route::get('admin/coupons/status/{id}', [CouponController::class, 'status'])
+        ->name('coupons.status');
+    // delete coupons
+    Route::get('admin/coupons/delete/{id}', [CouponController::class, 'delete'])
+        ->name('coupons.delete');
+    /**
+     * Size Routes
+     */
+    Route::get('admin/size', [SizeController::class, 'index'])
+        ->name('size');
+    // insert size
+    Route::get('admin/size/managesize', [SizeController::class, 'managesize'])
+        ->name('size.add_size');
+    Route::post('admin/size/managesizeprocess', [SizeController::class, 'managesizeprocess'])
+        ->name('size.manage_size_process');
+    // edit size
+    Route::get('admin/size/managesize/{id}', [SizeController::class, 'managesize'])
+        ->name('size.edit_size');
+    // Status change size
+    Route::get('admin/size/status/{id}', [SizeController::class, 'status'])
+        ->name('size.status');
+    // delete size
+    Route::get('admin/size/delete/{id}', [SizeController::class, 'delete'])
+        ->name('size.delete');
+    /**
+     * Color Routes
+     */
+    Route::get('admin/color', [ColorController::class, 'index'])
+        ->name('color');
+    // insert Color
+    Route::get('admin/color/managecolor', [ColorController::class, 'managecolor'])
+        ->name('color.add_color');
+    Route::post('admin/color/managecolorprocess', [ColorController::class, 'managecolorprocess'])
+        ->name('color.manage_color_process');
+    // edit Color
+    Route::get('admin/color/managecolor/{id}', [ColorController::class, 'managecolor'])
+        ->name('color.edit_color');
+    // Status change Color
+    Route::get('admin/color/status/{id}', [ColorController::class, 'status'])
+        ->name('color.status');
+    // delete Color
+    Route::get('admin/color/delete/{id}', [ColorController::class, 'delete'])
+        ->name('color.delete');
+    /**
+     * Product Routes
+     */
+    Route::get('admin/product', [ProductController::class, 'index'])
+        ->name('product');
+    // insert product
+    Route::get('admin/product/manageproduct', [ProductController::class, 'manageproduct'])
+        ->name('product.add_product');
+    Route::post('admin/product/manageproductprocess', [ProductController::class, 'manageproductprocess'])
+        ->name('product.manage_product_process');
+    // edit product
+    Route::get('admin/product/manageproduct/{id}', [ProductController::class, 'manageproduct'])
+        ->name('product.edit_product');
+    // Status change product
+    Route::get('admin/product/status/{id}', [ProductController::class, 'status'])
+        ->name('product.status');
+    // delete product
+    Route::get('admin/product/delete/{id}', [ProductController::class, 'delete'])
+        ->name('product.delete');
+});
