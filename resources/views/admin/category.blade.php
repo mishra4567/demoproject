@@ -9,7 +9,7 @@
                 <button type="button" class="btn btn-success ">Add Category</button>
             </a>
             <div class="row">
-                <form action="{{ route('media.bulkAction') }}" method="POST">
+                <form action="{{ route('category.bulkAction') }}" method="POST">
                     @csrf
                     <!-- Bulk Action Dropdown -->
                     <div class="mb-3 d-flex">
@@ -23,7 +23,7 @@
                         <button type="submit" class="btn btn-primary">
                             Apply
                         </button>
-                    </div>
+                    </div> 
                     <div class="table-responsive table--no-card m-b-30">
                         <table class="table table-borderless table-striped table-earning">
                             <thead>

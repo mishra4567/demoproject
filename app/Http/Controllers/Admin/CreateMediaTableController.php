@@ -78,31 +78,25 @@ class CreateMediaTableController extends Controller
         // $ids = (array) $request->ids;
         $ids = $request->ids ?? [];
         $action = $request->action;
-
         if (!$ids || !$action) {
             return back()->with('error', 'Select items and action');
         }
-
         switch ($action) {
             case 'activate':
                 CreateMediaTable::whereIn('id', $ids)->update(['status' => 1]);
                 break;
-
             case 'deactivate':
                 CreateMediaTable::whereIn('id', $ids)->update(['status' => 0]);
                 break;
-
-                // case 'delete':
-                //     CreateMediaTable::whereIn('id', $ids)->delete();
-                //     break;
-
+            case 'delete':
+                // CreateMediaTable::whereIn('id', $ids)->delete();
+                return back()->with('error', 'Delete action is not allowed ❌');
+                break;
         }
-
         return back()->with([
             'bulk-success' => $request->action,
             'ids' => is_array($ids) ? $ids : [$ids], // ✅ FIX
         ]);
-
         // return back()->with('success', 'Bulk action applied');
     }
 }

@@ -108,10 +108,32 @@ class ColorController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Bulk Action
      */
-    public function update(Request $request, Color $color)
+    public function bulkAction(Request $request)
     {
-        //
+        // $ids = (array) $request->ids;
+        $ids = $request->ids ?? [];
+        $action = $request->action;
+        if (!$ids || !$action) {
+            return back()->with('error', 'Select items and action');
+        }
+        switch ($action) {
+            case 'activate':
+                Color::whereIn('id', $ids)->update(['status' => 1]);
+                break;
+            case 'deactivate':
+                Color::whereIn('id', $ids)->update(['status' => 0]);
+                break;
+            case 'delete':
+                // Category::whereIn('id', $ids)->delete();
+                return back()->with('error', 'Delete action is not allowed ❌');
+                break;
+        }
+        return back()->with([
+            'bulk-success' => $request->action,
+            'ids' => is_array($ids) ? $ids : [$ids], // ✅ FIX
+        ]);
+        // return back()->with('success', 'Bulk action applied');
     }
 }

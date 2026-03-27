@@ -42,9 +42,12 @@ Route::group(['middleware' => 'admin_auth'], function () {
     // Status change category
     Route::get('admin/category/status/{id}', [CategoryController::class, 'status'])
         ->name('category.status')->setDefaults(['label' => '', 'role' => 1]);
-    // delete category
+    // Delete category
     Route::get('admin/category/delete/{id}', [CategoryController::class, 'delete'])
         ->name('category.delete')->setDefaults(['label' => '', 'role' => 1]);
+    // Bulk Action category
+    Route::post('admin/category/bulkaction', [CategoryController::class, 'bulkAction'])
+        ->name('category.bulkAction')->setDefaults(['label' => '', 'role' => 1]);
     /**
      * Coupon Routes
      */
@@ -64,6 +67,9 @@ Route::group(['middleware' => 'admin_auth'], function () {
     // delete coupons
     Route::get('admin/coupons/delete/{id}', [CouponController::class, 'delete'])
         ->name('coupons.delete')->setDefaults(['label' => '', 'role' => 1]);
+    // Bulk Action Copons
+    Route::post('admin/coupons/bulkaction', [CouponController::class, 'bulkAction'])
+        ->name('coupons.bulkAction')->setDefaults(['label' => '', 'role' => 1]);
     /**
      * Size Routes
      */
@@ -83,6 +89,9 @@ Route::group(['middleware' => 'admin_auth'], function () {
     // delete size
     Route::get('admin/size/delete/{id}', [SizeController::class, 'delete'])
         ->name('size.delete')->setDefaults(['label' => '', 'role' => 1]);
+    // Bulk Action Copons
+    Route::post('admin/size/bulkaction', [SizeController::class, 'bulkAction'])
+        ->name('size.bulkAction')->setDefaults(['label' => '', 'role' => 1]);
     /**
      * Color Routes
      */
@@ -102,6 +111,9 @@ Route::group(['middleware' => 'admin_auth'], function () {
     // delete Color
     Route::get('admin/color/delete/{id}', [ColorController::class, 'delete'])
         ->name('color.delete')->setDefaults(['label' => '', 'role' => 1]);
+    // Bulk Action Product
+    Route::post('admin/color/bulkaction', [ColorController::class, 'bulkAction'])
+        ->name('color.bulkAction')->setDefaults(['label' => '', 'role' => 1]);
     /**
      * Route For Media
      */
@@ -139,6 +151,9 @@ Route::group(['middleware' => 'admin_auth'], function () {
     // delete product
     Route::get('admin/product/delete/{id}', [ProductController::class, 'delete'])
         ->name('product.delete')->setDefaults(['label' => '', 'role' => 1]);
+    // Bulk Action Product
+    Route::post('admin/product/bulkaction', [ProductController::class, 'bulkAction'])
+        ->name('product.bulkAction')->setDefaults(['label' => '', 'role' => 1]);
     // delete product Images
     Route::get('admin/product/images_delete/{piid}/{pid}', [ProductController::class, 'product_images_delete'])
         ->name('product.images_delete')->setDefaults(['label' => '', 'role' => 1]);
@@ -151,8 +166,8 @@ Route::group(['middleware' => 'admin_auth'], function () {
     //     ->name('product.addlinkproduct')->setDefaults(['label' => 'Add linked product', 'role' => 0]);
     Route::get('admin/product/addlinkproduct/{id?}', [LinkproductController::class, 'addlinkproduct'])
         ->name('product.addlinkproduct')->setDefaults(['label' => 'Add linked product', 'role' => 0]);
-        Route::post('admin/product/processlinkproduct/', [LinkproductController::class, 'processlinkproduct'])
-            ->name('product.processlinkproduct')->setDefaults(['label' => '', 'role' => 1]);
+    Route::post('admin/product/processlinkproduct/', [LinkproductController::class, 'processlinkproduct'])
+        ->name('product.processlinkproduct')->setDefaults(['label' => '', 'role' => 1]);
     Route::get('admin/product/linkproductstatus/{id}', [LinkproductController::class, 'status'])
         ->name('product.linkproductstatus')->setDefaults(['label' => 'linked product status', 'role' => 1]);
     Route::get('admin/product/linkproductdelete/{id}', [LinkproductController::class, 'delete'])
@@ -161,4 +176,7 @@ Route::group(['middleware' => 'admin_auth'], function () {
     // delete product attribute
     Route::get('admin/product/attr_delete/{paid}/{pid}', [ProductController::class, 'product_attr_delete'])
         ->name('product.attr_delete')->setDefaults(['label' => '', 'role' => 1]);
+    // Bulk Action Product
+    Route::post('admin/product/linkproductdelete/bulkaction', [LinkproductController::class, 'bulkAction'])
+        ->name('product.linkbulkAction')->setDefaults(['label' => '', 'role' => 1]);
 });

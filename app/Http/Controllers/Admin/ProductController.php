@@ -237,6 +237,34 @@ class ProductController extends Controller
 
         return redirect()->back()->with('success', 'Status Updated');
     }
+    public function bulkAction(Request $request)
+    {
+        // $ids = (array) $request->ids;
+        $ids = $request->ids ?? [];
+        $action = $request->action;
+        if (!$ids || !$action) {
+            return back()->with('error', 'Select items and action');
+        }
+        switch ($action) {
+            case 'activate':
+                Product::whereIn('id', $ids)->update(['status' => 1]);
+                break;
+            case 'deactivate':
+                Product::whereIn('id', $ids)->update(['status' => 0]);
+                break;
+            case 'delete':
+                // CreateMediaTable::whereIn('id', $ids)->delete();
+                return back()->with('error', 'Delete action is not allowed ❌');
+                break;
+        }
+        return back()->with([
+            'bulk-success' => $request->action,
+            'ids' => is_array($ids) ? $ids : [$ids], // ✅ FIX
+        ]);
+        // return back()->with('success', 'Bulk action applied');
+    }
+
+
     // public function product_attr_delete(Request $request, $paid, $pid)
     // {
     //     // Get attribute

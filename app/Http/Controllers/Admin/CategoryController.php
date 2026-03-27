@@ -116,17 +116,30 @@ class CategoryController extends Controller
     /**
      * Bulk Action
      */
-    
-    public function update(Request $request, Category $category)
+    public function bulkAction(Request $request)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Category $category)
-    {
-        //
+        // $ids = (array) $request->ids;
+        $ids = $request->ids ?? [];
+        $action = $request->action;
+        if (!$ids || !$action) {
+            return back()->with('error', 'Select items and action');
+        }
+        switch ($action) {
+            case 'activate':
+                Category::whereIn('id', $ids)->update(['status' => 1]);
+                break;
+            case 'deactivate':
+                Category::whereIn('id', $ids)->update(['status' => 0]);
+                break;
+            case 'delete':
+                // Category::whereIn('id', $ids)->delete();
+                return back()->with('error', 'Delete action is not allowed ❌');
+                break;
+        }
+        return back()->with([
+            'bulk-success' => $request->action,
+            'ids' => is_array($ids) ? $ids : [$ids], // ✅ FIX
+        ]);
+        // return back()->with('success', 'Bulk action applied');
     }
 }
