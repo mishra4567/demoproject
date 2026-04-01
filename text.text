@@ -4,7 +4,7 @@ command
     create model migration controller and Resource :-
         php artisan make:model ModelName -mcr
         particuter folder for migration :-
-            php artisan migrate --path=/database/migrations/foldername
+            php artisan migrate --path=/database/migrations/foldername 
     Dump Autoload :-
         composer dump-autoload
     creating mddleware :-
@@ -22,6 +22,16 @@ command
             php artisan db:seed --class=(name_table)Seeder
     Storage link (Publik folder link):-
         php artisan storage:link
+
+    /********* Custom Command for Root and Website And Api Branch **********\
+        For This Project Custom Command to work
+                Write the command in terminal:-
+                    php artisan make:signatureName madelName
+        For My Project command are
+               php artisan make:root laptop
+               php artisan make:website laptop
+               php artisan make:api laptop
+    **********\
 
 /****  In Admin Controller
             Please add
@@ -78,15 +88,6 @@ To Create own Artisan command to automatically create:-
                     }
                 }
             ?>
-    /*********
-        For your Custom Command to work
-                Write the command in terminal:-
-                    php artisan make:signatureName madelName
-        For My Project command are
-               php artisan make:admin laptop
-               php artisan make:website laptop
-               php artisan make:api laptop
-    **********\
 
 
 \********************************/

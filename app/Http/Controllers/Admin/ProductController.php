@@ -43,8 +43,18 @@ class ProductController extends Controller
             if (!$product) {
                 abort(404);
             }
-            // $productAttrArr = DB::table('product_attr')->where('product_id', $id)->get();
-            // $productImagesArr = DB::table('product_images')->where('product_id', $id)->get();
+
+            // ✅ Fetch existing gallery images for this product
+            $gallery_images = DB::table('product_gallery')
+                ->leftJoin('create_media_tables', 'product_gallery.media_id', '=', 'create_media_tables.id')
+                ->select(
+                    'product_gallery.media_id as id',
+                    'create_media_tables.file_name'
+                )
+                ->where('product_gallery.product_id', $id)
+                ->where('product_gallery.status', 1)
+                ->get();
+
             $result = [
                 'category_id' => $product->category_id,
                 'name' => $product->name,
@@ -60,15 +70,8 @@ class ProductController extends Controller
                 'warranty' => $product->warranty,
                 'status' => $product->status,
                 'id' => $product->id,
-                // 'productAttrArr' => $productAttrArr,
-                // 'productImagesArr' => $productImagesArr,
+                'gallery_images' => $gallery_images,
             ];
-            // if (!isset($productImagesArr[0])) {
-            //     $result['productImagesArr']['0']['id'] = '';
-            //     $request['productImagesArr']['0']['images'] = '';
-            // } else {
-            //     $result['productImagesArrr'] = $productImagesArr;
-            // }
         } else {
 
             $result = [
@@ -86,26 +89,7 @@ class ProductController extends Controller
                 'warranty' => '',
                 'status' => '',
                 'id' => 0,
-                // 'productAttrArr' => [
-                //     [
-                //         'id' => '',
-                //         'product_id' => '',
-                //         'sku' => '',
-                //         'attr_image' => '',
-                //         'mrp' => '',
-                //         'price' => '',
-                //         'qty' => '',
-                //         'size_id' => '',
-                //         'color_id' => '',
-                //     ]
-                // ],
-                'productImagesArr' => [
-                    [
-                        'id' => '',
-                        'product_id' => '',
-                        'images' => '',
-                    ]
-                ]
+                'gallery_images' => [],
             ];
         }
         // echo "<pre>";
@@ -136,17 +120,11 @@ class ProductController extends Controller
         // print_r($request->post());
         // echo "</pre>";
         // die();
-        // Code frome chatgpt
         $id = $request->id;
 
         $request->validate([
             'name' => 'required',
             'media_id' => $id ? 'nullable' : 'required',
-            // 'slug' => [
-            //     'required',
-            //     Rule::unique('products', 'slug')->ignore($id),
-            // ],
-            // Attribute Image Validation
             'attr_image.*' => 'nullable|mimes:png,jpg,jpeg,webp',
         ], [
             'slug.unique' => 'This Product already exists',
@@ -172,11 +150,39 @@ class ProductController extends Controller
         $product->warranty = $request->warranty;
         $product->status = 1;
         $product->save();
+
+        // Gallery Images
+        if ($request->gallery_media_id && count($request->gallery_media_id) > 0) {
+            // Delete old gallery on update
+            if ($id) {
+                DB::table('product_gallery')->where('product_id', $product->id)->delete();
+            }
+
+            // Insert new gallery images
+            $galleryData = [];
+            foreach ($request->gallery_media_id as $mediaId) {
+                $galleryData[] = [
+                    'product_id' => $product->id,
+                    'media_id'   => $mediaId,
+                    'status'     => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+            DB::table('product_gallery')->insert($galleryData);
+        }
+
+
         return redirect('admin/product')
             ->with('success', $id ? 'Product Updated Successfully' : 'Product Inserted Successfully');
 
 
-        // // return $request->post();
+        // return $request->post();
+        // die();
+        // echo "<pre>";
+        // print_r($request->post());
+        // echo "</pre>";
+        // die();
     }
 
 

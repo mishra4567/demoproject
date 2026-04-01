@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\LinkproductController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\RouteSearchController;
 use App\Http\Controllers\Admin\SizeController;
+use App\Http\Controllers\Admin\ViewProductController;
 
 // Route::get('admin', [AdminController::class, 'index']);
 Route::get('admin', [AdminController::class, 'index']);
@@ -179,4 +180,9 @@ Route::group(['middleware' => 'admin_auth'], function () {
     // Bulk Action Product
     Route::post('admin/product/linkproductdelete/bulkaction', [LinkproductController::class, 'bulkAction'])
         ->name('product.linkbulkAction')->setDefaults(['label' => '', 'role' => 1]);
+    /**
+     *  Product View Route
+     */
+    Route::get('admin/product/productview/{id?}', [ViewProductController::class, 'index'])
+        ->name('product.productview')->setDefaults(['label' => '', 'role' => 0]);
 });

@@ -47,7 +47,9 @@
                                             <input type="checkbox" name="ids[]" value="{{ $list->id }}"
                                                 class="checkbox_ids">
                                         </td>
-                                        <td>{{ $list->id }}</td>
+                                        <td>
+                                            <a href="{{ route('product.productview', ['id' => $list->id]) }}"  target="_blank">{{$list->id}} <i class="fa-regular fa-eye"></i> </a>
+                                        </td>
                                         <td>{{ $list->name }}</td>
                                         <td>{{ $list->slug }}</td>
                                         <td><img src="{{ asset('storage/media/' . $list->file_name) }}" alt=""></td>

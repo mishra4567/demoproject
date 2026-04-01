@@ -1,3 +1,6 @@
+manage_product_process.blade.php
+
+
 @extends('admin.layout.layout')
 @section('page_title', 'Manage Product')
 @section('manage_product_select', 'active')
@@ -79,7 +82,8 @@
                                             value="{{ $media_id ?? '' }}">
                                         <div id="preview_product">
                                             @if (!empty($image))
-                                                <img src="{{ asset('storage/media/' . $image) }}" width="120">
+                                                <img src="{{ asset('storage/media/' . $image) }}"
+                                                    width="120">
                                             @endif
                                         </div>
                                         {{-- Media Modal End --}}
@@ -122,32 +126,7 @@
                         </div>
                         <div class="card">
                             <div class="card-body">
-                                <div class="card-body">
-                                    <h5 class="card-title mb-3">Product Gallery Images</h5>
-
-                                    <!-- Add Button -->
-                                    <button type="button" class="btn btn-outline-primary mb-3"
-                                        onclick="addMedia('gallery')">
-                                        + Add Gallery Image
-                                    </button>
-
-                                    <!-- Gallery Preview Container -->
-                                    <div id="gallery_preview" class="d-flex flex-wrap gap-2">
-                                        @if (!empty($gallery_images))
-                                            @foreach ($gallery_images as $gImg)
-                                                <div class="gallery-item position-relative m-2">
-                                                    <input type="hidden" name="gallery_media_id[]"
-                                                        value="{{ $gImg->id }}">
-                                                    <img src="{{ asset('storage/media/' . $gImg->file_name) }}"
-                                                        width="120" class="rounded">
-                                                    <button type="button"
-                                                        class="btn btn-danger btn-sm position-absolute top-0 end-0"
-                                                        onclick="removeGalleryImage(this)">✕</button>
-                                                </div>
-                                            @endforeach
-                                        @endif
-                                    </div>
-                                </div>
+                                {{-- Here add multiple image code --}}
                             </div>
                         </div>
                         <div class="d-grid">
@@ -162,3 +141,100 @@
         </div>
     </div>
 @endsection
+
+Product Controller
+        public function manageproductprocess(Request $request)
+    {
+        // return $request->post();
+        // die();
+        // echo "<pre>";
+        // print_r($request->post());
+        // echo "</pre>";
+        // die();
+        $id = $request->id;
+
+        $request->validate([
+            'name' => 'required',
+            'media_id' => $id ? 'nullable' : 'required',
+            'attr_image.*' => 'nullable|mimes:png,jpg,jpeg,webp',
+        ], [
+            'slug.unique' => 'This Product already exists',
+        ]);
+
+        // Insert Or Update
+        $product = $id ? Product::findOrFail($id) : new Product();
+
+        //  Image Media Id upload
+        if ($request->media_id) {
+            $product->media_ids = $request->media_id;
+        }
+        $product->category_id = $request->category_id;
+        $product->name = $request->name;
+        $product->slug = $request->slug;
+        $product->brand = $request->brand;
+        $product->model = $request->model;
+        $product->short_desc = $request->short_desc;
+        $product->desc = $request->desc;
+        $product->keywords = $request->keywords;
+        $product->technical_specification = $request->technical_specification;
+        $product->uses = $request->uses;
+        $product->warranty = $request->warranty;
+        $product->status = 1;
+        $product->save();
+        return redirect('admin/product')
+            ->with('success', $id ? 'Product Updated Successfully' : 'Product Inserted Successfully');
+
+
+        // return $request->post();
+        // die();
+        // echo "<pre>";
+        // print_r($request->post());
+        // echo "</pre>";
+        // die();
+    }
+
+javascript
+
+function addMediaButton() {
+    let selected = document.querySelector(
+        'input[name="selected_media"]:checked',
+    );
+
+    if (!selected) {
+        alert("Select image");
+        return;
+    }
+
+    let mediaId = selected.value;
+    let file = selected.dataset.file;
+
+    // PRODUCT IMAGE
+    if (mediaTarget === "product") {
+        document.getElementById("media_id_product").value = mediaId;
+
+        document.getElementById("preview_product").innerHTML =
+            `<img src="/storage/media/${file}" width="120">`;
+    }
+
+    // ATTRIBUTE IMAGE
+    else if (mediaTarget.startsWith("attr_")) {
+        document.getElementById("media_id_" + mediaTarget).value = mediaId;
+
+        document.getElementById("preview_" + mediaTarget).innerHTML =
+            `<img src="/storage/media/${file}" width="120">`;
+    }
+
+    // GALLERY IMAGE
+    else if (mediaTarget === "gallery") {
+        document.getElementById("gallery_preview").insertAdjacentHTML(
+            "beforeend",
+            `<div class="m-2">
+                <input type="hidden" name="gallery_media_id[]" value="${mediaId}">
+                <img src="/storage/media/${file}" width="120">
+            </div>`,
+        );
+    }
+
+    bootstrap.Modal.getInstance(document.getElementById("mediaModal")).hide();
+}
+

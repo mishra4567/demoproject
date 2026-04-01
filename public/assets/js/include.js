@@ -62,109 +62,15 @@ document.getElementById("select_all").addEventListener("click", function () {
         cb.checked = this.checked;
     });
 });
+
 /**
  * All Pages Bulk Action End
  */
-
-
-/**
- * For Add Product Attribute 1
- */
-// var loop_count = 1;
-
-// function add_more() {
-//     loop_count++;
-
-//     var size = document.getElementById("size_id").innerHTML;
-//     var size = document.getElementById("size_id").innerHTML;
-//     var color = document.getElementById("color_id").innerHTML;
-
-//     var html = `
-// <div class="row mb-3" id="product_attr_${loop_count}">
-
-// <input type="hidden" name="paid[]" value="">
-
-// <div class="col-md-2">
-// <label>SKU</label>
-// <input type="text" name="sku[]" class="form-control">
-// </div>
-
-// <div class="col-md-2">
-// <label>MRP</label>
-// <input type="text" name="mrp[]" class="form-control">
-// </div>
-
-// <div class="col-md-2">
-// <label>Price</label>
-// <input type="text" name="price[]" class="form-control">
-// </div>
-
-// <div class="col-md-2">
-// <label>Size</label>
-// <select name="size_id[]" class="form-control">
-// ${size}
-// </select>
-// </div>
-
-// <div class="col-md-2">
-// <label>Color</label>
-// <select name="color_id[]" class="form-control">
-// ${color}
-// </select>
-// </div>
-
-// <div class="col-md-2">
-// <label>Qty</label>
-// <input type="text" name="qty[]" class="form-control">
-// </div>
-
-// <div class="col-md-3 mt-2">
-// <label>Image</label>
-// <input type="file" name="attr_image[]" class="form-control">
-// </div>
-
-// <div class="col-md-2 mt-4">
-// <button type="button"
-// class="btn btn-sm btn-danger"
-// onclick="remove_more(${loop_count})">
-// Remove
-// </button>
-// </div>
-
-// </div>
-// `;
-
-//     document
-//         .getElementById("product_attr_1")
-//         .insertAdjacentHTML("beforeend", html);
-// }
-/**
- * For Add Product Attribute 1 End
- */
-/**
- * For Add Product Attribute 2
- */
 // let i = 1;
 
-// function add_more() {
-//     i++;
-//     const row = document.querySelector("#product_attr_1").cloneNode(true);
-//     row.id = "product_attr_" + i;
-
-//     row.querySelectorAll("input").forEach((el) => (el.value = ""));
-//     row.querySelectorAll("select").forEach((el) => (el.selectedIndex = 0));
-
-//     document.getElementById("product_attr_container").appendChild(row);
-// }
-
-// function remove_more(id) {
-//     document.getElementById("product_attr_" + id).remove();
-// }
-let i = 1;
-
 function add_more() {
-    i++;
-
+    // i++;
+let i = document.querySelectorAll('[id^="product_attr_"]').length + 1;
     const row = document.querySelector("#product_attr_1").cloneNode(true);
 
     row.id = "product_attr_" + i;
@@ -192,7 +98,7 @@ function add_more() {
     preview.innerHTML = "";
 
     // // update button
-    const btn = row.querySelector("button");
+    const btn = row.querySelector(".open-media-modal");
     btn.setAttribute("onclick", "addMedia('attr_" + i + "')");
 
     // change ADD button to REMOVE button
