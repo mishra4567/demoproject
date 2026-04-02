@@ -1,0 +1,174 @@
+document.addEventListener('DOMContentLoaded', function () {
+
+    const calendarEl = document.getElementById('calendar');
+    if (!calendarEl) return;
+
+    let calendar;
+
+    // ✅ INIT CALENDAR
+    calendar = new FullCalendar.Calendar(calendarEl, {
+
+        timeZone: 'local', // 🔥 FIX TIME ISSUE
+
+        initialView: 'dayGridMonth',
+
+        headerToolbar: {
+            left: 'prev,next today addEventBtn',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+        },
+
+        // ✅ ADD BUTTON
+        customButtons: {
+            addEventBtn: {
+                text: '+ Add',
+                click: () => openModal()
+            }
+        },
+
+        height: 'auto',
+
+        // ✅ FETCH EVENTS FROM LARAVEL
+        events: {
+            url: '/admin/calendar/fetch',
+            method: 'GET',
+            failure: () => alert('Failed to load events')
+        },
+
+        eventDisplay: 'block',
+        dayMaxEvents: 3,
+
+        // ✅ CLICK EVENT → EDIT
+        eventClick: function (info) {
+            openModal(info.event);
+        },
+
+        // ✅ CLICK DATE → ADD
+        dateClick: function (info) {
+            openModal(null, info.dateStr); // 🔥 FIXED
+        },
+
+        windowResize: function () {
+            calendar.updateSize();
+        }
+    });
+
+    calendar.render();
+
+    // =====================================================
+    // 🔥 MODAL OPEN (ADD / EDIT)
+    // =====================================================
+    function openModal(eventData = null, date = null) {
+
+        const modal = new bootstrap.Modal(document.getElementById('addEventModal'));
+        const form = document.getElementById('eventForm');
+
+        if (eventData) {
+            // ✏️ EDIT MODE
+            form.action = '/admin/calendar/update/' + eventData.id;
+
+            setValue('event_id', eventData.id);
+            setValue('event_title', eventData.title);
+            setValue('event_description', eventData.extendedProps?.description || '');
+            setValue('event_type', eventData.extendedProps?.type || '');
+
+            setValue('event_start', formatDate(eventData.start));
+            setValue('event_end', formatDate(eventData.end));
+
+            document.getElementById('deleteBtn').classList.remove('d-none');
+
+        } else {
+            // ➕ ADD MODE
+            form.action = '/admin/calendar/store';
+            form.reset();
+
+            const now = date ? new Date(date) : new Date();
+            const iso = formatDate(now);
+
+            setValue('event_start', iso);
+            setValue('event_end', iso);
+
+            setValue('event_id', '');
+            document.getElementById('deleteBtn').classList.add('d-none');
+        }
+
+        modal.show();
+    }
+
+    // =====================================================
+    // 🔥 DELETE EVENT
+    // =====================================================
+    document.getElementById('deleteBtn').onclick = function () {
+
+        const id = getValue('event_id');
+        if (!id) return;
+
+        if (!confirm('Delete this event?')) return;
+
+        fetch('/admin/calendar/delete/' + id, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        })
+        .then(() => {
+            calendar.refetchEvents(); // 🔥 no reload
+            bootstrap.Modal.getInstance(document.getElementById('addEventModal')).hide();
+        })
+        .catch(() => alert('Delete failed'));
+    };
+
+    // =====================================================
+    // 🔥 AUTO COLOR BASED ON TYPE
+    // =====================================================
+    document.getElementById('event_type').addEventListener('change', function () {
+
+        const colors = {
+            meeting: ['#007bff','#007bff','#ffffff'],
+            task: ['#28a745','#28a745','#ffffff'],
+            appointment: ['#ffc107','#ffc107','#000000'],
+            deadline: ['#dc3545','#dc3545','#ffffff'],
+            presentation: ['#17a2b8','#17a2b8','#ffffff']
+        };
+
+        const c = colors[this.value] || ['#6c757d','#6c757d','#ffffff'];
+
+        setValue('backgroundcolor', c[0]);
+        setValue('bordercolor', c[1]);
+        setValue('textcolor', c[2]);
+    });
+
+    // =====================================================
+    // 🔥 HELPERS
+    // =====================================================
+    function setValue(id, value) {
+        document.getElementById(id).value = value || '';
+    }
+
+    function getValue(id) {
+        return document.getElementById(id).value;
+    }
+
+    // ✅ LOCAL DATE FORMAT (NO UTC BUG)
+    function formatDate(date) {
+        if (!date) return '';
+
+        const d = new Date(date);
+
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+
+});
+
+
+
+
+
+
+

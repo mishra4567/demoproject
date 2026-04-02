@@ -1,0 +1,557 @@
+document.addEventListener('DOMContentLoaded', function () {
+
+    const calendarEl = document.getElementById('calendar');
+    if (!calendarEl) return;
+
+    // ✅ SHOW NOTIFY MESSAGE
+    window.showNotify = function(message, type = "success") {
+
+        const notifyArea = document.getElementById("notify-area");
+        if (!notifyArea) return;
+
+        notifyArea.innerHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+
+        setTimeout(() => {
+            notifyArea.innerHTML = '';
+        }, 3000);
+    }
+
+    // ✅ FORMAT DATE FOR INPUT (LOCAL)
+    window.formatDate = function(date) {
+        if (!date) return '';
+
+        const d = new Date(date);
+
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+
+    // ✅ OPEN MODAL (ADD/EDIT)
+    window.openModal = function(eventData = null, date = null) {
+
+        const modal = new bootstrap.Modal(document.getElementById('addEventModal'));
+        const form  = document.getElementById('eventForm');
+
+        form.action = "/admin/calendar/store";
+
+        if (eventData) {
+            // ✏️ EDIT EVENT
+            document.getElementById('event_id').value = eventData.id;
+            document.getElementById('event_title').value = eventData.title;
+            document.getElementById('event_description').value = eventData.extendedProps?.description || '';
+            document.getElementById('event_type').value = eventData.extendedProps?.type || '';
+            document.getElementById('event_start').value = formatDate(eventData.start);
+            document.getElementById('event_end').value = formatDate(eventData.end);
+            document.getElementById('event_status').value = eventData.extendedProps?.status || '1';
+
+            document.getElementById('backgroundcolor').value = eventData.backgroundColor || '#6c757d';
+            document.getElementById('bordercolor').value = eventData.borderColor || '#6c757d';
+            document.getElementById('textcolor').value = eventData.textColor || '#ffffff';
+
+            document.getElementById('deleteBtn').classList.remove('d-none');
+            document.getElementById('addEventModalLabel').textContent = "Edit Event";
+            document.getElementById('modal-submit-btn').textContent = "Update Event";
+
+        } else {
+            // ➕ ADD EVENT
+            form.reset();
+            document.getElementById('event_id').value = '';
+
+            const now = date ? new Date(date) : new Date();
+            document.getElementById('event_start').value = formatDate(now);
+            document.getElementById('event_end').value = formatDate(now);
+
+            document.getElementById('deleteBtn').classList.add('d-none');
+            document.getElementById('addEventModalLabel').textContent = "Add New Event";
+            document.getElementById('modal-submit-btn').textContent = "Save Event";
+        }
+
+        modal.show();
+    }
+
+    // ✅ OPEN MODAL ONLY FOR NEW EVENT BUTTON
+    window.addNewEvent = function() {
+        openModal(null, new Date());
+    }
+
+    // ✅ FULLCALENDAR INIT
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        timeZone: 'local',
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+        },
+        height: 'auto',
+        events: {
+            url: '/admin/calendar/fetch',
+            method: 'GET',
+            failure: () => showNotify("Failed to load events", "danger")
+        },
+        eventClick: function (info) {
+            openModal(info.event);
+        },
+        dateClick: function (info) {
+            openModal(null, info.date);
+        }
+    });
+
+    calendar.render();
+
+    // ✅ DELETE EVENT
+    document.getElementById('deleteBtn').addEventListener('click', function () {
+
+        const id = document.getElementById('event_id').value;
+        if (!id) {
+            showNotify("Event ID missing", "danger");
+            return;
+        }
+
+        if (!confirm("Delete this event?")) return;
+
+        const token = document.querySelector('input[name="_token"]').value;
+
+        fetch('/admin/calendar/delete/' + id, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': token,
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                calendar.refetchEvents();
+                bootstrap.Modal.getInstance(document.getElementById('addEventModal')).hide();
+                showNotify(data.message, "success");
+            } else {
+                showNotify(data.message, "danger");
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            showNotify("Something went wrong!", "danger");
+        });
+
+    });
+
+    // ✅ AUTO COLOR CHANGE ON TYPE
+    document.getElementById('event_type').addEventListener('change', function () {
+
+        const colors = {
+            meeting:      ['#007bff', '#007bff', '#ffffff'],
+            task:         ['#28a745', '#28a745', '#ffffff'],
+            appointment:  ['#ffc107', '#ffc107', '#000000'],
+            deadline:     ['#dc3545', '#dc3545', '#ffffff'],
+            presentation: ['#17a2b8', '#17a2b8', '#ffffff'],
+        };
+
+        const c = colors[this.value] || ['#6c757d', '#6c757d', '#ffffff'];
+
+        document.getElementById('backgroundcolor').value = c[0];
+        document.getElementById('bordercolor').value = c[1];
+        document.getElementById('textcolor').value = c[2];
+    });
+
+});
+
+
+
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    const calendarEl = document.getElementById('calendar');
+    if (!calendarEl) return;
+
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        timeZone:'local',
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+            left: 'prev,next today addEventBtn',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+        },
+        customButtons: {
+            addEventBtn: {
+                text: '+ Add',
+                click: () => openModal()
+            }
+        },
+        height: 'auto',
+        events: {
+            url: '/admin/calendar/fetch',   // ✅ correct spelling
+            method: 'GET',
+            failure: () => alert('Failed to load events')
+        },
+        eventClick: function (info) {
+            openModal(info.event);
+        },
+        dateClick: function (info) {
+            openModal(null, info.date);
+        }
+    });
+
+    calendar.render();
+
+    // 🔹 OPEN MODAL
+    function openModal(eventData = null, date = null) {
+        const modal = new bootstrap.Modal(document.getElementById('addEventModal'));
+        const form  = document.getElementById('eventForm');
+
+        form.action = '/admin/calendar/store';  // ✅ always same route
+
+        if (eventData) {
+            // ✏️ EDIT
+            setValue('event_id',          eventData.id);  // ✅ from extendedProps
+            setValue('event_title',       eventData.title);
+            setValue('event_description', eventData.extendedProps?.description || '');
+            setValue('event_type',        eventData.extendedProps?.type || '');
+            setValue('event_start',       formatDate(eventData.start));
+            setValue('event_end',         formatDate(eventData.end));
+            setValue('event_status',      eventData.extendedProps?.status || '1');
+            setValue('backgroundcolor',   eventData.backgroundColor);
+            setValue('bordercolor',       eventData.borderColor);
+            setValue('textcolor', eventData.textColor);
+            currentEventId = eventData.id;
+
+            document.getElementById('deleteBtn').classList.remove('d-none');
+            document.getElementById('addEventModalLabel').textContent = 'Edit Event';
+            document.getElementById('modal-submit-btn').textContent   = 'Update Event';
+
+        } else {
+            // ➕ ADD
+            form.reset();
+            setValue('event_id', '');   // ✅ must clear explicitly
+
+            const now = date ? new Date(date) : new Date();
+            setValue('event_start', formatDate(now));
+            setValue('event_end',   formatDate(now));
+
+            document.getElementById('deleteBtn').classList.add('d-none');
+            document.getElementById('addEventModalLabel').textContent = 'Add New Event';
+            document.getElementById('modal-submit-btn').textContent   = 'Save Event';
+        }
+
+        modal.show();
+    }
+
+    document.getElementById('deleteBtn').onclick = function () {
+
+    const id = getValue('event_id');
+
+    console.log('DELETE ID:', id); // 🔍 DEBUG
+
+    if (!id) {
+        alert('Event ID missing');
+        return;
+    }
+
+        if (!confirm('Delete this event?')) return;
+        const token = document.querySelector('input[name="_token"]').value
+
+    fetch('/admin/calendar/delete/' + id, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': token,
+            'Accept':'application/json'
+            // 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+    if (data.success) {
+        calendar.refetchEvents();
+        bootstrap.Modal.getInstance(document.getElementById('addEventModal')).hide();
+
+        showNotify(data.message, 'success'); // ✅ SHOW MESSAGE
+    } else {
+        showNotify(data.message, 'danger');
+    }
+})
+};
+
+    // 🔹 AUTO COLOR ON TYPE CHANGE
+//     document.getElementById('deleteBtn').addEventListener('click', function () {
+//         deleteEventById(currentEventId);
+//     })
+// function deleteEventById(id) {
+
+//         console.log('DELETE ID:', id);
+
+//         if (!id) {
+//             alert('Event ID missing');
+//             return;
+//         }
+
+//         if (!confirm('Delete this event?')) return;
+
+//         fetch('/admin/calendar/delete/' + id, {
+//             method: 'DELETE',
+//             headers: {
+//                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+//                 'Accept': 'application/json'
+//             }
+//         })
+//         .then(res => res.json())
+//         .then(data => {
+
+//             console.log(data);
+
+//             if (data.success) {
+//                 calendar.refetchEvents();
+
+//                 bootstrap.Modal
+//                     .getInstance(document.getElementById('addEventModal'))
+//                     .hide();
+//             } else {
+//                 alert(data.message || 'Delete failed');
+//             }
+//         })
+//         .catch(err => console.error(err));
+//     }
+
+
+
+    document.getElementById('event_type').addEventListener('change', function () {
+        const colors = {
+            meeting:      ['#007bff', '#007bff', '#ffffff'],
+            task:         ['#28a745', '#28a745', '#ffffff'],
+            appointment:  ['#ffc107', '#ffc107', '#000000'],
+            deadline:     ['#dc3545', '#dc3545', '#ffffff'],
+            presentation: ['#17a2b8', '#17a2b8', '#ffffff'],
+        };
+        const c = colors[this.value] || ['#6c757d', '#6c757d', '#ffffff'];
+        setValue('backgroundcolor', c[0]);
+        setValue('bordercolor',     c[1]);
+        setValue('textcolor',       c[2]);
+    });
+
+    // 🔹 HELPERS
+    function setValue(id, value) {
+        const el = document.getElementById(id);
+        if (el) el.value = value || '';
+    }
+
+    function getValue(id) {
+        return document.getElementById(id)?.value || '';
+    }
+
+    function formatDate(date) {
+        if (!date) return '';
+        return new Date(date).toISOString().slice(0, 16);
+    }
+
+    // ✅ LOCAL DATE FORMAT (NO UTC BUG)
+    function formatDate(date) {
+        if (!date) return '';
+
+        const d = new Date(date);
+
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+});
+
+
+
+
+
+
+// document.addEventListener('DOMContentLoaded', function () {
+
+//     const calendarEl = document.getElementById('calendar');
+//     if (!calendarEl) return;
+
+//     // ✅ SHOW NOTIFY MESSAGE
+//     window.showNotify = function(message, type = "success") {
+
+//         const notifyArea = document.getElementById("notify-area");
+//         if (!notifyArea) return;
+
+//         notifyArea.innerHTML = `
+//             <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+//                 ${message}
+//                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+//             </div>
+//         `;
+
+//         setTimeout(() => {
+//             notifyArea.innerHTML = '';
+//         }, 3000);
+//     }
+
+//     // ✅ FORMAT DATE FOR INPUT (LOCAL)
+//     window.formatDate = function(date) {
+//         if (!date) return '';
+
+//         const d = new Date(date);
+
+//         const year = d.getFullYear();
+//         const month = String(d.getMonth() + 1).padStart(2, '0');
+//         const day = String(d.getDate()).padStart(2, '0');
+//         const hours = String(d.getHours()).padStart(2, '0');
+//         const minutes = String(d.getMinutes()).padStart(2, '0');
+
+//         return `${year}-${month}-${day}T${hours}:${minutes}`;
+//     }
+
+//     // ✅ OPEN MODAL (ADD/EDIT)
+//     window.openModal = function(eventData = null, date = null) {
+
+//         const modal = new bootstrap.Modal(document.getElementById('addEventModal'));
+//         const form  = document.getElementById('eventForm');
+
+//         form.action = "/admin/calendar/store";
+
+//         if (eventData) {
+//             // ✏️ EDIT EVENT
+//             document.getElementById('event_id').value = eventData.id;
+//             document.getElementById('event_title').value = eventData.title;
+//             document.getElementById('event_description').value = eventData.extendedProps?.description || '';
+//             document.getElementById('event_type').value = eventData.extendedProps?.type || '';
+//             document.getElementById('event_start').value = formatDate(eventData.start);
+//             document.getElementById('event_end').value = formatDate(eventData.end);
+//             document.getElementById('event_status').value = eventData.extendedProps?.status || '1';
+
+//             document.getElementById('backgroundcolor').value = eventData.backgroundColor || '#6c757d';
+//             document.getElementById('bordercolor').value = eventData.borderColor || '#6c757d';
+//             document.getElementById('textcolor').value = eventData.textColor || '#ffffff';
+
+//             document.getElementById('deleteBtn').classList.remove('d-none');
+//             document.getElementById('addEventModalLabel').textContent = "Edit Event";
+//             document.getElementById('modal-submit-btn').textContent = "Update Event";
+
+//         } else {
+//             // ➕ ADD EVENT
+//             form.reset();
+//             document.getElementById('event_id').value = '';
+
+//             const now = date ? new Date(date) : new Date();
+//             document.getElementById('event_start').value = formatDate(now);
+//             document.getElementById('event_end').value = formatDate(now);
+
+//             document.getElementById('deleteBtn').classList.add('d-none');
+//             document.getElementById('addEventModalLabel').textContent = "Add New Event";
+//             document.getElementById('modal-submit-btn').textContent = "Save Event";
+//         }
+
+//         modal.show();
+//     }
+
+//     // ✅ OPEN MODAL ONLY FOR NEW EVENT BUTTON
+//     window.addNewEvent = function() {
+//         openModal(null, new Date());
+//     }
+
+//     // ✅ FULLCALENDAR INIT
+//     const calendar = new FullCalendar.Calendar(calendarEl, {
+//         timeZone: 'local',
+//         initialView: 'dayGridMonth',
+//         headerToolbar: {
+//             left: 'prev,next today',
+//             center: 'title',
+//             right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+//         },
+//         height: 'auto',
+//         events: {
+//             url: '/admin/calendar/fetch',
+//             method: 'GET',
+//             failure: () => showNotify("Failed to load events", "danger")
+//         },
+//         eventClick: function (info) {
+//             openModal(info.event);
+//         },
+//         dateClick: function (info) {
+//             openModal(null, info.date);
+//         }
+//     });
+
+//     calendar.render();
+
+//     // ✅ DELETE EVENT
+//     document.getElementById('deleteBtn').addEventListener('click', function () {
+
+//         const id = document.getElementById('event_id').value;
+//         if (!id) {
+//             showNotify("Event ID missing", "danger");
+//             return;
+//         }
+
+//         if (!confirm("Delete this event?")) return;
+
+//         const token = document.querySelector('input[name="_token"]').value;
+
+//         fetch('/admin/calendar/delete/' + id, {
+//             method: 'POST',
+//             headers: {
+//                 'X-CSRF-TOKEN': token,
+//                 'Accept': 'application/json'
+//             }
+//         })
+//         .then(res => res.json())
+//         .then(data => {
+//             if (data.success) {
+//                 calendar.refetchEvents();
+//                 bootstrap.Modal.getInstance(document.getElementById('addEventModal')).hide();
+//                 showNotify(data.message, "success");
+//             } else {
+//                 showNotify(data.message, "danger");
+//             }
+//         })
+//         .catch(err => {
+//             console.error(err);
+//             showNotify("Something went wrong!", "danger");
+//         });
+
+//     });
+
+//     // ✅ AUTO COLOR CHANGE ON TYPE
+//     document.getElementById('event_type').addEventListener('change', function () {
+
+//         const colors = {
+//             meeting:      ['#007bff', '#007bff', '#ffffff'],
+//             task:         ['#28a745', '#28a745', '#ffffff'],
+//             appointment:  ['#ffc107', '#ffc107', '#000000'],
+//             deadline:     ['#dc3545', '#dc3545', '#ffffff'],
+//             presentation: ['#17a2b8', '#17a2b8', '#ffffff'],
+//         };
+
+//         const c = colors[this.value] || ['#6c757d', '#6c757d', '#ffffff'];
+
+//         document.getElementById('backgroundcolor').value = c[0];
+//         document.getElementById('bordercolor').value = c[1];
+//         document.getElementById('textcolor').value = c[2];
+//     });
+
+// });
+
+
+
+
+
+
+
+
+
+

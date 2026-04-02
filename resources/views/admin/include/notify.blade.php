@@ -6,13 +6,13 @@
 @endif
 @if (session('bulk-success'))
     <div class="alert alert-success">
-         {{-- {{ session('action') }} <br> --}}
+        {{-- {{ session('action') }} <br> --}}
         @php
             $ids = session('ids');
         @endphp
         IDs:
         {{ is_array($ids) ? implode(', ', array_slice($ids, 0, 10)) : $ids }}
-        @if(is_array($ids) && count($ids) > 10)
+        @if (is_array($ids) && count($ids) > 10)
             ... +{{ count($ids) - 10 }} more
         @endif
         Action: {{ session('bulk-success') }} <br>
@@ -56,7 +56,20 @@
         {{ $message }}
     </div>
 @enderror
+{{-- Notifiction using javacript --}}
+<div id="notify-area">
+    @if (session('success'))
+        <div class="alert alert-success" role="alert">
+            {{ session('success') }}
+        </div>
+    @endif
 
+    @if (session('error'))
+        <div class="alert alert-danger" role="alert">
+            {{ session('error') }}
+        </div>
+    @endif
+</div>
 
 <script>
     setTimeout(() => {

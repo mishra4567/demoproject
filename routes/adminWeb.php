@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\CalendarEventController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ColorController;
 use App\Http\Controllers\Admin\CouponController;
@@ -185,4 +186,14 @@ Route::group(['middleware' => 'admin_auth'], function () {
      */
     Route::get('admin/product/productview/{id?}', [ViewProductController::class, 'index'])
         ->name('product.productview')->setDefaults(['label' => '', 'role' => 0]);
+    /**
+     * Calender to do work
+     */
+    Route::get('admin/calendar', [CalendarEventController::class, 'index'])
+        ->name('calender')->setDefaults(['label' => 'Calender', 'role' => 0]);
+    Route::get('admin/calendar/fetch', [CalendarEventController::class, 'fetch']);
+    Route::post('admin/calendar/store/{id?}', [CalendarEventController::class, 'store'])
+        ->name('calendar.store');
+    Route::post('/admin/calendar/delete/{id}', [CalendarEventController::class, 'deleteEvent'])
+        ->name('calendar.delete');
 });

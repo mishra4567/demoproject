@@ -4,7 +4,7 @@ command
     create model migration controller and Resource :-
         php artisan make:model ModelName -mcr
         particuter folder for migration :-
-            php artisan migrate --path=/database/migrations/foldername 
+            php artisan migrate --path=/database/migrations/foldername
     Dump Autoload :-
         composer dump-autoload
     creating mddleware :-
@@ -46,9 +46,14 @@ This time i using clodinary for upload image and vodeo
 
 
 
-For Root Branch
-Checking root branch
-checkout root branch
+/**
+Folder structure for blade file
+    admin
+    |-- components
+        |-- Calendar.blade.php
+    |-- dashboard.blade.php
+
+*/
 
 
 

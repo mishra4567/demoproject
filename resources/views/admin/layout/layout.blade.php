@@ -37,6 +37,7 @@
     <div class="page-wrapper">
         <!-- HEADER MOBILE-->
         @include('admin.include.mediamodal')
+        @include('admin.include.eventmodal')
         <header class="header-mobile d-block d-lg-none">
             <div class="header-mobile__bar">
                 <div class="container-fluid">
@@ -101,6 +102,10 @@
                             <a href="{{ route('dashboard') }}">
                                 <i class="fas fa-tachometer-alt"></i>Dashboard</a>
                         </li>
+                        <li class="has-sub @yield('calender_select')">
+                            <a href="{{ route('calender') }}">
+                                <i class="fa-regular fa-calendar-days"></i>Calender</a>
+                        </li>
                         <li class="has-sub @yield('category_select')">
                             <a href="{{ route('category') }}">
                                 <i class="fa-solid fa-layer-group"></i>Category</a>
@@ -121,7 +126,7 @@
                             <a href="{{ route('product') }}">
                                 <i class="fa-brands fa-product-hunt"></i>product</a>
                         </li> --}}
-                        <li class="has-sub" >
+                        <li class="has-sub">
                             <a class="js-arrow" href="#">
                                 <i class="fas fa-copy"></i>product
                                 {{-- <span class="arrow">
@@ -129,7 +134,7 @@
                                 </span> --}}
                             </a>
                             <ul class="list-unstyled navbar__sub-list js-sub-list">
-                                <li >
+                                <li>
                                     <a href="{{ route('product') }}">
                                         <i class="fas fa-sign-in-alt"></i>All Product</a>
                                 </li>
@@ -147,7 +152,7 @@
                                 </li>
                             </ul>
                         </li>
-                        <li class="has-sub" >
+                        <li class="has-sub">
                             <a class="js-arrow" href="#">
                                 <i class="fas fa-copy"></i>Media
                                 {{-- <span class="arrow">
@@ -155,7 +160,7 @@
                                 </span> --}}
                             </a>
                             <ul class="list-unstyled navbar__sub-list js-sub-list">
-                                <li >
+                                <li>
                                     <a href="{{ route('media') }}">
                                         <i class="fas fa-sign-in-alt"></i>Library</a>
                                 </li>
@@ -240,9 +245,11 @@
 
             <!-- MAIN CONTENT-->
             <div class="main-content">
-                @include('admin.include.notify')
-                @section('container')
-                @show
+                <div class="section__content section__content--p30">
+                    @include('admin.include.notify')
+                    @section('container')
+                    @show
+                </div>
             </div>
         </div>
 
@@ -270,7 +277,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
         integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
+    <!-- FullCalendar v6.1.11 -->
+    <script src="{{ asset('assets/vendor/fullcalendar-6.1.11/fullcalendar.min.js') }}"></script>
+    <script src="{{ asset('assets/js/calendar.js') }}"></script>
 
 </body>
 

@@ -200,3 +200,25 @@ function remove_more(id) {
 /**
  * For Add Product Attribute
  */
+/**
+ *  Notification Start
+ */
+
+function showNotify(message, type = 'success') {
+    const notifyArea = document.getElementById('notify-area');
+    if (!notifyArea) return;
+
+    notifyArea.innerHTML = `
+        <div class="alert alert-${type}" role="alert">
+            ${message}
+        </div>
+    `;
+
+    setTimeout(() => {
+        notifyArea.innerHTML = '';
+    }, 3000);
+}
+
+/**
+ *  Notification End
+ */
