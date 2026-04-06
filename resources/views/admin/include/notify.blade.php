@@ -58,15 +58,15 @@
 @enderror
 {{-- Notifiction using javacript --}}
 <div id="notify-area">
-    @if (session('success'))
+    @if (session('success_event'))
         <div class="alert alert-success" role="alert">
-            {{ session('success') }}
+            {{ session('success_event') }}
         </div>
     @endif
 
-    @if (session('error'))
+    @if (session('success_event'))
         <div class="alert alert-danger" role="alert">
-            {{ session('error') }}
+            {{ session('success_event') }}
         </div>
     @endif
 </div>

@@ -101,7 +101,7 @@ class CalendarEventController extends Controller
 
         if (!$event) {
             return response()->json([
-                'success' => false,
+                'success_event' => false,
                 'message' => 'Event not found'
             ], 404);
         }
@@ -109,7 +109,7 @@ class CalendarEventController extends Controller
         $event->delete();
 
         return response()->json([
-            'success' => true,
+            'success_event' => true,
             'message' => 'Event deleted successfully'
         ]);
     }

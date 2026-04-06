@@ -92,17 +92,18 @@ class ProductController extends Controller
                 'gallery_images' => [],
             ];
         }
-        // echo "<pre>";
-        // print_r($result);
-        // echo "</pre";
+
 
 
         // dropdown data
         $result['category'] = DB::table('categories')->where('status', 1)->get();
         $result['sizes']    = DB::table('sizes')->where('status', 1)->get();
         $result['colors']   = DB::table('colors')->where('status', 1)->get();
+        $result['brands']   = DB::table('brands')->where('status', 1)->get();
         $result['media']    = DB::table('create_media_tables')->where('status', 1)->get();
-
+        // echo "<pre>";
+        // print_r($result['brands']);
+        // echo "</pre";
         return view('admin.product.manage_product', $result);
     }
 
@@ -140,7 +141,7 @@ class ProductController extends Controller
         $product->category_id = $request->category_id;
         $product->name = $request->name;
         $product->slug = $request->slug;
-        $product->brand = $request->brand;
+        $product->brand = $request->brand_id;
         $product->model = $request->model;
         $product->short_desc = $request->short_desc;
         $product->desc = $request->desc;

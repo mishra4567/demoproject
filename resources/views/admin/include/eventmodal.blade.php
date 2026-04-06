@@ -10,7 +10,7 @@
 
             <form id="eventForm" method="POST" action="{{ route('calendar.store') }}">
                 @csrf
-                <input type="text" name="event_id" id="event_id">
+                <input type="hidden" name="event_id" id="event_id">
 
                 <div class="modal-body">
 

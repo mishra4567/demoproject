@@ -61,6 +61,10 @@
                             <a href="{{ route('dashboard') }}">
                                 <i class="fas fa-tachometer-alt"></i>Dashboard</a>
                         </li>
+                        <li class="has-sub @yield('calender_select')">
+                            <a href="{{ route('calendar') }}">
+                                <i class="fas fa-tachometer-alt"></i>Calendar</a>
+                        </li>
                         <li class="has-sub @yield('category_select')">
                             <a href="{{ route('category') }}">
                                 <i class="fa-solid fa-layer-group"></i>category</a>
@@ -77,9 +81,55 @@
                             <a href="{{ route('color') }}">
                                 <i class="fa-solid fa-fill-drip"></i>color</a>
                         </li>
-                        <li class="has-sub @yield('product_select')">
-                            <a href="{{ route('product') }}">
-                                <i class="fa-brands fa-product-hunt"></i>product</a>
+                        <li class="has-sub @yield('brands_select')">
+                            <a href="{{ route('brands') }}">
+                                <i class="fa-solid fa-fill-drip"></i>Brands</a>
+                        </li>
+                        {{-- Product Submenu --}}
+                        <li class="has-sub">
+                            <a class="js-arrow" href="#">
+                                <i class="fa-brands fa-product-hunt"></i>Product
+                            </a>
+                            <ul class="list-unstyled navbar__sub-list js-sub-list ps-sm-5">
+                                <li>
+                                    <a href="{{ route('product') }}">
+                                        <i class="fas fa-sign-in-alt"></i>All Product
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('product.add_product') }}">
+                                        <i class="fas fa-user"></i>Add Product
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('product.linkproduct') }}">
+                                        <i class="fas fa-user"></i>Link Product
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('product.addlinkproduct') }}">
+                                        <i class="fas fa-user"></i>Add Link Product
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        {{-- Media Submenu --}}
+                        <li class="has-sub">
+                            <a class="js-arrow" href="#">
+                                <i class="fas fa-copy"></i>Media
+                            </a>
+                            <ul class="list-unstyled navbar__sub-list js-sub-list ps-sm-5">
+                                <li>
+                                    <a href="{{ route('media') }}">
+                                        <i class="fas fa-sign-in-alt"></i>Library
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('media.managemedia') }}">
+                                        <i class="fas fa-user"></i>Add Media File
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                     </ul>
                 </div>
@@ -103,7 +153,7 @@
                                 <i class="fas fa-tachometer-alt"></i>Dashboard</a>
                         </li>
                         <li class="has-sub @yield('calender_select')">
-                            <a href="{{ route('calender') }}">
+                            <a href="{{ route('calendar') }}">
                                 <i class="fa-regular fa-calendar-days"></i>Calender</a>
                         </li>
                         <li class="has-sub @yield('category_select')">
@@ -121,6 +171,10 @@
                         <li class="has-sub @yield('color_select')">
                             <a href="{{ route('color') }}">
                                 <i class="fa-solid fa-fill-drip"></i>color</a>
+                        </li>
+                        <li class="has-sub @yield('brands_select')">
+                            <a href="{{ route('brands') }}">
+                                <i class="fa-solid fa-fill-drip"></i>Brans</a>
                         </li>
                         {{-- <li class="has-sub @yield('product_select')">
                             <a href="{{ route('product') }}">

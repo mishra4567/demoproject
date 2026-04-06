@@ -8,7 +8,8 @@ function openModal(eventData = null, date = null) {
     const modal = new bootstrap.Modal(document.getElementById('addEventModal'));
     const form  = document.getElementById('eventForm');
 
-    form.action = '/admin/calender/store';
+    form.action = '/admin/calendar/store';
+    form.method = 'POST';
 
     if (eventData) {
         // ✏️ EDIT
@@ -30,6 +31,9 @@ function openModal(eventData = null, date = null) {
     } else {
         // ➕ ADD
         document.getElementById('eventForm').reset();
+        form.method = 'POST';
+        form.action = '/admin/calendar/store';
+
         setValue('event_id',        '');
         setValue('backgroundcolor', '#6c757d');
         setValue('bordercolor',     '#6c757d');

@@ -21,6 +21,17 @@ class CreateMediaTableController extends Controller
     {
         return view('admin.uploadmedia.uploadmedia');
     }
+    public function mediasearch(Request $request)
+    {
+        $query = $request->get('query', '');
+
+        $media = CreateMediaTable::where('status', 1)
+            ->when($query, function ($q) use ($query) {
+                $q->where('tags', 'LIKE', '%' . $query . '%');
+            })
+            ->get();
+        return response()->json($media);
+    }
     public function store(Request $request)
     {
         $request->validate([

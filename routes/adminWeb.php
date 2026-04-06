@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\BrandsController;
 use App\Http\Controllers\Admin\CalendarEventController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ColorController;
@@ -117,11 +118,31 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::post('admin/color/bulkaction', [ColorController::class, 'bulkAction'])
         ->name('color.bulkAction')->setDefaults(['label' => '', 'role' => 1]);
     /**
+     * Brands Routes
+     */
+    Route::get('admin/brands', [BrandsController::class, 'index'])
+        ->name('brands')->setDefaults(['label' => 'View Brands', 'role' => 0]);
+    // insert brands
+    Route::post('admin/brands/managebrandsprocess', [BrandsController::class, 'managebrandsprocess'])
+        ->name('brands.manage_brands_process')->setDefaults(['label' => '', 'role' => 1]);
+    // inset and edit brands
+    Route::get('admin/brands/managebrands/{id?}', [BrandsController::class, 'managebrands'])
+        ->name('brands.add_brands')->setDefaults(['label' => 'Add Brands', 'role' => 0]);
+    // Status change brands
+    Route::get('admin/brands/status/{id}', [BrandsController::class, 'status'])
+        ->name('brands.status')->setDefaults(['label' => '', 'role' => 1]);
+    // delete brands
+    Route::get('admin/brands/delete/{id}', [BrandsController::class, 'delete'])
+        ->name('brands.delete')->setDefaults(['label' => '', 'role' => 1]);
+    // Bulk Action Product
+    Route::post('admin/brands/bulkaction', [BrandsController::class, 'bulkAction'])
+        ->name('brands.bulkAction')->setDefaults(['label' => '', 'role' => 1]);
+    /**
      * Route For Media
      */
     Route::get('admin/media', [CreateMediaTableController::class, 'index'])
         ->name('media')->setDefaults(['label' => 'View Media', 'role' => 0]);
-    Route::get('admin/media/managemedia', [CreateMediaTableController::class, 'managemedia'])
+    Route::get('admin/media/managemedia/{id?}', [CreateMediaTableController::class, 'managemedia'])
         ->name('media.managemedia')->setDefaults(['label' => 'Store Media', 'role' => 0]);
     // Route::post('admin/media/managemediaprocess', [CreateMediaTableController::class, 'managemedia'])
     //     ->name('media.managemedia')->setDefaults(['label' => 'Store Media', 'role' => 0]);
@@ -134,6 +155,8 @@ Route::group(['middleware' => 'admin_auth'], function () {
         ->name('media.status')->setDefaults(['label' => '', 'role' => 1]);
     Route::post('/media/bulkaction', [CreateMediaTableController::class, 'bulkAction'])
         ->name('media.bulkAction')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('/admin/media/search', [CreateMediaTableController::class, 'mediasearch'])
+        ->name('media.search')->setDefaults(['label' => '', 'role' => 1]);
     /**
      * Product Routes
      */
@@ -190,7 +213,7 @@ Route::group(['middleware' => 'admin_auth'], function () {
      * Calender to do work
      */
     Route::get('admin/calendar', [CalendarEventController::class, 'index'])
-        ->name('calender')->setDefaults(['label' => 'Calender', 'role' => 0]);
+        ->name('calendar')->setDefaults(['label' => 'Calender', 'role' => 0]);
     Route::get('admin/calendar/fetch', [CalendarEventController::class, 'fetch']);
     Route::post('admin/calendar/store/{id?}', [CalendarEventController::class, 'store'])
         ->name('calendar.store');

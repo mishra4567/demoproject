@@ -204,7 +204,7 @@ function remove_more(id) {
  *  Notification Start
  */
 
-function showNotify(message, type = 'success') {
+function showNotify(message, type = 'success_event') {
     const notifyArea = document.getElementById('notify-area');
     if (!notifyArea) return;
 

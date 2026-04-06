@@ -19,17 +19,28 @@ class ViewProductController extends Controller
                     ->where('create_media_tables.status', 1);
             })
             ->leftJoin('categories', function ($join) {
-                $join->on('products.category_id', '=', 'categories.id')
-                    ->where('categories.status', 1);
+                $join->on('products.category_id', '=', 'categories.id');
+                // ->where('categories.status', 1);
+            })
+            ->leftJoin('brands', function ($join) {
+                $join->on('products.brand', '=', 'brands.id');
+                // ->where('brands.status',1);
             })
             ->select(
                 'products.*',
                 'create_media_tables.file_name as media_url',
                 'categories.category_name as category_name',
+                'brands.name as brand_name',
             )
             ->where('products.id', $id)
             ->where('products.status', 1)
             ->first();
+
+        // dd(
+        //     DB::getSchemaBuilder()->getColumnListing('categories'),
+        //     DB::getSchemaBuilder()->getColumnListing('brands'),
+        //     DB::getSchemaBuilder()->getColumnListing('products'),
+        // );
 
         if (!$product) {
             abort(404);
@@ -74,7 +85,9 @@ class ViewProductController extends Controller
             ->get();
 
         // Defined variables
+        // $categoryName = $product->category_name;
         $categoryName = $product->category_name ?? 'N/A';
+        $brand_name = $product->brand_name;
         $media_url     = $product->media_url
             ? asset('storage/media/' . $product->media_url)
             : asset('storage/default/no-product-image.PNG');
@@ -106,9 +119,10 @@ class ViewProductController extends Controller
 
         echo "<pre>";
         print_r($product);
+        print_r($brand_name.'<br>');
         print_r($attributes);
         print_r($gallery);
-        print_r($categoryName);
+        print_r($categoryName.'<br>');
         print_r($media_url);
         echo "</pre>";
         die();

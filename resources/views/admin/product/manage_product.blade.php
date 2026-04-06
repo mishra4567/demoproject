@@ -53,10 +53,25 @@
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="mb-3">
-                                                    <label for="brand" class="control-label mb-1">Product brand
+
+                                                    <label for="brand_id" class="control-label mb-1">Product brand
                                                     </label>
-                                                    <input id="brand" name="brand" value="{{ $brand }}"
-                                                        type="text" class="form-control" required>
+                                                    <select name="brand_id" id="brand_id" class="form-control">
+                                                        <option value="">select Brand</option>
+                                                        @foreach ($brands as $band)
+                                                            @if ($brand == $band->id)
+                                                                <option selected value="{{ $band->id }}">
+                                                                    {{ $band->name }}
+                                                                </option>
+                                                            @else
+                                                                <option value="{{ $band->id }}"> {{ $band->name }}
+                                                                </option>
+                                                            @endif
+                                                        @endforeach
+                                                    </select>
+                                                    {{-- <input id="brand" name="brand" value="{{ $brand }}"
+                                                        type="text" class="form-control" required> --}}
+
                                                 </div>
                                             </div>
                                             <div class="col-md-4">

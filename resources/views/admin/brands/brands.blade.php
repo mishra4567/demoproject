@@ -1,16 +1,15 @@
 @extends('admin.layout.layout')
-@section('page_title', 'Media')
-@section('media_select', 'active')
+@section('page_title', 'Brands')
+@section('brands_select', 'active')
 @section('container')
     <div class="section__content section__content--p30">
-        <br class="container-fluid">
-            <h3 class="title-5 m-b-35">Media</h3>
-            <a href="{{ route('media.managemedia') }}">
-                <button type="button" class="btn btn-success ">Add Media</button>
+        <div class="container-fluid">
+            <h3 class="title-5 m-b-35">brands</h3>
+            <a href="{{ route('brands.add_brands') }}">
+                <button type="button" class="btn btn-success ">Add brands</button>
             </a>
-            <br><br>
             <div class="row">
-                <form action="{{ route('media.bulkAction') }}" method="POST">
+                <form action="{{ route('brands.bulkAction') }}" method="POST">
                     @csrf
                     <!-- Bulk Action Dropdown -->
                     <div class="mb-3 d-flex">
@@ -29,40 +28,36 @@
                         <table class="table table-borderless table-striped table-earning">
                             <thead>
                                 <tr>
+                                    {{-- <th>date</th> --}}
                                     <th>
                                         <input type="checkbox" id="select_all">
                                     </th>
-                                    <th>ID</th>
-                                    {{-- <th>Date</th> --}}
-                                    <th>Media</th>
-                                    <th>Media Type</th>
-                                    <th>Tag</th>
-                                    <th>Description</th>
+                                    <th>brands ID</th>
+                                    <th>brands</th>
+                                    <th>image</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($media as $list)
+                                @foreach ($data as $list)
                                     <tr>
+                                        {{-- <td>2025-01-15 14:32</td> --}}
                                         <td>
                                             <input type="checkbox" name="ids[]" value="{{ $list->id }}"
                                                 class="checkbox_ids">
                                         </td>
                                         <td>{{ $list->id }}</td>
-                                        {{-- <td>2025-01-15 14:32</td> --}}
+                                        <td>{{ $list->name }}</td>
                                         <td><img src="{{ asset('storage/media/' . $list->file_name) }}" alt=""></td>
-                                        <td>{{ $list->media_type }}</td>
-                                        <td>{{ $list->description }}</td>
-                                        <td>{{ $list->tags }}</td>
                                         <td>
-                                            <a href="{{ route('media.status', $list->id) }}"
+                                            <a href="{{ route('brands.status', $list->id) }}"
                                                 class="btn btn-outline-{{ $list->status == 1 ? 'info' : 'warning' }} btn-sm ">
                                                 {{ $list->status == 1 ? 'Active' : 'Deactive' }}
                                             </a>
-                                            <a href="{{ route('media.managemedia', $list->id) }}">
-                                            <button type="button" class="btn btn-outline-success btn-sm">Edit </button>
-                                        </a>
-                                            <a href="{{ route('media.delete', $list->id) }}">
+                                            <a href="{{ route('brands.add_brands', $list->id) }}">
+                                                <button type="button" class="btn btn-outline-success btn-sm">Edit </button>
+                                            </a>
+                                            <a href="{{ route('brands.delete', $list->id) }}">
                                                 <button type="button" class="btn btn-outline-danger btn-sm">Delete
                                                 </button>
                                             </a>
