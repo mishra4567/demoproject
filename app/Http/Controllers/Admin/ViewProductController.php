@@ -35,6 +35,10 @@ class ViewProductController extends Controller
             ->where('products.id', $id)
             ->where('products.status', 1)
             ->first();
+        $technical_specification = DB::table('technical_specs')
+            ->where('product_id', $id)
+            ->where('status', 1)
+            ->first();
 
         // dd(
         //     DB::getSchemaBuilder()->getColumnListing('categories'),
@@ -119,10 +123,11 @@ class ViewProductController extends Controller
 
         echo "<pre>";
         print_r($product);
-        print_r($brand_name.'<br>');
+        print_r($technical_specification);
+        print_r($brand_name . '<br>');
         print_r($attributes);
         print_r($gallery);
-        print_r($categoryName.'<br>');
+        print_r($categoryName . '<br>');
         print_r($media_url);
         echo "</pre>";
         die();

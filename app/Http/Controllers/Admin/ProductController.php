@@ -12,6 +12,20 @@ use Illuminate\Validation\Rule;
 class ProductController extends Controller
 {
     /**
+     * Generate Unique Barcode
+     */
+    private function generateBarcode()
+    {
+        do {
+            $barcode = rand(100000000000, 999999999999);
+            $exists = DB::table('products')
+                ->where('barcode', $barcode)
+                ->exists();
+        } while ($exists);
+        return $barcode;
+    }
+
+    /**
      * Index Page for Product
      */
     public function index()
@@ -150,6 +164,10 @@ class ProductController extends Controller
         $product->uses = $request->uses;
         $product->warranty = $request->warranty;
         $product->status = 1;
+        // Auto Generate Barcode if not exists
+        if (!$product->barcode) {
+            $product->barcode = $this->generateBarcode();
+        }
         $product->save();
 
         // Gallery Images

@@ -48,7 +48,20 @@
                                                 class="checkbox_ids">
                                         </td>
                                         <td>
-                                            <a href="{{ route('product.productview', ['id' => $list->id]) }}"  target="_blank">{{$list->id}} <i class="fa-regular fa-eye"></i> </a>
+                                            <a href="{{ route('product.productview', ['id' => $list->id]) }}"
+                                                target="_blank">{{ $list->id }} <i class="fa-regular fa-eye"></i> </a>
+                                            @if ($list->barcode)
+                                                <code class="small text-muted">{{ $list->barcode }}</code>
+                                            @else
+                                                <span class="text-muted small">No Barcode</span>
+                                            @endif
+                                            <a {{-- onclick="downloadBarcode({{$list->id}})" --}} class="btn btn-success btn-sm">
+                                                <i class="zmdi zmdi-download"></i>
+                                            </a>
+                                            {{-- <a href="{{ route('barcode.product.download', $list->id) }}"
+                                                class="btn btn-sm btn-primary">
+                                                Download
+                                            </a> --}}
                                         </td>
                                         <td>{{ $list->name }}</td>
                                         <td>{{ $list->slug }}</td>

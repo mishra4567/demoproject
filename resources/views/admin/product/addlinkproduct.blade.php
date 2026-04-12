@@ -1,5 +1,6 @@
 @extends('admin.layout.layout')
 @section('page_title', 'Link Product')
+@section('addlinkproduct_select', 'active')
 @section('container')
     @php
         $id = 1;

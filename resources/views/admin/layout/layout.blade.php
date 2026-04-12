@@ -111,6 +111,16 @@
                                         <i class="fas fa-user"></i>Add Link Product
                                     </a>
                                 </li>
+                                <li>
+                                    <a href="{{ route('product.tecnicalspacs') }}">
+                                        <i class="fas fa-user"></i>Tecnical Specs
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('product.addtecnicalspecs') }}">
+                                        <i class="fas fa-user"></i>Add Tecnical Specs
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                         {{-- Media Submenu --}}
@@ -203,6 +213,14 @@
                                 <li>
                                     <a href="{{ route('product.addlinkproduct') }}">
                                         <i class="fas fa-user"></i> Add Link Product</a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('product.tecnicalspacs') }}">
+                                        <i class="fas fa-user"></i>Tecnical Specs</a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('product.addtecnicalspecs') }}">
+                                        <i class="fas fa-user"></i> Add Tecnical Specs</a>
                                 </li>
                             </ul>
                         </li>

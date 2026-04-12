@@ -14,6 +14,9 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\RouteSearchController;
 use App\Http\Controllers\Admin\SizeController;
 use App\Http\Controllers\Admin\ViewProductController;
+// use App\Http\Controllers\Admin\BarcodeController;
+use App\Http\Controllers\Admin\BarcodeController;
+use App\Http\Controllers\Admin\TechnicalSpecsController;
 
 // Route::get('admin', [AdminController::class, 'index']);
 Route::get('admin', [AdminController::class, 'index']);
@@ -182,6 +185,10 @@ Route::group(['middleware' => 'admin_auth'], function () {
     // delete product Images
     Route::get('admin/product/images_delete/{piid}/{pid}', [ProductController::class, 'product_images_delete'])
         ->name('product.images_delete')->setDefaults(['label' => '', 'role' => 1]);
+    // Route::get('admin/barcode/product/{id}', [BarcodeController::class, 'prodBarcodeHelp'])
+    //     ->name('barcode.product');
+    // Route::get('/barcode/product-download/{id}', [BarcodeController::class, 'proBarcodeDawn'])
+    //     ->name('barcode.product.download');
     /**
      * Linked Product Routes
      */
@@ -197,6 +204,21 @@ Route::group(['middleware' => 'admin_auth'], function () {
         ->name('product.linkproductstatus')->setDefaults(['label' => 'linked product status', 'role' => 1]);
     Route::get('admin/product/linkproductdelete/{id}', [LinkproductController::class, 'delete'])
         ->name('product.linkproductdelete')->setDefaults(['label' => 'linked product delete', 'role' => 1]);
+    /**
+     * Tecnical Specs Product Routes
+     */
+    Route::get('admin/product/tecnicalspecs', [TechnicalSpecsController::class, 'index'])
+        ->name('product.tecnicalspacs')->setDefaults(['label' => 'Product Tecnical Spesc', 'role' => 0]);
+    Route::get('admin/product/addtecnicalaspecs/{id?}', [TechnicalSpecsController::class, 'addTechnicalSpecs'])
+        ->name('product.addtecnicalspecs')->setDefaults(['label' => 'Add Product Tecnical Spesc', 'role' => 0]);
+    Route::post('admin/product/processTechnicalSpecs/', [TechnicalSpecsController::class, 'processTechnicalSpecs'])
+        ->name('product.processTechnicalSpecs')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('admin/product/tecnicalspecsstatus/{id}', [TechnicalSpecsController::class, 'status'])
+        ->name('product.tecnicalspecsstatus')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('admin/product/tecnicalspecsdelete/{id}', [TechnicalSpecsController::class, 'delete'])
+        ->name('product.tecnicalspecsdelete')->setDefaults(['label' => '', 'role' => 1]);
+    Route::post('admin/tecnicalspecs/bulkaction', [TechnicalSpecsController::class, 'bulkAction'])
+        ->name('tecnicalspecs.bulkAction')->setDefaults(['label' => '', 'role' => 1]);
     // Linked Product
     // delete product attribute
     Route::get('admin/product/attr_delete/{paid}/{pid}', [ProductController::class, 'product_attr_delete'])

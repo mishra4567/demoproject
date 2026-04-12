@@ -201,6 +201,26 @@ function remove_more(id) {
  * For Add Product Attribute
  */
 /**
+ *  For barcode download function
+ */
+
+//   For Product
+function downloadBarcode(productId) {
+    fetch('/admin/barcode/product/' + productId)
+        .then(res => res.json())
+        .then(({ svg, filename }) => {
+            const a    = Object.assign(document.createElement('a'), {
+                href:     URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' })),
+                download: filename
+            });
+            a.click();
+            URL.revokeObjectURL(a.href);
+        });
+}
+/**
+ *  For barcode download function
+ */
+/**
  *  Notification Start
  */
 

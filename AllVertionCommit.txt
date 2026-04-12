@@ -1,5 +1,14 @@
 
 
+9-12.4.2026
+vertion:- 1.5.7
+Comment:- (1.5.6) Add technical_specification field page and add in product details page.
+(1.5.7) Bug Fix,
+**** I am confusing about the product details page, I am not sure about the design and how to show all details, so I am working on it, I will update you soon. ****
+8.4.2026
+vertion:- 1.4.6
+Comment:- Add barcode Generetor in project BUT not fully function yet, need to work on it.
+
 6.4.2026
 vertion:- 1.4.5
 Comment:- Adding Media Search And Fix Styling.
@@ -8,12 +17,12 @@ Comment:- Add Brand page and dropdown, Add full product view.
 
 5.4.2026
 vertion:- 1.3.3
-Comment:- Bug fix:- Calendar Event, 
+Comment:- Bug fix:- Calendar Event,
 
 31-03.2026
 vertion:- 1.3.2
 Adding Calendar Page in Project
-Full Function:- Add, update, delete, view, sibar show list 
+Full Function:- Add, update, delete, view, sibar show list
 
 29.03.2026
 vertion:- 1.2.2
