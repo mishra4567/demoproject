@@ -1,5 +1,7 @@
 
-
+12.4.2026
+vertion::- 1.5.8
+Comment:- In Category page add parent category ( dropdown, database, controller), Bug Fix.
 9-12.4.2026
 vertion:- 1.5.7
 Comment:- (1.5.6) Add technical_specification field page and add in product details page.

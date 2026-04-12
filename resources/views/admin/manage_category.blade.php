@@ -1,84 +1,57 @@
 @extends('admin.layout.layout')
-@section('page_title','Manage Category')
+@section('page_title', 'Manage Category')
 @section('container')
     <div class="section__content section__content--p30">
         <div class="container-fluid">
             <h3 class="title-5 m-b-35">Manage Category</h3>
-            <a href="{{ route('category')}}">
+            <a href="{{ route('category') }}">
                 <button type="button" class="btn btn-success " disabled="">Back to Category</button>
             </a>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card">
-                        {{-- <div class="card-header">Manage Category</div> --}}
-                        <div class="card-body">
-                            {{-- <div class="card-title">
-                                <h3 class="text-center title-2">Pay Invoice</h3>
+            <div class="card">
+                <div class="card-body">
+                    <form action="{{ route('category.manage_category_process') }}" method="post">
+                        @csrf
+                        <div class="row g-3">
+
+                            <!-- Category Name -->
+                            <div class="col-md-6">
+                                <label class="form-label">Category Name</label>
+                                <input type="text" name="category_name" value="{{ $category_name ?? '' }}"
+                                    class="form-control" required>
                             </div>
-                            <hr> --}}
-                            <form action="{{ route('category.manage_category_process') }}" method="post">
-                                @csrf
-                                {{-- {{session('message')}} --}}
-                                <div class="mb-3">
-                                    <div class="mb-3">
-                                        <label for="category_name" class="control-label mb-1">Category
-                                            Name</label>
-                                        <input id="category_name" name="category_name" value="{{ $category_name }}" type="text" class="form-control"
-                                            required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="category_slug" class="control-label mb-1">Category Slug
-                                        </label>
-                                        <input id="category_slug" name="category_slug" value="{{ $category_slug }}" type="text" class="form-control"
-                                            required>
-                                    </div>
 
-                                    {{-- <div class="mb-3">
-                                    <label for="cc-number" class="control-label mb-1">Card number</label>
-                                    <input id="cc-number" name="cc-number" type="tel"
-                                        class="form-control cc-number identified visa" value="" data-val="true"
-                                        data-val-required="Please enter the card number"
-                                        data-val-cc-number="Please enter a valid card number" autocomplete="cc-number">
-                                    <span class="help-block" data-valmsg-for="cc-number" data-valmsg-replace="true"></span>
-                                </div> --}}
-                                    {{-- <div class="row">
-                                    <div class="col-6">
-                                        <div class="mb-3">
-                                            <label for="cc-exp" class="control-label mb-1">Expiration</label>
-                                            <input id="cc-exp" name="cc-exp" type="tel" class="form-control cc-exp"
-                                                value="" data-val="true"
-                                                data-val-required="Please enter the card expiration"
-                                                data-val-cc-exp="Please enter a valid month and year" placeholder="MM / YY"
-                                                autocomplete="cc-exp">
-                                            <span class="help-block" data-valmsg-for="cc-exp"
-                                                data-valmsg-replace="true"></span>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <label for="x_card_code" class="control-label mb-1">Security
-                                            code</label>
-                                        <div class="input-group">
-                                            <input id="x_card_code" name="x_card_code" type="tel"
-                                                class="form-control cc-cvc" value="" data-val="true"
-                                                data-val-required="Please enter the security code"
-                                                data-val-cc-cvc="Please enter a valid security code" autocomplete="off">
+                            <!-- Slug -->
+                            <div class="col-md-6">
+                                <label class="form-label">Category Slug</label>
+                                <input type="text" name="category_slug" value="{{ $category_slug ?? '' }}"
+                                    class="form-control" required>
+                            </div>
 
-                                        </div>
-                                    </div>
-                                </div> --}}
-                                </div>
-                                <div class="d-grid">
-                                    <input type="hidden" name="id" value="{{$id ?? ''}}">
-                                    <button id="payment-button" type="submit" class="btn btn-lg btn-info">
-                                        Submit
-                                        {{-- <i class="fa-solid fa-lock fa-lg"></i>&nbsp; --}}
-                                        {{-- <span id="payment-button-amount">Pay $100.00</span> --}}
-                                        {{-- <span id="payment-button-sending" style="display:none;">Sending…</span> --}}
-                                    </button>
-                                </div>
-                            </form>
+                            <!-- Parent Category -->
+                            <div class="col-md-6">
+                                <label class="form-label">Parent Category</label>
+                                <select name="parent_id" class="form-control">
+                                    <option value="0">Main Category</option>
+
+                                    @foreach ($parent_categories as $list)
+                                        <option value="{{ $list->id }}"
+                                            {{ ($parent_id ?? 0) == $list->id ? 'selected' : '' }}>
+                                            {{ $list->category_name }}
+                                        </option>
+                                    @endforeach
+
+                                </select>
+                            </div>
+
                         </div>
-                    </div>
+
+                        <div class="d-grid mt-4">
+                            <input type="hidden" name="id" value="{{ $id ?? '' }}">
+                            <button id="payment-button" type="submit" class="btn btn-lg btn-info">
+                                Submit
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

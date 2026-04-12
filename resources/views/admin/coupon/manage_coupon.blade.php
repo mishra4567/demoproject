@@ -7,89 +7,63 @@
             <a href="{{ route('coupons') }}">
                 <button type="button" class="btn btn-success " disabled="">Back to Coupon</button>
             </a>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card">
-                        {{-- <div class="card-header">Manage Coupon</div> --}}
-                        <div class="card-body">
-                            {{-- <div class="card-title">
-                                <h3 class="text-center title-2">Pay Invoice</h3>
+            <div class="card">
+                <div class="card-body">
+                    <form action="{{ route('coupons.manage_coupons_process') }}" method="post">
+                        @csrf
+                        <div class="row g-3">
+                            <!-- Title -->
+                            <div class="col-md-6">
+                                <label class="form-label">Coupon Title</label>
+                                <input type="text" name="title" value="{{ $title }}" class="form-control"
+                                    placeholder="Enter coupon title" required>
                             </div>
-                            <hr> --}}
-                            <form action="{{ route('coupons.manage_coupons_process') }}" method="post">
-                                @csrf
-                                {{-- {{session('message')}} --}}
-                                <div class="mb-3">
-                                    <div class="mb-3">
-                                        <label for="title" class="control-label mb-1">Coupon
-                                            Title</label>
-                                        <input id="title" name="title"
-                                        value="{{ $title }}"
-                                            type="text" class="form-control" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="code" class="control-label mb-1">Coupon Code
-                                        </label>
-                                        <input id="code" name="code"
-                                        value="{{ $code }}"
-                                            type="text" class="form-control" required>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="value" class="control-label mb-1">Coupon value
-                                        </label>
-                                        <input id="value" name="value"
-                                        value="{{ $value }}"
-                                            type="text" class="form-control" required>
-                                    </div>
-
-                                    {{-- <div class="mb-3">
-                                    <label for="cc-number" class="control-label mb-1">Card number</label>
-                                    <input id="cc-number" name="cc-number" type="tel"
-                                        class="form-control cc-number identified visa" value="" data-val="true"
-                                        data-val-required="Please enter the card number"
-                                        data-val-cc-number="Please enter a valid card number" autocomplete="cc-number">
-                                    <span class="help-block" data-valmsg-for="cc-number" data-valmsg-replace="true"></span>
-                                </div> --}}
-                                    {{-- <div class="row">
-                                    <div class="col-6">
-                                        <div class="mb-3">
-                                            <label for="cc-exp" class="control-label mb-1">Expiration</label>
-                                            <input id="cc-exp" name="cc-exp" type="tel" class="form-control cc-exp"
-                                                value="" data-val="true"
-                                                data-val-required="Please enter the card expiration"
-                                                data-val-cc-exp="Please enter a valid month and year" placeholder="MM / YY"
-                                                autocomplete="cc-exp">
-                                            <span class="help-block" data-valmsg-for="cc-exp"
-                                                data-valmsg-replace="true"></span>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <label for="x_card_code" class="control-label mb-1">Security
-                                            code</label>
-                                        <div class="input-group">
-                                            <input id="x_card_code" name="x_card_code" type="tel"
-                                                class="form-control cc-cvc" value="" data-val="true"
-                                                data-val-required="Please enter the security code"
-                                                data-val-cc-cvc="Please enter a valid security code" autocomplete="off">
-
-                                        </div>
-                                    </div>
-                                </div> --}}
+                            <!-- Code -->
+                            <div class="col-md-6">
+                                <label class="form-label">Coupon Code</label>
+                                <input type="text" name="code" value="{{ $code }}" class="form-control"
+                                    placeholder="Enter coupon code" required>
+                            </div>
+                            <!-- Value -->
+                            <div class="col-md-6">
+                                <label class="form-label">Coupon Value</label>
+                                <input type="number" name="value" value="{{ $value }}" class="form-control"
+                                    placeholder="Enter value" required>
+                            </div>
+                            <!-- Value -->
+                            <div class="col-md-6">
+                                <label class="form-label">Min order Amt</label>
+                                <input type="number" name="min_order_amt" value="{{ $min_order_amt }}" class="form-control"
+                                    placeholder="Enter value" required>
+                            </div>
+                            <!-- Type -->
+                            <div class="col-md-6">
+                                <label class="form-label">Coupon Type</label>
+                                <select name="type" class="form-control">
+                                    <option value="value" {{ ($type ?? '') == 'value' ? 'selected' : '' }}>Value</option>
+                                    <option value="per" {{ ($type ?? '') == 'per' ? 'selected' : '' }}>Percent
+                                    </option>
+                                </select>
+                            </div>
+                            <!-- Promo Switch -->
+                            <div class="col-md-6 d-flex align-items-center">
+                                <div class="form-check form-switch mt-3">
+                                    <input type="checkbox" name="is_promo" class="form-check-input" id="is_promo"
+                                        value="1" {{ ($is_one_time ?? 0)== 1 ? 'checked' : '' }}>
+                                    <label class="form-check-label ms-2" for="is_promo">One Time Usable</label>
                                 </div>
-                                <div class="d-grid">
-                                    <input type="hidden" name="id"
-                                    value="{{ $id ?? '' }}"
-                                    >
-                                    <button id="payment-button" type="submit" class="btn btn-lg btn-info">
-                                        Submit
-                                        {{-- <i class="fa-solid fa-lock fa-lg"></i>&nbsp; --}}
-                                        {{-- <span id="payment-button-amount">Pay $100.00</span> --}}
-                                        {{-- <span id="payment-button-sending" style="display:none;">Sending…</span> --}}
-                                    </button>
-                                </div>
-                            </form>
+                            </div>
                         </div>
-                    </div>
+
+                        <!-- Submit -->
+                        <div class="mt-4">
+                            <input type="hidden" name="id" value="{{ $id ?? '' }}">
+                            <button type="submit" class="btn btn-info w-100">
+                                Submit
+                            </button>
+                        </div>
+
+                    </form>
                 </div>
             </div>
         </div>

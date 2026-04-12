@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 
@@ -24,22 +25,34 @@ class CategoryController extends Controller
      */
     public function managecategory(Request $request, $id = null)
     {
+        $parentQuery = Category::where('status', 1);
         if (!empty($id) && is_numeric($id)) {
 
-            $category = Category::where('id', $id)->first();
+            $category = Category::findOrFail($id);
 
             if (!$category) {
                 abort(404);
             }
+            $parent_categories = $parentQuery->where('id', '!=', $id)->get();
 
-            $result['category_name'] = $category->category_name;
-            $result['category_slug'] = $category->category_slug;
-            $result['id'] = $category->id;
+            $result = [
+                'category_name' => $category->category_name,
+                'category_slug' => $category->category_slug,
+                'parent_id'     => $category->parent_id ?? 0,
+                'id'            => $category->id,
+                'parent_categories' => $parent_categories,
+            ];
         } else {
 
-            $result['category_name'] = '';
-            $result['category_slug'] = '';
-            $result['id'] = 0;
+            $result = [
+                'category_name' => '',
+                'category_slug' => '',
+                'parent_id'     => 0,
+                'id'            => 0,
+                'parent_categories' => $parentQuery
+                    ->orderBy('category_name')
+                    ->get(),
+            ];
         }
 
         return view('admin.manage_category', $result);
@@ -69,6 +82,7 @@ class CategoryController extends Controller
 
         $model->category_name = $request->category_name;
         $model->category_slug = $request->category_slug;
+        $model->parent_id = $request->parent_id;
         $model->status = 1;
         $model->save();
 

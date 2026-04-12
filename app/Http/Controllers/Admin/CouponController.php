@@ -35,12 +35,18 @@ class CouponController extends Controller
             $result['title'] = $coupon->title;
             $result['code'] = $coupon->code;
             $result['value'] = $coupon->value;
+            $result['type'] = $coupon->type;
+            $result['min_order_amt'] = $coupon->min_order_amt;
+            $result['is_one_time'] = $coupon->is_one_time;
             $result['id'] = $coupon->id;
         } else {
 
             $result['title'] = '';
             $result['code'] = '';
             $result['value'] = '';
+            $result['type'] = '';
+            $result['min_order_amt'] = '';
+            $result['is_one_time'] = '';
             $result['id'] = 0;
         }
 
@@ -68,6 +74,9 @@ class CouponController extends Controller
         $model->title = $request->title;
         $model->code = $request->code;
         $model->value = $request->value;
+        $model->type = $request->type;
+        $model->min_order_amt = $request->min_order_amt;
+        $model->is_one_time = $request->has('is_one_time') ? 1 : 0;
         $model->save();
 
         return redirect('admin/coupons')
@@ -133,5 +142,4 @@ class CouponController extends Controller
         ]);
         // return back()->with('success', 'Bulk action applied');
     }
-
 }
