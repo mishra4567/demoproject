@@ -3,7 +3,7 @@
 
 16.4.2026 - 17.4.2026
 vertion:- 1.6.9
-Command:- Add Customer address and repor psge (report page has bug)
+Command:- Add Customer address and report page (report page has bug)
 fixing some bug in customer details page and add new field in database and form.
             & Adding New Page for Customer Address (Add, Update, Delete)
             & pop up to add new address in customer details page.
