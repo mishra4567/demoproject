@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\SizeController;
 use App\Http\Controllers\Admin\ViewProductController;
 // use App\Http\Controllers\Admin\BarcodeController;
 use App\Http\Controllers\Admin\BarcodeController;
+use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\TechnicalSpecsController;
 
 // Route::get('admin', [AdminController::class, 'index']);
@@ -32,6 +33,16 @@ Route::group(['middleware' => 'admin_auth'], function () {
         ->name('dashboard')->setDefaults(['label' => 'Go to Dashboard', 'role' => 0]);
     Route::get('admin/updatepassword', [AdminController::class, 'updatepassword']);
     Route::get('/admin/logout', [AdminController::class, 'logout']);
+    /**
+     * Calender to do work
+     */
+    Route::get('admin/calendar', [CalendarEventController::class, 'index'])
+        ->name('calendar')->setDefaults(['label' => 'Calender', 'role' => 0]);
+    Route::get('admin/calendar/fetch', [CalendarEventController::class, 'fetch']);
+    Route::post('admin/calendar/store/{id?}', [CalendarEventController::class, 'store'])
+        ->name('calendar.store');
+    Route::post('/admin/calendar/delete/{id}', [CalendarEventController::class, 'deleteEvent'])
+        ->name('calendar.delete');
     /**
      * Category Routes
      */
@@ -232,13 +243,26 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::get('admin/product/productview/{id?}', [ViewProductController::class, 'index'])
         ->name('product.productview')->setDefaults(['label' => '', 'role' => 0]);
     /**
-     * Calender to do work
+     * Full Product View Route End
      */
-    Route::get('admin/calendar', [CalendarEventController::class, 'index'])
-        ->name('calendar')->setDefaults(['label' => 'Calender', 'role' => 0]);
-    Route::get('admin/calendar/fetch', [CalendarEventController::class, 'fetch']);
-    Route::post('admin/calendar/store/{id?}', [CalendarEventController::class, 'store'])
-        ->name('calendar.store');
-    Route::post('/admin/calendar/delete/{id}', [CalendarEventController::class, 'deleteEvent'])
-        ->name('calendar.delete');
+    /**
+     * Product Routes
+     */
+    Route::get('admin/customers', [CustomerController::class, 'index'])
+        ->name('customer')->setDefaults(['label' => 'View customer', 'role' => 0]);
+    Route::get('admin/customer/managecustomer/{id?}', [CustomerController::class, 'managecustomer'])
+        ->name('customer.view_customer')->setDefaults(['label' => 'Add customer', 'role' => 0]);
+    Route::post('admin/customer/managecustomerprocess', [CustomerController::class, 'managecustomerprocess'])
+        ->name('customer.manage_customer_process')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('admin/customer/status/{id}', [CustomerController::class, 'status'])
+        ->name('customer.status')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('admin/customer/delete/{id}', [CustomerController::class, 'delete'])
+        ->name('customer.delete')->setDefaults(['label' => '', 'role' => 1]);
+    Route::post('admin/customer/bulkaction', [CustomerController::class, 'bulkAction'])
+        ->name('customer.bulkAction')->setDefaults(['label' => '', 'role' => 1]);
+    Route::post('admin/customer/saveaddress', [CustomerController::class, 'saveAddress'])
+        ->name('customer.save_address')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('admin/customer/deleteaddress/{id?}/{addid?}', [CustomerController::class, 'deleteAddress'])
+        ->name('customer.delete_address')->setDefaults(['label' => '', 'role' => 1]);
+
 });

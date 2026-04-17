@@ -53,7 +53,6 @@
                                             </div>
                                             <div class="col-md-4">
                                                 <div class="mb-3">
-
                                                     <label for="brand_id" class="control-label mb-1">Product brand
                                                     </label>
                                                     <select name="brand_id" id="brand_id" class="form-control">
@@ -71,7 +70,6 @@
                                                     </select>
                                                     {{-- <input id="brand" name="brand" value="{{ $brand }}"
                                                         type="text" class="form-control" required> --}}
-
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
@@ -85,19 +83,46 @@
                                         </div>
                                     </div>
                                     <div class="mb-3">
-                                        {{-- Media Modal Start --}}
-                                        <button type="button" class="btn btn-outline-primary"
-                                            onclick="addMedia('product')">
-                                            Select Image
-                                        </button>
-                                        <input type="hidden" name="media_id" id="media_id_product"
-                                            value="{{ $media_id ?? '' }}">
-                                        <div id="preview_product">
-                                            @if (!empty($image))
-                                                <img src="{{ asset('storage/media/' . $image) }}" width="120">
-                                            @endif
+                                        <div class="row">
+                                            <div class="col-md-4 d-flex align-items-center">
+                                                {{-- Media Modal Start --}}
+                                                <button type="button" class="btn btn-outline-primary mb-3"
+                                                    onclick="addMedia('product')">
+                                                    Select Image
+                                                </button>
+                                                <input type="hidden" name="media_id" id="media_id_product"
+                                                    value="{{ $media_id ?? '' }}">
+                                                <div id="preview_product" class="d-flex flex-wrap gap-2">
+                                                    <div class="position-relative m-2">
+                                                        @if (!empty($image))
+                                                            <img src="{{ asset('storage/media/' . $image) }}"
+                                                                width="120">
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                                {{-- Media Modal End --}}
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-3">
+                                                    <label for="coupon_id" class="control-label mb-1">Coupon Add ?
+                                                    </label>
+                                                    <select name="coupon_id" id="coupon_id" class="form-control">
+                                                        <option value="">select Coupon</option>
+                                                        @foreach ($coupon_select as $coupon)
+                                                            @if ($brand == $coupon->id)
+                                                                <option selected value="{{ $coupon->id }}">
+                                                                    {{ $coupon->title }}
+                                                                </option>
+                                                            @else
+                                                                <option value="{{ $coupon->id }}"> {{ $coupon->title }}
+                                                                </option>
+                                                            @endif
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4"></div>
                                         </div>
-                                        {{-- Media Modal End --}}
                                     </div>
 
                                     <div class="mb-3">

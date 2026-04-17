@@ -1,4 +1,15 @@
 
+
+
+16.4.2026 - 17.4.2026
+vertion:- 1.6.9
+Command:- Add Customer address and repor psge (report page has bug)
+fixing some bug in customer details page and add new field in database and form.
+            & Adding New Page for Customer Address (Add, Update, Delete)
+            & pop up to add new address in customer details page.
+14.4.2026
+vertion:- 1.6.8
+Command:- Adding Customer Details Page (Add, Update, Delete, status)
 12.4.2026
 vertion::- 1.5.8
 Comment:- In Category page add parent category ( dropdown, database, controller), Bug Fix.

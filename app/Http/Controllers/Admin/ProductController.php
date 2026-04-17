@@ -115,6 +115,7 @@ class ProductController extends Controller
         $result['colors']   = DB::table('colors')->where('status', 1)->get();
         $result['brands']   = DB::table('brands')->where('status', 1)->get();
         $result['media']    = DB::table('create_media_tables')->where('status', 1)->get();
+        $result['coupon_select']      = DB::table('coupons')->where('status', 1)->get();
         // echo "<pre>";
         // print_r($result['brands']);
         // echo "</pre";
@@ -157,6 +158,7 @@ class ProductController extends Controller
         $product->slug = $request->slug;
         $product->brand = $request->brand_id;
         $product->model = $request->model;
+        $product->coupon_id = $request->coupon_id;
         $product->short_desc = $request->short_desc;
         $product->desc = $request->desc;
         $product->keywords = $request->keywords;

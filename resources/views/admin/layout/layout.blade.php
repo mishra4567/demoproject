@@ -141,6 +141,14 @@
                                 </li>
                             </ul>
                         </li>
+                        <li class="has-sub @yield('customer_select')">
+                            <a href="{{ route('customer') }}">
+                                <i class="fa-solid fa-fill-drip"></i>Customers</a>
+                        </li>
+                        <li class="has-sub @yield('customer_select')">
+                            <a href="{{ route('report') }}">
+                                <i class="fa-solid fa-fill-drip"></i>Report</a>
+                        </li>
                     </ul>
                 </div>
             </nav>
@@ -227,9 +235,6 @@
                         <li class="has-sub">
                             <a class="js-arrow" href="#">
                                 <i class="fas fa-copy"></i>Media
-                                {{-- <span class="arrow">
-                                    <i class="fas fa-angle-down"></i>
-                                </span> --}}
                             </a>
                             <ul class="list-unstyled navbar__sub-list js-sub-list">
                                 <li>
@@ -240,11 +245,15 @@
                                     <a href="{{ route('media.managemedia') }}">
                                         <i class="fas fa-user"></i>Add Media File</a>
                                 </li>
-                                {{-- <li>
-                                    <a href="forget-pass.html">
-                                        <i class="fas fa-unlock-alt"></i>Forget Password</a>
-                                </li> --}}
                             </ul>
+                        </li>
+                        <li class="has-sub @yield('customer_select')">
+                            <a href="{{ route('customer') }}">
+                                <i class="fa-solid fa-fill-drip"></i>Customers</a>
+                        </li>
+                        <li class="has-sub @yield('customer_select')">
+                            <a href="{{ route('report') }}">
+                                <i class="fa-solid fa-fill-drip"></i>Report</a>
                         </li>
                     </ul>
                 </nav>
