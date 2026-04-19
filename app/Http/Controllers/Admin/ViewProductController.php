@@ -35,20 +35,20 @@ class ViewProductController extends Controller
             ->where('products.id', $id)
             ->where('products.status', 1)
             ->first();
+        if (!$product) {
+            return view('admin.partials.not_found_page',[
+                'type'=>'404',
+                'title'=>'Product Not Found',
+                'message' => 'The product you are looking for does not exist or has been removed.',
+                'btnText' => 'Back to Products',
+                'btnUrl'  => route('product'),
+            ]);
+        }
         $technical_specification = DB::table('technical_specs')
             ->where('product_id', $id)
             ->where('status', 1)
             ->first();
 
-        // dd(
-        //     DB::getSchemaBuilder()->getColumnListing('categories'),
-        //     DB::getSchemaBuilder()->getColumnListing('brands'),
-        //     DB::getSchemaBuilder()->getColumnListing('products'),
-        // );
-
-        if (!$product) {
-            abort(404);
-        }
 
         $attributes = DB::table('linkproducts')
             ->leftJoin('sizes', function ($join) {
@@ -121,17 +121,18 @@ class ViewProductController extends Controller
          * Old code for view product
          */
 
-        echo "<pre>";
-        print_r($product);
-        print_r($technical_specification);
-        print_r($brand_name . '<br>');
-        print_r($attributes);
-        print_r($gallery);
-        print_r($categoryName . '<br>');
-        print_r($media_url);
-        echo "</pre>";
-        die();
-        return view('admin.product.viewproduct');
+        // echo "<pre>";
+        // print_r($product);
+        // print_r($technical_specification);
+        // print_r($brand_name . '<br>');
+        // print_r($attributes);
+        // print_r($gallery);
+        // print_r($categoryName . '<br>');
+        // print_r($media_url);
+        // echo "</pre>";
+        // die();
+        return view('admin.product.viewproduct',
+        compact('product', 'technical_specification', 'attributes', 'gallery', 'categoryName', 'brand_name', 'media_url'));
         // echo "This is for size" ;
     }
 }

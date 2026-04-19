@@ -1,26 +1,11 @@
-{{-- resources/views/reviews/create.blade.php --}}
-{{-- <!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Write a Review – ShopStar</title> --}}
-
-    {{-- ── CDN: Bootstrap 5.3 ── --}}
-    {{-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"> --}}
-    {{-- ── CDN: Bootstrap Icons ── --}}
-    {{-- <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"> --}}
-    {{-- ── Google Fonts ── --}}
-    {{-- <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Nunito:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"> --}}
-
+@extends('admin.layout.layout')
+@section('page_title', 'Reports')
+@section('report_select', 'active')
+@section('container')
     <style>
         /* ══════════════════════════════════════════════
-           DESIGN TOKENS
-        ══════════════════════════════════════════════ */
+                       DESIGN TOKENS
+                    ══════════════════════════════════════════════ */
         :root {
             --gold: #c9922a;
             --gold-lt: #f5c96a;
@@ -49,8 +34,8 @@
 
 
         /* ══════════════════════════════════════════════
-           SECTION CARD
-        ══════════════════════════════════════════════ */
+                       SECTION CARD
+                    ══════════════════════════════════════════════ */
         .rev-card {
             background: var(--card-bg);
             border: 1.5px solid var(--border);
@@ -83,8 +68,8 @@
         }
 
         /* ══════════════════════════════════════════════
-           STAR RATING
-        ══════════════════════════════════════════════ */
+                       STAR RATING
+                    ══════════════════════════════════════════════ */
         .star-group {
             display: flex;
             gap: .3rem;
@@ -123,8 +108,8 @@
         }
 
         /* ══════════════════════════════════════════════
-           FORM OVERRIDES
-        ══════════════════════════════════════════════ */
+                       FORM OVERRIDES
+                    ══════════════════════════════════════════════ */
         .form-label-custom {
             display: block;
             font-size: .7rem;
@@ -176,8 +161,8 @@
         }
 
         /* ══════════════════════════════════════════════
-           DYNAMIC FIELD BLOCKS
-        ══════════════════════════════════════════════ */
+                       DYNAMIC FIELD BLOCKS
+                    ══════════════════════════════════════════════ */
         #fieldsContainer {
             display: flex;
             flex-direction: column;
@@ -261,8 +246,8 @@
         }
 
         /* ══════════════════════════════════════════════
-           ADD SECTION BUTTON
-        ══════════════════════════════════════════════ */
+                       ADD SECTION BUTTON
+                    ══════════════════════════════════════════════ */
         .btn-add-section {
             width: 100%;
             border: 2px dashed var(--gold);
@@ -294,8 +279,8 @@
         }
 
         /* ══════════════════════════════════════════════
-           FOOTER ACTIONS
-        ══════════════════════════════════════════════ */
+                       FOOTER ACTIONS
+                    ══════════════════════════════════════════════ */
         .form-footer {
             display: flex;
             align-items: center;
@@ -356,8 +341,8 @@
         }
 
         /* ══════════════════════════════════════════════
-           EMPTY STATE
-        ══════════════════════════════════════════════ */
+                       EMPTY STATE
+                    ══════════════════════════════════════════════ */
         .empty-state {
             text-align: center;
             padding: 2rem 1rem;
@@ -370,8 +355,8 @@
         }
 
         /* ══════════════════════════════════════════════
-           COUNTER PILL
-        ══════════════════════════════════════════════ */
+                       COUNTER PILL
+                    ══════════════════════════════════════════════ */
         .count-pill {
             background: var(--gold);
             color: #fff;
@@ -385,8 +370,8 @@
         }
 
         /* ══════════════════════════════════════════════
-           CUSTOM ALERTS
-        ══════════════════════════════════════════════ */
+                       CUSTOM ALERTS
+                    ══════════════════════════════════════════════ */
         .alert-success-custom {
             background: var(--success-bg);
             border: 1.5px solid var(--success-bdr);
@@ -402,29 +387,23 @@
         }
 
         /* ══════════════════════════════════════════════
-           HELPER
-        ══════════════════════════════════════════════ */
+                       HELPER
+                    ══════════════════════════════════════════════ */
         .divider-dashed {
             border: none;
             border-top: 1.5px dashed var(--border);
             margin: 1.1rem 0;
         }
     </style>
-</head>
-
-<body>
     <form action="
                 {{-- {{ route('reviews.store') }} --}}
                  " method="POST" enctype="multipart/form-data"
         id="reviewForm" novalidate>
         @csrf
-        <input type="hidden" name="product_id"
-            value="
-                    {{-- {{ $productId }} --}}
-                     ">
 
         {{-- ── Card 1: Rating + Title ── --}}
-        <div class="rev-card">
+        <div class="card border mb-3">
+        <div class="card-body">
             <div class="rev-card-title">Overall Rating</div>
 
             {{-- Star buttons --}}
@@ -441,16 +420,17 @@
             <label class="form-label-custom" for="reviewTitle">
                 Review Title <span class="opt">(optional)</span>
             </label>
-            <input type="text" id="reviewTitle" name="title"
-                class="form-control @error('title') is-invalid @enderror"
+            <input type="text" id="reviewTitle" name="title" class="form-control @error('title') is-invalid @enderror"
                 placeholder="Summarise your experience in a few words…" value="{{ old('title') }}" maxlength="255">
             @error('title')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
+        </div>
 
         {{-- ── Card 2: Dynamic Sections ── --}}
-        <div class="rev-card">
+        <div class="card border mb-3">
+        <div class="card-body">
 
             {{-- Header --}}
             <div class="d-flex align-items-center justify-content-between mb-1">
@@ -481,13 +461,11 @@
 
             {{-- Footer: cancel + submit --}}
             <div class="form-footer">
-                <a href="javascript:history.back()" class="btn-cancel-form">
-                    <i class="bi bi-arrow-left"></i> Cancel
-                </a>
                 <button type="submit" class="btn-submit-form" id="submitBtn">
                     <i class="bi bi-send-fill"></i> Submit Review
                 </button>
             </div>
+        </div>
         </div>
 
     </form>
@@ -559,9 +537,6 @@
         </div>
     </template>
 
-    {{-- ══════════════════════════════════════════════
-     BOOTSTRAP 5 JS (CDN)
-══════════════════════════════════════════════ --}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
@@ -813,7 +788,4 @@
 
         })();
     </script>
-
-</body>
-
-</html>
+@endsection

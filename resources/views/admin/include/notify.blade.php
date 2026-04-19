@@ -35,27 +35,34 @@
         {{ session('error') }}
     </div>
 @endif
-@if ($errors->any())
-    <div class="alert alert-danger">
-        <ul class="mb-0">
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+@isset($errors)
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+@endisset
 
-@error('category_name')
-    <div class="alert alert-danger" role="alert">
-        {{ $message }}
-    </div>
-@enderror
+@isset($error)
+    @error('category_name')
+        <div class="alert alert-danger" role="alert">
+            {{ $message }}
+        </div>
+    @enderror
+@endisset
 
-@error('category_slug')
-    <div class="alert alert-danger" role="alert">
-        {{ $message }}
-    </div>
-@enderror
+@isset($error)
+    @error('category_slug')
+        <div class="alert alert-danger" role="alert">
+            {{ $message }}
+        </div>
+    @enderror
+@endisset
+
 {{-- Notifiction using javacript --}}
 <div id="notify-area">
     @if (session('success_event'))

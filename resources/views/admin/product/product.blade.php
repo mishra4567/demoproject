@@ -5,7 +5,7 @@
     <div class="section__content section__content--p30">
         <div class="container-fluid">
             <h3 class="title-5 m-b-35">Product</h3>
-            <a href="{{ route('product.add_product') }}">
+            <a href="{{ route('product.manage') }}">
                 <button type="button" class="btn btn-success ">Add Product</button>
             </a>
             <div class="row">
@@ -67,11 +67,15 @@
                                         <td>{{ $list->slug }}</td>
                                         <td><img src="{{ asset('storage/media/' . $list->file_name) }}" alt=""></td>
                                         <td>
+                                            <a href="{{ route('product.productview', ['id' => $list->id]) }}" target="_blank"
+                                                class="btn btn-outline-{{ $list->is_publish == 1 ? 'info' : 'warning' }} btn-sm ">
+                                                {{ $list->is_publish == 1 ? 'Publish' : 'Draft' }}
+                                            </a>
                                             <a href="{{ route('product.status', $list->id) }}"
                                                 class="btn btn-outline-{{ $list->status == 1 ? 'info' : 'warning' }} btn-sm ">
                                                 {{ $list->status == 1 ? 'Active' : 'Deactive' }}
                                             </a>
-                                            <a href="{{ route('product.edit_product', $list->id) }}">
+                                            <a href="{{ route('product.manage', $list->id) }}">
                                                 <button type="button" class="btn btn-outline-success btn-sm">Edit </button>
                                             </a>
                                             <a href="{{ route('product.delete', $list->id) }}">

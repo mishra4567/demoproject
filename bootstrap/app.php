@@ -3,10 +3,12 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__ . '/../routes/web.php',
+        api: __DIR__ . '/../routes/api.php',
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
     )
@@ -16,5 +18,16 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Adding custom exception handler for 404 errors
+        $exceptions->render(function (NotFoundHttpException $e, $request) {
+            if ($request->is('admin/*')) {
+                return response()->view('admin.partials.not_found_page', [
+                    'type'    => '404',
+                    'title'   => 'Page Not Found',
+                    'message' => 'The page you are looking for does not exist.',
+                    'btnText' => 'Go to Dashboard',
+                    'btnUrl'  => url('admin/dashboard'),
+                ], 404);
+            }
+        });
     })->create();

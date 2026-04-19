@@ -15,8 +15,9 @@ use App\Http\Controllers\Admin\RouteSearchController;
 use App\Http\Controllers\Admin\SizeController;
 use App\Http\Controllers\Admin\ViewProductController;
 // use App\Http\Controllers\Admin\BarcodeController;
-use App\Http\Controllers\Admin\BarcodeController;
+// use App\Http\Controllers\Admin\BarcodeController;
 use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\TechnicalSpecsController;
 
 // Route::get('admin', [AdminController::class, 'index']);
@@ -177,16 +178,16 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::get('admin/product', [ProductController::class, 'index'])
         ->name('product')->setDefaults(['label' => 'View Product', 'role' => 0]);
     // insert product
-    Route::get('admin/product/manageproduct', [ProductController::class, 'manageproduct'])
-        ->name('product.add_product')->setDefaults(['label' => 'Add Product', 'role' => 0]);
+    Route::get('admin/product/manageproduct/{id?}', [ProductController::class, 'manageproduct'])
+        ->name('product.manage')->setDefaults(['label' => 'Add Product', 'role' => 0]);
     Route::post('admin/product/manageproductprocess', [ProductController::class, 'manageproductprocess'])
         ->name('product.manage_product_process')->setDefaults(['label' => '', 'role' => 1]);
-    // edit product
-    Route::get('admin/product/manageproduct/{id}', [ProductController::class, 'manageproduct'])
-        ->name('product.edit_product')->setDefaults(['label' => '', 'role' => 1]);
     // Status change product
     Route::get('admin/product/status/{id}', [ProductController::class, 'status'])
         ->name('product.status')->setDefaults(['label' => '', 'role' => 1]);
+    // Status publish product
+    Route::get('admin/product/publish/{id}', [ProductController::class, 'publish'])
+        ->name('product.publish')->setDefaults(['label' => '', 'role' => 1]);
     // delete product
     Route::get('admin/product/delete/{id}', [ProductController::class, 'delete'])
         ->name('product.delete')->setDefaults(['label' => '', 'role' => 1]);
@@ -265,4 +266,11 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::get('admin/customer/deleteaddress/{id?}/{addid?}', [CustomerController::class, 'deleteAddress'])
         ->name('customer.delete_address')->setDefaults(['label' => '', 'role' => 1]);
 
+    /**
+     * Report Send
+     */
+    Route::get('admin/reports/view', [ReportController::class, 'index'])
+        ->name('admin.reportsView')->setDefaults(['label' => 'Add Report', 'role' => 0]);
+    Route::get('admin/report/new', [ReportController::class, 'create'])
+        ->name('admin.reports')->setDefaults(['label' => 'Add Report', 'role' => 0]);
 });

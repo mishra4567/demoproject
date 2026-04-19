@@ -97,7 +97,7 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('product.add_product') }}">
+                                    <a href="{{ route('product.manage') }}">
                                         <i class="fas fa-user"></i>Add Product
                                     </a>
                                 </li>
@@ -211,7 +211,7 @@
                                         <i class="fas fa-sign-in-alt"></i>All Product</a>
                                 </li>
                                 <li>
-                                    <a href="{{ route('product.add_product') }}">
+                                    <a href="{{ route('product.manage') }}">
                                         <i class="fas fa-user"></i>Add Product</a>
                                 </li>
                                 <li>
@@ -251,9 +251,20 @@
                             <a href="{{ route('customer') }}">
                                 <i class="fa-solid fa-fill-drip"></i>Customers</a>
                         </li>
-                        <li class="has-sub @yield('customer_select')">
-                            <a href="{{ route('report') }}">
-                                <i class="fa-solid fa-fill-drip"></i>Report</a>
+                        <li class="has-sub">
+                            <a class="js-arrow" href="#">
+                                <i class="fas fa-copy"></i>Report
+                            </a>
+                            <ul class="list-unstyled navbar__sub-list js-sub-list">
+                                <li>
+                                    <a href="{{ route('admin.reportsView') }}">
+                                        <i class="fas fa-sign-in-alt"></i>View</a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('admin.reports') }}">
+                                        <i class="fas fa-user"></i>Add</a>
+                                </li>
+                            </ul>
                         </li>
                     </ul>
                 </nav>

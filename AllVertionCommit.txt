@@ -1,6 +1,8 @@
 
 
-
+19.04.2026
+vertion:- 1.7.9
+Comment:- Fix Security Bug in Product Details Page, Add Custom page not found in Every where Page.
 16.4.2026 - 17.4.2026
 vertion:- 1.6.9
 Command:- Add Customer address and report page (report page has bug)
