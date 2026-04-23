@@ -116,6 +116,7 @@ class ProductController extends Controller
         $result['brands']   = DB::table('brands')->where('status', 1)->get();
         $result['media']    = DB::table('create_media_tables')->where('status', 1)->get();
         $result['coupon_select']      = DB::table('coupons')->where('status', 1)->get();
+        $result['info'] = config('field_info.product');
         // echo "<pre>";
         // print_r($result['brands']);
         // echo "</pre";
@@ -264,6 +265,21 @@ class ProductController extends Controller
 
         return redirect()->back()->with('success', 'Status Updated');
     }
+    /**
+     * Show Product is publish or draft.
+     */
+    public function publish($id)
+    {
+        $model = Product::findOrFail($id); // ← 404 if not found
+
+        // ✅ toggle is_publish correctly
+        $model->is_publish = ($model->is_publish == 1) ? 0 : 1;
+        $model->save();
+
+        $message = $model->is_publish == 1 ? 'Product is Published' : 'Product is Draft';
+
+        return redirect()->back()->with('success', $message);
+    }
     public function bulkAction(Request $request)
     {
         // $ids = (array) $request->ids;
@@ -290,52 +306,4 @@ class ProductController extends Controller
         ]);
         // return back()->with('success', 'Bulk action applied');
     }
-
-
-    // public function product_attr_delete(Request $request, $paid, $pid)
-    // {
-    //     // Get attribute
-    //     $attr = DB::table('product_attr')->where('id', $paid)->first();
-
-    //     // Delete image if exists
-    //     if ($attr && $attr->attr_image) {
-
-    //         $imagePath = public_path('/storage/media/' . $attr->attr_image);
-
-    //         if (file_exists($imagePath)) {
-    //             unlink($imagePath);
-    //         }
-    //     }
-
-    //     // Delete database record
-    //     DB::table('product_attr')->where('id', $paid)->delete();
-
-    //     return redirect('admin/product/manageproduct/' . $pid)
-    //         ->with('success', 'Product Attribute Deleted Successfully...');
-
-    //     // echo "product deleted" ;
-    // }
-    // public function product_images_delete(Request $request, $piid, $pid)
-    // {
-    //     // Get Product images
-    //     $images = DB::table('product_images')->where('id', $piid)->first();
-
-    //     // Delete image if exists
-    //     if ($images && $images->image) {
-
-    //         $imagePath = public_path('/storage/media/' . $images->image);
-
-    //         if (file_exists($imagePath)) {
-    //             unlink($imagePath);
-    //         }
-    //     }
-
-    //     // Delete database record
-    //     DB::table('product_images')->where('id', $piid)->delete();
-
-    //     return redirect('admin/product/manageproduct/' . $pid)
-    //         ->with('success', 'Product Image Deleted Successfully...');
-
-    //     // echo "product deleted" ;
-    // }
 }

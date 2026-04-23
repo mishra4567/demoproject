@@ -14,31 +14,51 @@
                         <div class="row g-3">
                             <!-- Title -->
                             <div class="col-md-6">
-                                <label class="form-label">Coupon Title</label>
+                                <label class="form-label">Coupon Title
+                                    @include('admin.partials.field_info', [
+                                        'info' => $info['title'] ?? '',
+                                    ])
+                                </label>
                                 <input type="text" name="title" value="{{ $title }}" class="form-control"
                                     placeholder="Enter coupon title" required>
                             </div>
                             <!-- Code -->
                             <div class="col-md-6">
-                                <label class="form-label">Coupon Code</label>
+                                <label class="form-label">Coupon Code
+                                    @include('admin.partials.field_info', [
+                                        'info' => $info['code'] ?? '',
+                                    ])
+                                </label>
                                 <input type="text" name="code" value="{{ $code }}" class="form-control"
                                     placeholder="Enter coupon code" required>
                             </div>
                             <!-- Value -->
                             <div class="col-md-6">
-                                <label class="form-label">Coupon Value</label>
+                                <label class="form-label">Coupon Value
+                                    @include('admin.partials.field_info', [
+                                        'info' => $info['discount'] ?? '',
+                                    ])
+                                </label>
                                 <input type="number" name="value" value="{{ $value }}" class="form-control"
                                     placeholder="Enter value" required>
                             </div>
                             <!-- Value -->
                             <div class="col-md-6">
-                                <label class="form-label">Min order Amt</label>
+                                <label class="form-label">Min order Amt
+                                    @include('admin.partials.field_info', [
+                                        'info' => $info['min_order'] ?? '',
+                                    ])
+                                </label>
                                 <input type="number" name="min_order_amt" value="{{ $min_order_amt }}" class="form-control"
                                     placeholder="Enter value" required>
                             </div>
                             <!-- Type -->
                             <div class="col-md-6">
-                                <label class="form-label">Coupon Type</label>
+                                <label class="form-label">Coupon Type
+                                    @include('admin.partials.field_info', [
+                                        'info' => $info['type'] ?? '',
+                                    ])
+                                </label>
                                 <select name="type" class="form-control">
                                     <option value="value" {{ ($type ?? '') == 'value' ? 'selected' : '' }}>Value</option>
                                     <option value="per" {{ ($type ?? '') == 'per' ? 'selected' : '' }}>Percent
@@ -49,8 +69,12 @@
                             <div class="col-md-6 d-flex align-items-center">
                                 <div class="form-check form-switch mt-3">
                                     <input type="checkbox" name="is_promo" class="form-check-input" id="is_promo"
-                                        value="1" {{ ($is_one_time ?? 0)== 1 ? 'checked' : '' }}>
-                                    <label class="form-check-label ms-2" for="is_promo">One Time Usable</label>
+                                        value="1" {{ ($is_one_time ?? 0) == 1 ? 'checked' : '' }}>
+                                    <label class="form-check-label ms-2" for="is_promo">One Time Usable
+                                        @include('admin.partials.field_info', [
+                                            'info' => $info['one_time'] ?? '',
+                                        ])
+                                    </label>
                                 </div>
                             </div>
                         </div>

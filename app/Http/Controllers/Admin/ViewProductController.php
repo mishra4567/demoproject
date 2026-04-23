@@ -33,7 +33,7 @@ class ViewProductController extends Controller
                 'brands.name as brand_name',
             )
             ->where('products.id', $id)
-            ->where('products.status', 1)
+            // ->where('products.status', 1)
             ->first();
         if (!$product) {
             return view('admin.partials.not_found_page',[
@@ -46,7 +46,7 @@ class ViewProductController extends Controller
         }
         $technical_specification = DB::table('technical_specs')
             ->where('product_id', $id)
-            ->where('status', 1)
+            // ->where('status', 1)
             ->first();
 
 
@@ -70,7 +70,7 @@ class ViewProductController extends Controller
                 'attr_media.file_name as media_url',
             )
             ->where('linkproducts.product_id', $id)
-            ->where('linkproducts.status', 1)
+            // ->where('linkproducts.status', 1)
             ->get();
 
         // ✅ Gallery Images

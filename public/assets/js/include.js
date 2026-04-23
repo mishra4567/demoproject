@@ -242,3 +242,30 @@ function showNotify(message, type = 'success_event') {
 /**
  *  Notification End
  */
+// {{-- Info Popover JS — add once in layout --}}
+document.addEventListener('DOMContentLoaded', function () {
+    // Init all popovers
+    var popoverList = [];
+    document.querySelectorAll('[data-bs-toggle="popover"]').forEach(function (el) {
+        var pop = new bootstrap.Popover(el, { trigger: 'manual', html: true });
+        popoverList.push({ el: el, pop: pop });
+
+        // Click on icon — toggle
+        el.addEventListener('click', function (e) {
+            e.stopPropagation(); // ✅ stop from bubbling to document
+            popoverList.forEach(function (item) {
+                if (item.el !== el) {
+                    item.pop.hide(); // close others
+                }
+            });
+            pop.toggle();
+        });
+    });
+
+    // Click anywhere outside — close all
+    document.addEventListener('click', function () {
+        popoverList.forEach(function (item) {
+            item.pop.hide();
+        });
+    });
+});

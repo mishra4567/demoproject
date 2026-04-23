@@ -49,6 +49,7 @@ class CouponController extends Controller
             $result['is_one_time'] = '';
             $result['id'] = 0;
         }
+        $result['info'] = config('field_info.coupon');
 
         return view('admin.coupon.manage_coupon', $result);
     }

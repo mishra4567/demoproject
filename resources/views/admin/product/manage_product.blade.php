@@ -22,12 +22,19 @@
                                 <div class="mb-3">
                                     <div class="mb-3">
                                         <label for="name" class="control-label mb-1">Product
-                                            Name</label>
+                                            Name
+                                            @include('admin.partials.field_info', [
+                                                'info' => $info['name'] ?? '',
+                                            ])
+                                        </label>
                                         <input id="name" name="name" value="{{ $name }}" type="text"
                                             class="form-control" required>
                                     </div>
                                     <div class="mb-3">
                                         <label for="slug" class="control-label mb-1">Product Slug
+                                            @include('admin.partials.field_info', [
+                                                'info' => $info['slug'] ?? '',
+                                            ])
                                         </label>
                                         <input id="slug" name="slug" value="{{ $slug }}" type="text"
                                             class="form-control" required>
@@ -36,6 +43,9 @@
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <label for="category_id" class="control-label mb-1">Select Category
+                                                    @include('admin.partials.field_info', [
+                                                        'info' => $info['category_id'] ?? '',
+                                                    ])
                                                 </label>
                                                 <select name="category_id" id="category_id" class="form-control">
                                                     <option value="">select categories</option>
@@ -54,6 +64,9 @@
                                             <div class="col-md-4">
                                                 <div class="mb-3">
                                                     <label for="brand_id" class="control-label mb-1">Product brand
+                                                        @include('admin.partials.field_info', [
+                                                            'info' => $info['brand'] ?? '',
+                                                        ])
                                                     </label>
                                                     <select name="brand_id" id="brand_id" class="form-control">
                                                         <option value="">select Brand</option>
@@ -75,6 +88,9 @@
                                             <div class="col-md-4">
                                                 <div class="mb-3">
                                                     <label for="model" class="control-label mb-1">Product model
+                                                        @include('admin.partials.field_info', [
+                                                            'info' => $info['model'] ?? '',
+                                                        ])
                                                     </label>
                                                     <input id="model" name="model" value="{{ $model }}"
                                                         type="text" class="form-control" required>
@@ -84,6 +100,11 @@
                                     </div>
                                     <div class="mb-3">
                                         <div class="row">
+                                            <label for="media" class="control-label mb-1">Product Image
+                                                @include('admin.partials.field_info', [
+                                                    'info' => $info['media_id'] ?? '',
+                                                ])
+                                            </label>
                                             <div class="col-md-4 d-flex align-items-center">
                                                 {{-- Media Modal Start --}}
                                                 <button type="button" class="btn btn-outline-primary mb-3"
@@ -105,6 +126,9 @@
                                             <div class="col-md-4">
                                                 <div class="mb-3">
                                                     <label for="coupon_id" class="control-label mb-1">Coupon Add ?
+                                                        @include('admin.partials.field_info', [
+                                                            'info' => $info['coupon_id'] ?? '',
+                                                        ])
                                                     </label>
                                                     <select name="coupon_id" id="coupon_id" class="form-control">
                                                         <option value="">select Coupon</option>
@@ -127,16 +151,25 @@
 
                                     <div class="mb-3">
                                         <label for="short_desc" class="control-label mb-1">Product short desc
+                                            @include('admin.partials.field_info', [
+                                                'info' => $info['short_desc'] ?? '',
+                                            ])
                                         </label>
                                         <textarea name="short_desc" id="short_desc" cols="3" rows="3" class="form-control" {{ $required }}>{{ $short_desc }}</textarea>
                                     </div>
                                     <div class="mb-3">
                                         <label for="desc" class="control-label mb-1">Product desc
+                                            @include('admin.partials.field_info', [
+                                                'info' => $info['desc'] ?? '',
+                                            ])
                                         </label>
                                         <textarea name="desc" id="desc" cols="3" rows="3" class="form-control" {{ $required }}>{{ $desc }}</textarea>
                                     </div>
                                     <div class="mb-3">
                                         <label for="keywords" class="control-label mb-1">Product keywords
+                                            @include('admin.partials.field_info', [
+                                                'info' => $info['keywords'] ?? '',
+                                            ])
                                         </label>
                                         <textarea name="keywords" id="keywords" cols="3" rows="3" class="form-control" {{ $required }}>{{ $keywords }}</textarea>
                                     </div>
@@ -149,11 +182,17 @@
                                     </div>
                                     <div class="mb-3">
                                         <label for="uses" class="control-label mb-1">Product uses
+                                            @include('admin.partials.field_info', [
+                                                'info' => $info['uses'] ?? '',
+                                            ])
                                         </label>
                                         <textarea name="uses" id="uses" cols="3" rows="3" class="form-control" {{ $required }}>{{ $uses }}</textarea>
                                     </div>
                                     <div class="mb-3">
                                         <label for="warranty" class="control-label mb-1">Product warranty
+                                            @include('admin.partials.field_info', [
+                                                'info' => $info['warranty'] ?? '',
+                                            ])
                                         </label>
                                         <textarea name="warranty" id="warranty" cols="3" rows="3" class="form-control" {{ $required }}>{{ $warranty }}</textarea>
                                     </div>
@@ -163,7 +202,11 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="card-body">
-                                    <h5 class="card-title mb-3">Product Gallery Images</h5>
+                                    <h5 class="card-title mb-3">Product Gallery Images
+                                        @include('admin.partials.field_info', [
+                                            'info' => $info['gallery'] ?? '',
+                                        ])
+                                    </h5>
 
                                     <!-- Add Button -->
                                     <button type="button" class="btn btn-outline-primary mb-3"

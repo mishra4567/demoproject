@@ -15,6 +15,7 @@ class ColorController extends Controller
     public function index()
     {
         $result['data'] = Color::all();
+        $result['info'] = config('field_info.color');
         return view('admin.color.color', $result);
         // echo "This is for color" ;
     }
@@ -42,6 +43,7 @@ class ColorController extends Controller
             $result['id']     = 0;
         }
 
+        $result['info'] = config('field_info.color');
         return view('admin.color.manage_color', $result);
 
         // echo "This is for manage color";
