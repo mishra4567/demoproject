@@ -21,12 +21,19 @@ use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\TechnicalSpecsController;
 
 // Route::get('admin', [AdminController::class, 'index']);
-Route::get('admin', [AdminController::class, 'index']);
+Route::get('admin', [AdminController::class, 'index'])
+    ->name('admin.index');
+Route::get('admin/register', [AdminController::class, 'register'])
+    ->name('admin.register');
+Route::post('admin/register/process', [AdminController::class, 'registerProcess'])
+    ->name('admin.register.process');
+Route::get('admin/verify-email/{token}',     [AdminController::class, 'verifyEmail'])
+    ->name('admin.verify.email');
 Route::post('admin/auth', [AdminController::class, 'auth'])
     ->name('admin.auth');
-Route::get('admin/search-routes', [RouteSearchController::class, 'ajaxSearch'])
-    ->name('admin.ajax.search');
 Route::group(['middleware' => 'admin_auth'], function () {
+    Route::get('admin/search-routes', [RouteSearchController::class, 'ajaxSearch'])
+        ->name('admin.ajax.search')->setDefaults(['label' => '', 'role' => 1]);
     /**
      * Admin Routes
      */
@@ -34,6 +41,16 @@ Route::group(['middleware' => 'admin_auth'], function () {
         ->name('dashboard')->setDefaults(['label' => 'Go to Dashboard', 'role' => 0]);
     Route::get('admin/updatepassword', [AdminController::class, 'updatepassword']);
     Route::get('/admin/logout', [AdminController::class, 'logout']);
+    Route::get('admin/settings', [AdminController::class, 'settings'])
+        ->name('admin.settings')->setDefaults(['label' => 'Admin Settings', 'role' => 0]);
+    Route::get('admin/manageprofile/{id?}', [AdminController::class, 'update'])
+        ->name('admin.profile.edite')->setDefaults(['label' => 'Add Admin', 'role' => 0]);
+    Route::get('admin/profileupdate/{id?}', [AdminController::class, 'profileupdate'])
+        ->name('admin.profile.update')->setDefaults(['label' => 'Add Admin', 'role' => 0]);
+    Route::get('/settings/change-password',  [AdminController::class, 'changePasswordForm'])
+        ->name('admin.change.password')->setDefaults(['label' => 'Change Password', 'role' => 0]);
+    Route::post('/settings/change-password', [AdminController::class, 'changePassword'])
+        ->name('admin.change.password.update')->setDefaults(['label' => '', 'role' => 1]);
     /**
      * Calender to do work
      */

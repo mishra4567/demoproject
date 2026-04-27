@@ -266,6 +266,21 @@
                                 </li>
                             </ul>
                         </li>
+                        <li class="has-sub">
+                            <a class="js-arrow" href="#">
+                                <i class="fa-solid fa-gear"></i>Settings
+                            </a>
+                            <ul class="list-unstyled navbar__sub-list js-sub-list">
+                                <li>
+                                    <a href="{{ route('admin.settings') }}">
+                                        <i class="fa-solid fa-address-card"></i>Profile View</a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('admin.change.password') }}">
+                                        <i class="fa-solid fa-key"></i>Password</a>
+                                </li>
+                            </ul>
+                        </li>
                     </ul>
                 </nav>
             </div>
