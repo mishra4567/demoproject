@@ -61,7 +61,7 @@
                                 </div>
                                 <div class="login-checkbox">
                                     <label>
-                                        <a href="#">Forgotten Password?</a>
+                                        <a href="{{ route('admin.forgot.password') }}">Forgotten Password?</a>
                                     </label>
                                 </div>
                                 <button class="au-btn au-btn--block au-btn--green m-b-20" type="submit">sign

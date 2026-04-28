@@ -1,4 +1,13 @@
 
+28.4.2026:-
+vertion:- 1.9.11
+Comment:- Add few Authentication (forgot password, reset password, email verification) for admin user, Fix some bug in admin login and register page.
+27.4.2026
+vertion:- 1.8.11
+Comment:- Add new page for admin settings, Add new page for admin profile update,
+            Add new page for change password, Fix some bug in admin login and register page.
+            And add email verification for admin registration.
+            Fix bug for admin login and register page.
 22-23.4.2026
 vertion:- 1.7.10
 Comment:- Add Custom page not found in Every where Page, Fix Security Bug in Product Details Page, Add New Field in Product Details Page.

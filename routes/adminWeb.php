@@ -23,12 +23,24 @@ use App\Http\Controllers\Admin\TechnicalSpecsController;
 // Route::get('admin', [AdminController::class, 'index']);
 Route::get('admin', [AdminController::class, 'index'])
     ->name('admin.index');
+// Registration process Routes
 Route::get('admin/register', [AdminController::class, 'register'])
     ->name('admin.register');
 Route::post('admin/register/process', [AdminController::class, 'registerProcess'])
     ->name('admin.register.process');
 Route::get('admin/verify-email/{token}',     [AdminController::class, 'verifyEmail'])
     ->name('admin.verify.email');
+// Registration process Routes End
+// Forgot Password process Routes
+Route::get('admin/forgot-password', [AdminController::class, 'forgotPassword'])
+    ->name('admin.forgot.password');
+Route::post('admin/forgot-password',            [AdminController::class, 'forgotPasswordSend'])
+    ->name('admin.forgot.password.send');
+Route::get('admin/reset-password/{token}',      [AdminController::class, 'resetPasswordForm'])
+    ->name('admin.reset.password.form');
+Route::post('admin/reset-password',             [AdminController::class, 'resetPassword'])
+    ->name('admin.reset.password');
+// Registration process Routes End
 Route::post('admin/auth', [AdminController::class, 'auth'])
     ->name('admin.auth');
 Route::group(['middleware' => 'admin_auth'], function () {

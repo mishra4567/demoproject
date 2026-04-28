@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Services\AdminEmailService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -22,10 +23,10 @@ class AdminController extends Controller
         if ($request->session()->has('ADMIN_LOGIN')) {
             return redirect('admin/dashboard');
         } else {
-            return view('admin.login');
+            return view('admin.auth.login');
         }
 
-        return view('admin.login');
+        return view('admin.auth.login');
     }
 
     /**
@@ -98,7 +99,7 @@ class AdminController extends Controller
     // This method shows the registration form for new admin users.
     public function register(Request $request)
     {
-        return view('admin.register');
+        return view('admin.auth.register');
     }
     // This method processes the registration form submission, creates a new admin user, and sends a verification email.
     public function registerProcess(Request $request)
@@ -356,4 +357,99 @@ class AdminController extends Controller
 
         return redirect('/admin')->with('success', 'Logged out successfully');
     }
+    /**
+     * Forgot password form for admin user.
+     */
+    public function forgotPassword()
+    {
+        return view('admin.auth.forgot_password');
+    }
+    public function forgotPasswordSend(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+        $admin = Admin::where('email', $request->email)->first();
+        // Always show success even if email not found (security)
+        if (!$admin) {
+            return redirect()->back()
+                ->with('success', 'If this email exists, a reset link has been sent.');
+        }
+        // Generate token
+        $token = Str::random(64);
+        $admin->update([
+            'password_reset_token'      => $token,
+            'password_reset_expires_at' => Carbon::now()->addMinutes(60),
+        ]);
+        // Send email
+        AdminEmailService::send('reset_password', $admin, [
+            'reset_url' => route('admin.reset.password.form', $token),
+            'expiry'    => '60 minutes',
+        ]);
+        return redirect()->back()
+            ->with('success', 'Password reset link sent! Please check your email.');
+    }
+    public function resetPasswordForm(Request $request, string $token)
+    {
+        $admin = Admin::where('password_reset_token', $token)->first();
+        // Invalid token
+        if (!$admin) {
+            return redirect()->route('admin.forgot.password')
+                ->with('error', 'Invalid or expired reset link. Please request a new one.');
+        }
+        // Expired token
+        if (Carbon::now()->isAfter($admin->password_reset_expires_at)) {
+            $admin->update([
+                'password_reset_token'      => null,
+                'password_reset_expires_at' => null,
+            ]);
+            return redirect()->route('admin.forgot.password')
+                ->with('error', 'This reset link has expired. Please request a new one.');
+        }
+        return view('admin.auth.reset_password', compact('token'));
+    }
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token'    => 'required',
+            'password' => [
+                'required',
+                'min:6',
+                'confirmed',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'regex:/[@$!%*#?&]/',
+            ],
+        ], [
+            'password.min'      => 'Password must be at least 6 characters.',
+            'password.confirmed' => 'Password confirmation does not match.',
+            'password.regex'    => 'Password must contain uppercase, lowercase, number and special character (@$!%*#?&).',
+        ]);
+        $admin = Admin::where('password_reset_token', $request->token)->first();
+        // Invalid token
+        if (!$admin) {
+            return redirect()->route('admin.forgot.password')
+                ->with('error', 'Invalid or expired reset link.');
+        }
+        // Expired
+        if (Carbon::now()->isAfter($admin->password_reset_expires_at)) {
+            $admin->update([
+                'password_reset_token'      => null,
+                'password_reset_expires_at' => null,
+            ]);
+            return redirect()->route('admin.forgot.password')
+                ->with('error', 'Reset link expired. Please request a new one.');
+        }
+        // ✅ Update password and clear token
+        $admin->update([
+            'password'                  => Hash::make($request->password),
+            'password_reset_token'      => null,
+            'password_reset_expires_at' => null,
+        ]);
+        return redirect()->route('admin.index')
+            ->with('success', 'Password reset successfully! You can now login with your new password.');
+    }
+    /**
+     * Forgot password form for admin user End.
+     */
 }
