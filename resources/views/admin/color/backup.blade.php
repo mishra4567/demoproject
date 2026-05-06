@@ -2,44 +2,44 @@
 @section('page_title', 'Color')
 @section('color_select', 'active')
 @section('container')
+
     <div class="section__content section__content--p30">
         <div class="container-fluid">
-            {{-- Trash Toggle --}}
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h3 class="title-5 m-b-0">Color</h3>
-                <a href="{{ route('color.add_color') }}">
-                    <button type="button" class="btn btn-success">
-                        <i class="fa fa-plus me-1"></i> Add Color
-                    </button>
-                </a>
-            </div>
+
+            <h3 class="title-5 m-b-35">Color</h3>
+
             <div class="d-flex gap-2 mb-3">
-                <button type="button" class="btn btn-secondary" id="trash_toggle_btn" onclick="toggleTrash()">
-                    <i class="fa fa-trash me-1"></i> Show Deleted
-                    @if ($deletedData->count() > 0)
-                        <span class="badge bg-danger ms-1">{{ $deletedData->count() }}</span>
+                <a href="{{ route('color.add_color') }}">
+                    <button type="button" class="btn btn-success">Add Color</button>
+                </a>
+
+                {{-- Trash Toggle --}}
+                <button type="button" class="btn btn-secondary" onclick="toggleTrash()" id="trash_toggle_btn">
+                    <i class="fa fa-trash me-1"></i>
+                    Show Deleted
+                    @if (count(${'delete-data'}) > 0)
+                        <span class="badge bg-danger ms-1">{{ count(${'delete-data'}) }}</span>
                     @endif
                 </button>
             </div>
-            {{-- Trash Toggle --}}
+
+            @include('admin.include.notify')
+
             <div class="row">
                 <form action="{{ route('color.bulkAction') }}" method="POST">
                     @csrf
-                    <input type="hidden" name="bulk_type" id="bulk_type" value="active">
+
                     {{-- Bulk Action --}}
                     <div class="mb-3 d-flex gap-2">
-                        <select name="action" id="bulk_action" class="form-control w-auto">
+                        <select name="action" class="form-control w-auto" required>
                             <option value="">Bulk Action</option>
-                            {{-- Active Section --}}
-                            <option value="activate" class="active-option">Activate</option>
-                            <option value="deactivate" class="active-option">Deactivate</option>
-                            <option value="trash" class="active-option">Move to Trash</option>
-                            {{-- Deleted Section --}}
-                            <option value="restore" class="deleted-option d-none">Restore</option>
-                            <option value="permanent_delete" class="deleted-option d-none">Delete</option>
+                            <option value="activate">Activate</option>
+                            <option value="deactivate">Deactivate</option>
+                            <option value="delete">Delete</option>
                         </select>
                         <button type="submit" class="btn btn-primary">Apply</button>
                     </div>
+
                     <div class="table-responsive table--no-card m-b-30">
                         <table class="table table-borderless table-striped table-earning">
                             <thead>
@@ -52,6 +52,7 @@
                                 </tr>
                             </thead>
                             <tbody>
+
                                 {{-- ✅ Active Rows --}}
                                 @forelse ($data as $list)
                                     <tr class="active-row">
@@ -60,12 +61,12 @@
                                                 class="checkbox_ids">
                                         </td>
                                         <td>{{ $list->id }}</td>
-                                        <td>{{ $list->color_name }}</td>
+                                        <td>{{ $list->color }}</td>
                                         <td>
                                             <div
                                                 style="
                                             width:28px; height:28px;
-                                            background:{{ $list->hex_id }};
+                                            background:{{ $list->color }};
                                             border-radius:50%;
                                             border:1px solid #ddd;">
                                             </div>
@@ -99,8 +100,9 @@
                                         </td>
                                     </tr>
                                 @endforelse
-                                {{-- ✅ Deleted Rows — hidden by    default --}}
-                                @foreach ($deletedData as $list)
+
+                                {{-- ✅ Deleted Rows — hidden by default --}}
+                                @foreach (${'delete-data'} as $list)
                                     <tr class="trash-row d-none" style="background:#fff3f3;">
                                         <td>
                                             <input type="checkbox" name="ids[]" value="{{ $list->id }}"
@@ -109,14 +111,14 @@
                                         <td>{{ $list->id }}</td>
                                         <td>
                                             <span class="text-muted text-decoration-line-through">
-                                                {{ $list->color_name }}
+                                                {{ $list->color }}
                                             </span>
                                         </td>
                                         <td>
                                             <div
                                                 style="
                                             width:28px; height:28px;
-                                            background:{{ $list->hex_id }};
+                                            background:{{ $list->color }};
                                             border-radius:50%;
                                             border:1px solid #ddd;
                                             filter:grayscale(100%);">
@@ -138,6 +140,7 @@
                                         </td>
                                     </tr>
                                 @endforeach
+
                             </tbody>
                         </table>
                     </div>
@@ -146,7 +149,7 @@
         </div>
     </div>
 
-    {{-- <script>
+    <script>
         let trashVisible = false;
 
         function toggleTrash() {
@@ -164,7 +167,7 @@
                 trashRows.forEach(r => r.classList.add('d-none'));
                 activeRows.forEach(r => r.classList.remove('d-none'));
                 btn.innerHTML =
-                    '<i class="fa fa-trash me-1"></i> Show Deleted <span class="badge bg-danger ms-1">{{ count(${'deletedData'}) }}</span>';
+                    '<i class="fa fa-trash me-1"></i> Show Deleted <span class="badge bg-danger ms-1">{{ count(${'delete-data'}) }}</span>';
                 btn.classList.replace('btn-success', 'btn-secondary');
             }
         }
@@ -175,6 +178,6 @@
                 checkbox.checked = this.checked;
             }, this);
         });
-    </script> --}}
+    </script>
 
 @endsection

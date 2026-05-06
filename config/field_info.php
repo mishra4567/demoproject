@@ -1,5 +1,4 @@
 <?php
-
 return [
 
     'product' => [
@@ -32,6 +31,7 @@ return [
 
     'category' => [
         'category_name' => 'Enter the category name. e.g. Electronics, Clothing.',
+        'parent_category' => 'Select a parent category if this is a subcategory. Leave as "None" for top-level categories.',
         'slug'          => 'URL-friendly version of the category name.',
         'media_id'      => 'Select a display image for this category.',
     ],
@@ -64,6 +64,7 @@ return [
     ],
 
     'technical_spec' => [
+        'productIdName'  =>'Select the product this technical specification belongs to. The product name will be displayed for reference.',
         'title'          => 'Title or heading for this specification entry.',
         'lead_time_from' => 'Earliest expected delivery or lead time start date.',
         'lead_time_to'   => 'Latest expected delivery or lead time end date.',
@@ -73,6 +74,24 @@ return [
         'is_featured'    => 'Mark this product as featured to show it on the homepage or featured section.',
         'is_discounted'  => 'Mark this product as discounted to show a discount badge.',
         'is_trending'    => 'Mark this product as trending to show it in trending sections.',
+    ],
+    'customer' => [
+        'name' => 'Enter the full name of the customer.',
+        'email' => 'Enter a valid email address for the customer. Must be unique.',
+        'phone' => 'Enter the customer\'s phone number.',
+        'password' => 'Set a password for the customer account. Leave blank to keep existing password.',
+        'status' => 'Set whether this customer account is active.',
+    ],
+    'customer_address' => [
+        'customer_id' => 'Select the customer this address belongs to.',
+        'address' => 'Enter the street address.',
+        'landmark' => 'Enter a nearby landmark for easier identification.',
+        'city' => 'Enter the city name.',
+        'state' => 'Enter the state or province.',
+        'zipcode' => 'Enter the postal code.',
+        'country' => 'Enter the country name.',
+        'label' => 'Enter a label for this address. e.g. Home, Work.',
+        'is_default' => 'Check this box to set this address as the default for the customer.',
     ],
 
 ];

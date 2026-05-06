@@ -40,109 +40,6 @@
             <a href="{{ route('product.tecnicalspacs') }}">
                 <button type="button" class="btn btn-success " disabled="">Back Technical Specs</button>
             </a>
-            {{-- <div class="row">
-                <div class="card">
-                    <div class="card-body">
-                        <form action="{{ route('product.processTechnicalSpecs') }}" method="post">
-                            @csrf
-                            <div class="row mb-3">
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <label for="name" class="control-label mb-1">Title
-                                        </label>
-                                        <input id="name" name="name" value="{{ $result->name }}" type="text"
-                                            class="form-control" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <label for="email" class="control-label mb-1">Email
-                                        </label>
-                                        <input id="email" name="email" value="{{ $result->email }}" type="text"
-                                            class="form-control" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <label for="password" class="control-label mb-1">Password
-                                        </label>
-                                        <input id="password" name="password" value="{{ $result->password }}" type="text"
-                                            class="form-control" required>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-md-3">
-                                    <label class="fw-bold control-label mb-1">Lead Time From</label>
-                                    <input type="datetime-local" name="lead_time_from" class="form-control"
-                                        value="{{ isset($result->lead_time_from) ? \Carbon\Carbon::parse($result->lead_time_from)->format('Y-m-d\TH:i') : '' }}">
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="fw-bold control-label mb-1">Lead Time To</label>
-                                    <input type="datetime-local" name="lead_time_to" class="form-control"
-                                        value="{{ isset($result->lead_time_to) ? \Carbon\Carbon::parse($result->lead_time_to)->format('Y-m-d\TH:i') : '' }}">
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="fw-bold control-label mb-1">Tax (%)</label>
-                                    <input type="number" name="tax" class="form-control" step="0.01" min="0"
-                                        value="{{ $result->tax ?? 0 }}">
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="fw-bold control-label mb-1">Select Tax Type</label>
-                                    <select name="tax_type" class="form-control">
-                                        <option value="none" {{ ($result->tax_type ?? '') == 'none' ? 'selected' : '' }}>
-                                            Select Type</option>
-                                        <option value="inclusive"
-                                            {{ ($result->tax_type ?? '') == 'inclusive' ? 'selected' : '' }}>Inclusive
-                                        </option>
-                                        <option value="exclusive"
-                                            {{ ($result->tax_type ?? '') == 'exclusive' ? 'selected' : '' }}>Exclusive
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-md-3">
-                                    <div class="form-check form-switch">
-                                        <input type="checkbox" name="is_promo" class="form-check-input" id="is_promo"
-                                            value="1" {{ $result->is_promo ?? false ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="is_promo">Promo</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-check form-switch">
-                                        <input type="checkbox" name="is_featured" class="form-check-input" id="is_featured"
-                                            value="1" {{ $result->is_featured ?? false ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="is_featured">Featured</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-check form-switch">
-                                        <input type="checkbox" name="is_discounted" class="form-check-input"
-                                            id="is_discounted" value="1"
-                                            {{ $result->is_discounted ?? false ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="is_discounted">Discounted</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-check form-switch">
-                                        <input type="checkbox" name="is_trending" class="form-check-input" id="is_trending"
-                                            value="1" {{ $result->is_trending ?? false ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="is_trending">Trending</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="d-grid">
-                                <input type="hidden" name="id" value="{{ $result->id != 0 ? $result->id : '' }}">
-                                <button id="payment-button" type="submit" class="btn btn-lg btn-info">
-                                    Submit
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div> --}}
             <form action="{{ route('customer.manage_customer_process') }}" method="post">
                 @csrf
                 <div class="row">
@@ -156,7 +53,11 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>Name</td>
+                                    <td>Name
+                                        @include('admin.partials.field_info',[
+                                            'info'=>$info['name']
+                                        ])
+                                    </td>
                                     <td ondblclick="enableEdit(this)">
                                         <span class="text">{{ $result->name }}</span>
                                         <input type="text" name="name" value="{{ $result->name }}"
@@ -164,7 +65,11 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>Email</td>
+                                    <td>Email
+                                        @include('admin.partials.field_info',[
+                                            'info'=>$info['email']
+                                        ])
+                                    </td>
                                     <td ondblclick="enableEdit(this)">
                                         <span class="text">{{ $result->email }}</span>
                                         <input type="text" name="email" value="{{ $result->email }}"
@@ -172,7 +77,11 @@
                                     </td>
                                 </tr>
                                 {{-- <tr>
-                                    <td>Password</td>
+                                    <td>Password<
+                                        @include('admin.partials.field_info',[
+                                            'info'=>$info['password']
+                                        ])
+                                        /td>
                                     <td ondblclick="enableEdit(this)">
                                         <span class="text">{{ $result->password }}</span>
                                         <input type="text" name="password" value="{{ $result->password }}"
@@ -180,7 +89,11 @@
                                     </td>
                                 </tr> --}}
                                 <tr>
-                                    <td>phone</td>
+                                    <td>phone
+                                        @include('admin.partials.field_info',[
+                                            'info'=>$info['phone']
+                                        ])
+                                    </td>
                                     <td ondblclick="enableEdit(this)">
                                         <span class="text">{{ $result->phone }}</span>
                                         <input type="text" name="phone" value="{{ $result->phone }}"
@@ -189,7 +102,11 @@
                                 </tr>
 
                                 <tr>
-                                    <td>Status</td>
+                                    <td>Status
+                                        @include('admin.partials.field_info',[
+                                            'info'=>$info['status']
+                                        ])
+                                    </td>
                                     <td onclick="enableEdit(this)">
                                         <span class="text">
                                             {{ $result->status == 1 ? 'Active' : 'Inactive' }}

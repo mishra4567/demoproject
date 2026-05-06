@@ -16,8 +16,10 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $result['data'] = Category::all();
-        return view('admin.category', $result);
+        $data = Category::where('is_deleted', 0)->get();
+        $deletedData = Category::where('is_deleted', 1)->get();
+        $info = config('field_info.category');
+        return view('admin.category', compact('data', 'deletedData', 'info'));
     }
 
     /**
@@ -54,6 +56,7 @@ class CategoryController extends Controller
                     ->get(),
             ];
         }
+        $result['info'] = config('field_info.category');
 
         return view('admin.manage_category', $result);
     }
@@ -83,6 +86,8 @@ class CategoryController extends Controller
         $model->category_name = $request->category_name;
         $model->category_slug = $request->category_slug;
         $model->parent_id = $request->parent_id;
+        $model->who_created = session('ADMIN_ID');
+        $model->created_at = now();
         $model->status = 1;
         $model->save();
 
@@ -105,13 +110,34 @@ class CategoryController extends Controller
         // category delete
         $category = Category::find($id);
         if (!$category) return redirect('admin/category')->with('error', 'Category not found');
-
-        $category->delete();
+        $category->is_deleted = 1;
+        $category->who_delete = session('ADMIN_ID');
+        $category->deleted_at = now();
+        $category->save();
 
         return redirect('admin/category')->with('success', 'Category Deleted Successfully...');
 
         // echo "category deleted" ;
     }
+
+    public function restore(Request $request, $id)
+    {
+        $category = Category::find($id);
+        if (!$category) return redirect('admin/category')->with('error', 'Category not found');
+        $category->is_deleted = 0;
+        $category->who_delete = null;
+        $category->save();
+        return redirect('admin/category')
+            ->with('success', 'Category Restored Successfully...');
+    }
+    public function permanentDelete($id)
+    {
+        // Category::findOrFail($id)->delete();
+        // return redirect('admin/category')
+        // ->with('success', 'Category Permanently Deleted Successfully...');
+        return back()->with('error', 'Delete action is not allowed ❌');
+    }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -145,9 +171,23 @@ class CategoryController extends Controller
             case 'deactivate':
                 Category::whereIn('id', $ids)->update(['status' => 0]);
                 break;
-            case 'delete':
+            case 'trash':
+                Category::whereIn('id', $ids)->update([
+                    'is_deleted' => 1,
+                    'deleted_at' => now(),
+                    'who_delete' => session('ADMIN_ID')
+                ]);
+                break;
+            case 'restore':
+                Category::whereIn('id', $ids)->update([
+                    'is_deleted' => 0,
+                    'deleted_at' => null,
+                    'who_delete' => null
+                ]);
+                break;
+            case 'permanent_delete':
                 // Category::whereIn('id', $ids)->delete();
-                return back()->with('error', 'Delete action is not allowed ❌');
+                return back()->with('error', 'Permanent delete is not allowed ❌');
                 break;
         }
         return back()->with([

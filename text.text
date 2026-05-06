@@ -184,3 +184,42 @@ admincontroller.php
 
 
 
+
+/***   Pending TODO List Date:-29.4.2026   ***/
+
+# Project Roadmap
+
+## ✅ Done
+- Product CRUD
+- Category management
+- Media library
+- Gallery system
+- Link products / variants
+- Admin auth + email verification
+- Admin approval panel
+- Email templates
+- Forgot password flow
+- Change password
+
+## 🔲 Pending — Role & Permission System
+When ready, ask Claude:
+> "make all code controller provider blade"
+> for role restriction system
+
+Files needed:
+- config/roles.php
+- app/Helpers/RoleHelper.php
+- app/Providers/AppServiceProvider.php
+- resources/views/admin/partials/restricted_button.blade.php
+- Update all controllers with RoleHelper::cannot()
+- Update all blades with @role() and restricted_button
+
+## 🔲 Pending — Future Features
+- Orders Management
+- Customer Management
+- Reports & Analytics
+- Banner / Slider
+- SEO Settings
+
+
+/***   Pending TODO List Date:-29.4.2026  ***/

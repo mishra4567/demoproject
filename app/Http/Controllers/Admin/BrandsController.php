@@ -15,13 +15,19 @@ class brandsController extends Controller
      */
     public function index()
     {
-        $result['data'] = DB::table('brands')
+        $data = DB::table('brands')
             ->leftJoin('create_media_tables', 'brands.media_ids', '=', 'create_media_tables.id')
             ->select('brands.*', 'create_media_tables.file_name')
-            // ->where('products.status', 1)
+            ->where('brands.is_deleted', 0)
             ->get();
-        // $result['data'] = Brands::all();
-        return view('admin.brands.brands', $result);
+
+        $deleteData = DB::table('brands')
+            ->leftJoin('create_media_tables', 'brands.media_ids', '=', 'create_media_tables.id')
+            ->select('brands.*', 'create_media_tables.file_name')
+            ->where('brands.is_deleted', 1)
+            ->get();
+
+        return view('admin.brands.brands', compact('data', 'deleteData'));
         // echo "This is for brands" ;
     }
 
@@ -80,6 +86,8 @@ class brandsController extends Controller
         $model = $id ? Brands::findOrFail($id) : new Brands();
         $model->name = $request->name;
         $model->media_ids = $request->media_ids;
+        $model->who_create = session('ADMIN_ID');
+        $model->created_at = now();
         $model->status = 1;
         $model->save();
 
@@ -100,12 +108,32 @@ class brandsController extends Controller
         // // brands delete
         $brands = Brands::find($id);
         if (!$brands) return redirect('admin/brands')->with('error', 'brands not found');
-
-        $brands->delete();
-
+        $brands->is_deleted = 1;
+        $brands->who_delete = session('ADMIN_ID');
+        $brands->deleted_at = now();
+        $brands->save();
         return redirect('admin/brands')->with('success', 'brands Deleted Successfully...');
         // echo "brands deleted" ;
         // echo "this is for brands delete";
+    }
+    public function restore(Request $request, $id)
+    {
+        $brands = Brands::find($id);
+        if (!$brands) return redirect('admin/brands')->with('error', 'brands not found');
+        $brands->is_deleted = 0;
+        $brands->deleted_at = null;
+        $brands->who_delete = null;
+        $brands->save();
+        return redirect()->route('brands')->with('success', 'brands Restored Successfully...');
+    }
+
+    public function permanentDelete(Request $request, $id)
+    {
+        // $brands = Brands::find($id);
+        // if (!$brands) return redirect('admin/brands')->with('error', 'brands not found');
+        // $brands->delete();
+        // return redirect()->route('brands')->with('success', 'brands Permanently Deleted Successfully...');
+        return back()->with('error', 'Delete action is not allowed ❌');
     }
 
     /**
@@ -141,9 +169,24 @@ class brandsController extends Controller
             case 'deactivate':
                 Brands::whereIn('id', $ids)->update(['status' => 0]);
                 break;
-            case 'delete':
-                // Category::whereIn('id', $ids)->delete();
-                return back()->with('error', 'Delete action is not allowed ❌');
+            case 'trash':
+                Brands::whereIn('id', $ids)->update([
+                    'is_deleted' => 1,
+                    'who_delete' => session('ADMIN_ID'),
+                    'deleted_at' => now(),
+                ]);
+                // return back()->with('error', 'Delete  action is not allowed ❌');
+                break;
+            case 'restore':
+                Brands::whereIn('id', $ids)->update([
+                    'is_deleted' => 0,
+                    'deleted_at' => null,
+                    'who_delete' => null
+                ]);
+                break;
+            case 'permanent_delete':
+                // Brands::whereIn('id', $ids)->delete();
+                return back()->with('error', 'Permanent delete is not allowed ❌');
                 break;
         }
         return back()->with([

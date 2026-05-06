@@ -14,8 +14,10 @@ class SizeController extends Controller
      */
     public function index()
     {
-        $result['data'] = Size::all();
-        return view('admin.size.size', $result);
+        $data = Size::where('is_deleted', 0)->get();
+        $deletedData = Size::where('is_deleted', 1)->get();
+        $info = config('field_info.size');
+        return view('admin.size.size', compact('data', 'deletedData', 'info'));
         // echo "This is for size" ;
     }
 
@@ -43,7 +45,7 @@ class SizeController extends Controller
                 'id'     => 0,
             ];
         }
-
+        $result['info'] = config('field_info.size');
         return view('admin.size.manage_size', $result);
     }
 
@@ -64,6 +66,8 @@ class SizeController extends Controller
         ]);
         $model = $id ? Size::findOrFail($id) : new Size();
         $model->size = $request->size;
+        $model->who_create = session('ADMIN_ID');
+        $model->created_at = now();
         $model->status = 1;
         $model->save();
 
@@ -84,12 +88,31 @@ class SizeController extends Controller
         // // size delete
         $size = Size::find($id);
         if (!$size) return redirect('admin/size')->with('error', 'size not found');
-
-        $size->delete();
-
+        $size->is_deleted = 1;
+        $size->deleted_at = now();
+        $size->who_delete = session('ADMIN_ID');
+        $size->save();
         return redirect('admin/size')->with('success', 'size Deleted Successfully...');
         // echo "size deleted" ;
         // echo "this is for size delete";
+    }
+    public function restore(Request $request, $id)
+    {
+        $size = Size::find($id);
+        if (!$size) return redirect('admin/size')->with('error', 'size not found');
+        $size->is_deleted = 0;
+        $size->deleted_at = null;
+        $size->who_delete = null;
+        $size->save();
+        return redirect('admin/size')->with('success', 'size Restored Successfully...');
+    }
+    public function permanentDelete(Request $request, $id)
+    {
+        // $size = Size::find($id);
+        // if (!$size) return redirect('admin/size')->with('error', 'size not found');
+        // $size->delete();
+        // return redirect('admin/size')->with('success', 'size Permanently Deleted Successfully...');
+        return back()->with('error', 'Delete action is not allowed ❌');
     }
 
     /**
@@ -125,9 +148,25 @@ class SizeController extends Controller
             case 'deactivate':
                 Size::whereIn('id', $ids)->update(['status' => 0]);
                 break;
-            case 'delete':
+            case 'trash':
                 // Category::whereIn('id', $ids)->delete();
-                return back()->with('error', 'Delete action is not allowed ❌');
+                Size::whereIn('id', $ids)->update([
+                    'is_deleted' => 1,
+                    'deleted_at' => now(),
+                    'who_delete' => session('ADMIN_ID'),
+                ]);
+                // return back()->with('error', 'Delete action is not allowed ❌');
+                break;
+            case 'restore':
+                Size::whereIn('id', $ids)->update([
+                    'is_deleted' => 0,
+                    'deleted_at' => null,
+                    'who_delete' => null
+                ]);
+                break;
+            case 'permanent_delete':
+                // ::whereIn('id', $ids)->delete();
+                return back()->with('error', 'Permanent delete is not allowed ❌');
                 break;
         }
         return back()->with([

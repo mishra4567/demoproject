@@ -1,4 +1,9 @@
 
+
+29-6.4.2026:-
+Comment:- Adding Bulk Action for delete, Restore, parmanent delete And fix few bug.
+Pending TODO List:-
+   "I want to add role restriction system now"
 28.4.2026:-
 vertion:- 1.9.11
 Comment:- Add few Authentication (forgot password, reset password, email verification) for admin user, Fix some bug in admin login and register page.

@@ -31,12 +31,18 @@ class ProductController extends Controller
     public function index()
     {
         // $result['data'] = Product::all();
-        $result['data'] = DB::table('products')
+        $data = DB::table('products')
             ->leftJoin('create_media_tables', 'products.media_ids', '=', 'create_media_tables.id')
             ->select('products.*', 'create_media_tables.file_name')
-            // ->where('products.status', 1)
+            ->where('products.is_deleted', 0)
             ->get();
-        return view('admin.product.product', $result);
+        $deletedData = DB::table('products')
+            ->leftJoin('create_media_tables', 'products.media_ids', '=', 'create_media_tables.id')
+            ->select('products.*', 'create_media_tables.file_name')
+            ->where('products.is_deleted', 1)
+            ->get();
+        $info = config('field_info.product');
+        return view('admin.product.product', compact('data', 'deletedData', 'info'));
         // return view('admin.product.product', );
     }
 
@@ -166,6 +172,8 @@ class ProductController extends Controller
         $product->technical_specification = $request->technical_specification;
         $product->uses = $request->uses;
         $product->warranty = $request->warranty;
+        $product->who_create = session('ADMIN_ID');
+        $product->created_at = now();
         $product->status = 1;
         // Auto Generate Barcode if not exists
         if (!$product->barcode) {
@@ -215,41 +223,44 @@ class ProductController extends Controller
      */
     public function delete(Request $request, $id)
     {
-
         $product = Product::find($id);
-
         if (!$product) {
             return redirect('admin/product')
                 ->with('error', 'Product not found');
         }
-
-        //  1. Delete Main Product Image
-        // if ($product->image && file_exists(public_path('/storage/media/' . $product->image))) {
-        //     unlink(public_path('/storage/media/' . $product->image));
-        // }
-
-        //  2. Get All Product Attributes
-        // $attributes = DB::table('product_attr')
-        //     ->where('product_id', $id)
-        //     ->get();
-
-        // 3. Delete Attribute Images
-        // foreach ($attributes as $attr) {
-        //     if ($attr->attr_image && file_exists(public_path('/storage/media/' . $attr->attr_image))) {
-        //         unlink(public_path('/storage/media/' . $attr->attr_image));
-        //     }
-        // }
-
-        // 4. Delete Attribute Records
-        // DB::table('product_attr')
-        //     ->where('product_id', $id)
-        //     ->delete();
-
-        // 5. Delete Product
-        $product->delete();
-
+        $product->is_deleted = 1;
+        $product->deleted_at = now();
+        $product->who_delete = session('ADMIN_ID');
+        $product->save();
         return redirect('admin/product')
-            ->with('success', 'Product Deleted Successfully...');
+            ->with('success', 'Product moved to trash...');
+    }
+    // ─── Restore ───────────────────────────────────────────
+    public function restore(Request $request, $id)
+    {
+        $product = Product::find($id);
+        if (!$product) {
+            return redirect('admin/product')
+                ->with('error', 'Product not found');
+        }
+        $product->is_deleted = 0;
+        $product->deleted_at = null;
+        $product->who_delete = null;
+        $product->save();
+        return redirect('admin/product')
+            ->with('success', 'Product Restored Successfully');
+    }
+    public function permanentDelete(Request $request, $id)
+    {
+        // $product = Product::find($id);
+        // if (!$product) {
+        //     return redirect('admin/product')
+        //         ->with('error', 'Product not found');
+        // }
+        // $product->delete();
+        // return redirect('admin/product')
+        //     ->with('success', 'Product Deleted Permanently');
+        return back()->with('error', 'Delete action is not allowed ❌');
     }
 
     /**
@@ -295,9 +306,24 @@ class ProductController extends Controller
             case 'deactivate':
                 Product::whereIn('id', $ids)->update(['status' => 0]);
                 break;
-            case 'delete':
-                // CreateMediaTable::whereIn('id', $ids)->delete();
-                return back()->with('error', 'Delete action is not allowed ❌');
+            case 'trash':
+                Product::whereIn('id', $ids)->update([
+                    'is_deleted' => 1,
+                    'deleted_at' => now(),
+                    'who_delete' => session('ADMIN_ID'),
+                ]);
+                // return back()->with('error', 'Delete action is not allowed ❌');
+                break;
+            case 'restore':
+                Product::whereIn('id', $ids)->update([
+                    'is_deleted' => 0,
+                    'deleted_at' => null,
+                    'who_delete' => null
+                ]);
+                break;
+            case 'permanent_delete':
+                // ::whereIn('id', $ids)->delete();
+                return back()->with('error', 'Permanent delete is not allowed ❌');
                 break;
         }
         return back()->with([

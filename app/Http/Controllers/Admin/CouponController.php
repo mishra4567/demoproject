@@ -14,8 +14,10 @@ class CouponController extends Controller
      */
     public function index()
     {
-        $result['data'] = Coupon::all();
-        return view('admin.coupon.coupon', $result);
+        $data = Coupon::where('is_deleted', 0)->get();
+        $deletedData = Coupon::where('is_deleted', 1)->get();
+        $info = config('field_info.coupon');
+        return view('admin.coupon.coupon', compact('data', 'deletedData', 'info'));
     }
 
     /**
@@ -78,6 +80,8 @@ class CouponController extends Controller
         $model->type = $request->type;
         $model->min_order_amt = $request->min_order_amt;
         $model->is_one_time = $request->has('is_one_time') ? 1 : 0;
+        $model->who_created = session('ADMIN_ID');
+        $model->created_at = now();
         $model->save();
 
         return redirect('admin/coupons')
@@ -95,12 +99,30 @@ class CouponController extends Controller
         // Coupon delete
         $coupon = Coupon::find($id);
         if (!$coupon) return redirect('admin/coupons')->with('error', 'Coupon not found');
-
-        $coupon->delete();
-
+        $coupon->is_deleted = 1;
+        $coupon->who_delete = session('ADMIN_ID');
+        $coupon->deleted_at = now();
+        $coupon->save();
         return redirect('admin/coupons')->with('success', 'Coupon Deleted Successfully...');
 
         // echo "Coupon deleted" ;
+    }
+    public function restore(Request $request, $id)
+    {
+        $coupon = Coupon::find($id);
+        if (!$coupon) return redirect('admin/coupon')->with('error', 'coupon not found');
+        $coupon->is_deleted = 0;
+        $coupon->who_delete = null;
+        $coupon->save();
+        return redirect()->route('coupons')
+            ->with('success', 'Coupon restored successfully.');
+    }
+    public function permanentDelete($id)
+    {
+        // Coupon::findOrFail($id)->delete();
+        // return redirect()->route('coupons')
+        // ->with('success', 'Coupon permanently deleted.');
+        return back()->with('error', 'Delete action is not allowed ❌');
     }
 
     public function status($id)
@@ -132,9 +154,24 @@ class CouponController extends Controller
             case 'deactivate':
                 Coupon::whereIn('id', $ids)->update(['status' => 0]);
                 break;
-            case 'delete':
-                // Category::whereIn('id', $ids)->delete();
-                return back()->with('error', 'Delete action is not allowed ❌');
+            case 'trash':
+                Coupon::whereIn('id', $ids)->update([
+                    'is_deleted' => 1,
+                    'deleted_at' => now(),
+                    'who_delete' => session('ADMIN_ID')
+                ]);
+                // return back()->with('error', 'Delete action is not allowed ❌');
+                break;
+            case 'restore':
+                Coupon::whereIn('id', $ids)->update([
+                    'is_deleted' => 0,
+                    'deleted_at' => null,
+                    'who_delete' => null
+                ]);
+                break;
+            case 'permanent_delete':
+                // Color::whereIn('id', $ids)->delete();
+                return back()->with('error', 'Permanent delete is not allowed ❌');
                 break;
         }
         return back()->with([

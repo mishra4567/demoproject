@@ -13,13 +13,15 @@ class CreateMediaTableController extends Controller
     public function index()
     {
         // $result['data'] = Product::all();
-        $media['media'] = CreateMediaTable::all();
-        return view('admin.uploadmedia.media', $media);
+        $media = CreateMediaTable::Where('is_deleted', 0)->get();
+        $deletedMedia = CreateMediaTable::Where('is_deleted', 1)->get();
+        return view('admin.uploadmedia.media', compact('media', 'deletedMedia'));
     }
 
     public function manageMedia(Request $request,)
     {
-        return view('admin.uploadmedia.uploadmedia');
+        $info = config('field_info.media');
+        return view('admin.uploadmedia.uploadmedia', compact('info'));
     }
     public function mediasearch(Request $request)
     {
@@ -39,23 +41,18 @@ class CreateMediaTableController extends Controller
             'tags.*' => 'nullable|max:10',
             'description.*' => 'nullable|max:500',
         ]);
-
-
         if ($request->hasFile('media')) {
-
             foreach ($request->file('media') as $key => $file) {
-
                 $extension = strtolower($file->getClientOriginalExtension());
                 $fileName = time() . '_' . uniqid() . '.' . $extension;
-
                 $file->move(public_path('/storage/media'), $fileName);
-
                 $pAData = [
                     'file_name'   => $fileName,
                     'media_type'  => $extension, // saving only extension (as you want)
                     'tags'        => $request->tags[$key] ?? null,
                     'description' => $request->description ?? null,
                     'vendor_id'   => 1,
+                    'who_create'  => session('ADMIN_ID'),
                     'status'      => 1,
                     'created_at'  => now(),
                     'updated_at'  => now(),
@@ -79,10 +76,28 @@ class CreateMediaTableController extends Controller
     }
     public function delete(Request $request, $id)
     {
-        $coupon = CreateMediaTable::find($id);
-        if (!$coupon) return redirect()->back()->with('error', 'Media not found');
-        $coupon->delete();
+        $mediaTable = CreateMediaTable::find($id);
+        if (!$mediaTable) return redirect()->back()->with('error', 'Media not found');
+        $mediaTable->is_deleted = 1;
+        $mediaTable->deleted_at = now();
+        $mediaTable->who_delete = session('ADMIN_ID');
+        $mediaTable->save();
         return redirect()->back()->with('success', 'Media Deleted Successfully...');
+    }
+    public function restore(Request $request, $id)
+    {
+        $mediaTable = CreateMediaTable::find($id);
+        if (!$mediaTable) return redirect()->back()->with('error', 'Media not found');
+        $mediaTable->is_deleted = 0;
+        $mediaTable->who_delete = null;
+        $mediaTable->save();
+        return redirect()->back()->with('success', 'Media Restored Successfully...');
+    }
+    public function permanentDelete($id)
+    {
+        // CreateMediaTable::findOrFail($id)->delete();
+        // return redirect()->back()->with('success', 'Media permanently deleted.');
+        return back()->with('error', 'Delete action is not allowed ❌');
     }
     public function bulkAction(Request $request)
     {
@@ -99,9 +114,24 @@ class CreateMediaTableController extends Controller
             case 'deactivate':
                 CreateMediaTable::whereIn('id', $ids)->update(['status' => 0]);
                 break;
-            case 'delete':
-                // CreateMediaTable::whereIn('id', $ids)->delete();
-                return back()->with('error', 'Delete action is not allowed ❌');
+            case 'trash':
+                CreateMediaTable::whereIn('id', $ids)->update([
+                    'is_deleted' => 1,
+                    'deleted_at' => now(),
+                    'who_delete' => session('ADMIN_ID')
+                ]);
+                // return back()->with('error', 'Delete action is not allowed ❌');
+                break;
+            case 'restore':
+                CreateMediaTable::whereIn('id', $ids)->update([
+                    'is_deleted' => 0,
+                    'deleted_at' => null,
+                    'who_delete' => null
+                ]);
+                break;
+            case 'permanent_delete':
+                // ::whereIn('id', $ids)->delete();
+                return back()->with('error', 'Permanent delete is not allowed ❌');
                 break;
         }
         return back()->with([

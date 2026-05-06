@@ -14,9 +14,14 @@ class ColorController extends Controller
      */
     public function index()
     {
-        $result['data'] = Color::all();
-        $result['info'] = config('field_info.color');
-        return view('admin.color.color', $result);
+        $data = Color::where('is_deleted', 0)->get();
+        $deletedData = Color::where('is_deleted', 1)->get();
+        $info = config('field_info.color');
+        // echo "<pre>";
+        // print_r($result);
+        // echo "</pre>";
+        // die();
+        return view('admin.color.color', compact('data', 'deletedData', 'info'));
         // echo "This is for color" ;
     }
 
@@ -33,12 +38,14 @@ class ColorController extends Controller
                 abort(404);
             }
 
-            $result['color']  = $color->color;
+            $result['color_name']  = $color->color_name;
+            $result['hex_id'] = $color->hex_id;
             $result['status'] = $color->status;
             $result['id']     = $color->id;
         } else {
 
-            $result['color']  = '';
+            $result['color_name']  = '';
+            $result['hex_id'] = '';
             $result['status'] = '';
             $result['id']     = 0;
         }
@@ -54,18 +61,25 @@ class ColorController extends Controller
      */
     public function managecolorprocess(Request $request)
     {
+        // echo "<pre>";
+        // print_r($request->post());
+        // echo "</pre>";
+        // die();
         // Code frome chatgpt
         $id = $request->post('id');
         $request->validate([
             'color' => [
                 'required',
-                Rule::unique('colors', 'color')->ignore($id),
+                // Rule::unique('colors', 'color')->ignore($id),
             ],
         ], [
             'color.unique' => 'This color already exists',
         ]);
         $model = $id ? Color::findOrFail($id) : new Color();
-        $model->color = $request->color;
+        $model->color_name = $request->color_name;
+        $model->hex_id = $request->color;
+        $model->who_create = session('ADMIN_ID');
+        $model->created_at = now();
         $model->status = 1;
         $model->save();
 
@@ -81,17 +95,35 @@ class ColorController extends Controller
      */
     public function delete(Request $request, $id)
     {
-        // // it is get methode to performe delete
-        // // we have post methode to delete
-        // // color delete
         $color = Color::find($id);
         if (!$color) return redirect('admin/color')->with('error', 'color not found');
-
-        $color->delete();
-
-        return redirect('admin/color')->with('success', 'color Deleted Successfully...');
+        $color->is_deleted = 1;
+        $color->deleted_at = now();
+        $color->who_delete = session('ADMIN_ID');
+        $color->save();
+        return redirect('admin/color')->with('success', 'Color moved to trash...');
         // echo "color deleted" ;
         // echo "this is for color delete";
+    }
+    // ─── Restore ───────────────────────────────────────────
+    public function restore(Request $request, $id)
+    {
+        $color = Color::find($id);
+        if (!$color) return redirect('admin/color')->with('error', 'color not found');
+        $color->is_deleted = 0;
+        $color->deleted_at = null;
+        $color->who_delete = null;
+        $color->save();
+        return redirect()->route('color')
+            ->with('success', 'Color restored successfully.');
+    }
+    // ─── Permanent Delete ──────────────────────────────────
+    public function permanentDelete($id)
+    {
+        // Color::findOrFail($id)->delete();
+        // return redirect()->route('color')
+        // ->with('success', 'Color permanently deleted.');
+        return back()->with('error', 'Delete action is not allowed ❌');
     }
 
     /**
@@ -127,9 +159,24 @@ class ColorController extends Controller
             case 'deactivate':
                 Color::whereIn('id', $ids)->update(['status' => 0]);
                 break;
-            case 'delete':
-                // Category::whereIn('id', $ids)->delete();
-                return back()->with('error', 'Delete action is not allowed ❌');
+            case 'trash':
+                Color::whereIn('id', $ids)->update([
+                    'is_deleted' => 1,
+                    'deleted_at' => now(),
+                    'who_delete' => session('ADMIN_ID')
+                ]);
+                // return back()->with('error', 'Delete action is not allowed ❌');
+                break;
+            case 'restore':
+                Color::whereIn('id', $ids)->update([
+                    'is_deleted' => 0,
+                    'deleted_at' => null,
+                    'who_delete' => null
+                ]);
+                break;
+            case 'permanent_delete':
+                // Color::whereIn('id', $ids)->delete();
+                return back()->with('error', 'Permanent delete is not allowed ❌');
                 break;
         }
         return back()->with([

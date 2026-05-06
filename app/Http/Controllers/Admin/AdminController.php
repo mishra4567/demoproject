@@ -93,7 +93,7 @@ class AdminController extends Controller
         $request->session()->put('ADMIN_ROLE', $admin->admin_role);
         $request->session()->put('ADMIN_NAME', $admin->name);
 
-        return redirect('admin/dashboard')
+        return redirect()->intended('admin/dashboard')
             ->with('success', 'Welcome back, ' . $admin->name . '!');
     }
     // This method shows the registration form for new admin users.

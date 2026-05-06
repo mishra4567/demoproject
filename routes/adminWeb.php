@@ -95,13 +95,17 @@ Route::group(['middleware' => 'admin_auth'], function () {
     // Bulk Action category
     Route::post('admin/category/bulkaction', [CategoryController::class, 'bulkAction'])
         ->name('category.bulkAction')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('/admin/categoty/restore/{id}', [CategoryController::class, 'restore'])
+        ->name('categoty.restore')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('/admin/category/permanent-delete/{id}', [CategoryController::class, 'permanentDelete'])
+        ->name('category.permanent_delete')->setDefaults(['label' => '', 'role' => 1]);
     /**
      * Coupon Routes
      */
     Route::get('admin/coupons', [CouponController::class, 'index'])
         ->name('coupons')->setDefaults(['label' => 'View Coupons', 'role' => 0]);
     // insert coupons
-    Route::get('admin/coupons/managecoupons', [CouponController::class, 'managecoupons'])
+    Route::get('admin/coupons/managecoupons/{id?}', [CouponController::class, 'managecoupons'])
         ->name('coupons.add_coupons')->setDefaults(['label' => 'Add Coupons', 'role' => 0]);
     Route::post('admin/coupons/managecouponsprocess', [CouponController::class, 'managecouponsprocess'])
         ->name('coupons.manage_coupons_process')->setDefaults(['label' => '', 'role' => 1]);
@@ -117,19 +121,24 @@ Route::group(['middleware' => 'admin_auth'], function () {
     // Bulk Action Copons
     Route::post('admin/coupons/bulkaction', [CouponController::class, 'bulkAction'])
         ->name('coupons.bulkAction')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('/admin/coupons/restore/{id}', [CouponController::class, 'restore'])
+        ->name('coupons.restore')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('/admin/coupons/permanent-delete/{id}', [CouponController::class, 'permanentDelete'])
+        ->name('coupons.permanent_delete')->setDefaults(['label' => '', 'role' => 1]);
+
     /**
      * Size Routes
      */
     Route::get('admin/size', [SizeController::class, 'index'])
         ->name('size')->setDefaults(['label' => 'view sizes', 'role' => 0]);
     // insert size
-    Route::get('admin/size/managesize', [SizeController::class, 'managesize'])
+    Route::get('admin/size/managesize/{id?}', [SizeController::class, 'managesize'])
         ->name('size.add_size')->setDefaults(['label' => 'Add Sizes', 'role' => 0]);
     Route::post('admin/size/managesizeprocess', [SizeController::class, 'managesizeprocess'])
         ->name('size.manage_size_process')->setDefaults(['label' => '', 'role' => 1]);
     // edit size
-    Route::get('admin/size/managesize/{id}', [SizeController::class, 'managesize'])
-        ->name('size.edit_size')->setDefaults(['label' => '', 'role' => 1]);
+    // Route::get('admin/size/managesize/{id}', [SizeController::class, 'managesize'])
+    //     ->name('size.edit_size')->setDefaults(['label' => '', 'role' => 1]);
     // Status change size
     Route::get('admin/size/status/{id}', [SizeController::class, 'status'])
         ->name('size.status')->setDefaults(['label' => '', 'role' => 1]);
@@ -139,6 +148,10 @@ Route::group(['middleware' => 'admin_auth'], function () {
     // Bulk Action Copons
     Route::post('admin/size/bulkaction', [SizeController::class, 'bulkAction'])
         ->name('size.bulkAction')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('/size/restore/{id}', [SizeController::class, 'restore'])
+        ->name('size.restore')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('/size/permanent-delete/{id}', [SizeController::class, 'permanentDelete'])
+        ->name('size.permanent_delete')->setDefaults(['label' => '', 'role' => 1]);
     /**
      * Color Routes
      */
@@ -158,6 +171,11 @@ Route::group(['middleware' => 'admin_auth'], function () {
     // delete Color
     Route::get('admin/color/delete/{id}', [ColorController::class, 'delete'])
         ->name('color.delete')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('/color/restore/{id}', [ColorController::class, 'restore'])
+        ->name('color.restore')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('/color/permanent-delete/{id}', [ColorController::class, 'permanentDelete'])
+        ->name('color.permanent_delete')->setDefaults(['label' => '', 'role' => 1]);
+
     // Bulk Action Product
     Route::post('admin/color/bulkaction', [ColorController::class, 'bulkAction'])
         ->name('color.bulkAction')->setDefaults(['label' => '', 'role' => 1]);
@@ -181,6 +199,10 @@ Route::group(['middleware' => 'admin_auth'], function () {
     // Bulk Action Product
     Route::post('admin/brands/bulkaction', [BrandsController::class, 'bulkAction'])
         ->name('brands.bulkAction')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('/brands/restore/{id}', [BrandsController::class, 'restore'])
+        ->name('brands.restore')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('/brands/permanent-delete/{id}', [BrandsController::class, 'permanentDelete'])
+        ->name('brands.permanent_delete')->setDefaults(['label' => '', 'role' => 1]);
     /**
      * Route For Media
      */
@@ -201,6 +223,10 @@ Route::group(['middleware' => 'admin_auth'], function () {
         ->name('media.bulkAction')->setDefaults(['label' => '', 'role' => 1]);
     Route::get('/admin/media/search', [CreateMediaTableController::class, 'mediasearch'])
         ->name('media.search')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('/media/restore/{id}', [CreateMediaTableController::class, 'restore'])
+        ->name('media.restore')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('/media/permanent-delete/{id}', [CreateMediaTableController::class, 'permanentDelete'])
+        ->name('media.permanent_delete')->setDefaults(['label' => '', 'role' => 1]);
     /**
      * Product Routes
      */
@@ -223,9 +249,14 @@ Route::group(['middleware' => 'admin_auth'], function () {
     // Bulk Action Product
     Route::post('admin/product/bulkaction', [ProductController::class, 'bulkAction'])
         ->name('product.bulkAction')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('/product/restore/{id}', [ProductController::class, 'restore'])
+        ->name('product.restore')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('/product/permanent-delete/{id}', [ProductController::class, 'permanentDelete'])
+        ->name('product.permanent_delete')->setDefaults(['label' => '', 'role' => 1]);
+
     // delete product Images
-    Route::get('admin/product/images_delete/{piid}/{pid}', [ProductController::class, 'product_images_delete'])
-        ->name('product.images_delete')->setDefaults(['label' => '', 'role' => 1]);
+    // Route::get('admin/product/images_delete/{piid}/{pid}', [ProductController::class, 'product_images_delete'])
+    //     ->name('product.images_delete')->setDefaults(['label' => '', 'role' => 1]);
     // Route::get('admin/barcode/product/{id}', [BarcodeController::class, 'prodBarcodeHelp'])
     //     ->name('barcode.product');
     // Route::get('/barcode/product-download/{id}', [BarcodeController::class, 'proBarcodeDawn'])
@@ -245,6 +276,11 @@ Route::group(['middleware' => 'admin_auth'], function () {
         ->name('product.linkproductstatus')->setDefaults(['label' => 'linked product status', 'role' => 1]);
     Route::get('admin/product/linkproductdelete/{id}', [LinkproductController::class, 'delete'])
         ->name('product.linkproductdelete')->setDefaults(['label' => 'linked product delete', 'role' => 1]);
+    Route::get('/product/linkproductdelete/restore/{id}', [LinkproductController::class, 'restore'])
+        ->name('linkproduct.restore')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('/product/linkproductdelete/permanent-delete/{id}', [LinkproductController::class, 'permanentDelete'])
+        ->name('linkproduct.permanent_delete')->setDefaults(['label' => '', 'role' => 1]);
+
     /**
      * Tecnical Specs Product Routes
      */
@@ -260,6 +296,10 @@ Route::group(['middleware' => 'admin_auth'], function () {
         ->name('product.tecnicalspecsdelete')->setDefaults(['label' => '', 'role' => 1]);
     Route::post('admin/tecnicalspecs/bulkaction', [TechnicalSpecsController::class, 'bulkAction'])
         ->name('tecnicalspecs.bulkAction')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('/product/tecnicalspecsdelete/restore/{id}', [TechnicalSpecsController::class, 'restore'])
+        ->name('product.tecnicalspec.restore')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('/product/tecnicalspecsdelete/permanent-delete/{id}', [TechnicalSpecsController::class, 'permanentDelete'])
+        ->name('product.tecnicalspec.permanent_delete')->setDefaults(['label' => '', 'role' => 1]);
     // Linked Product
     // delete product attribute
     Route::get('admin/product/attr_delete/{paid}/{pid}', [ProductController::class, 'product_attr_delete'])
@@ -276,7 +316,7 @@ Route::group(['middleware' => 'admin_auth'], function () {
      * Full Product View Route End
      */
     /**
-     * Product Routes
+     * Customer Routes
      */
     Route::get('admin/customers', [CustomerController::class, 'index'])
         ->name('customer')->setDefaults(['label' => 'View customer', 'role' => 0]);
@@ -294,6 +334,14 @@ Route::group(['middleware' => 'admin_auth'], function () {
         ->name('customer.save_address')->setDefaults(['label' => '', 'role' => 1]);
     Route::get('admin/customer/deleteaddress/{id?}/{addid?}', [CustomerController::class, 'deleteAddress'])
         ->name('customer.delete_address')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('/admin/customer/restore/{id}', [CustomerController::class, 'restore'])
+        ->name('customer.restore')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('/admin/customer/permanent-delete/{id}', [CustomerController::class, 'permanentDelete'])
+        ->name('customer.permanent_delete')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('/admin/customer/address/restore/{id}', [CustomerController::class, 'restoreAddress'])
+        ->name('customer.address.restore')->setDefaults(['label' => '', 'role' => 1]);
+    Route::get('/admin/customer/address/permanent-delete/{id}', [CustomerController::class, 'permanentDeleteAddress'])
+        ->name('customer.address.permanent_delete')->setDefaults(['label' => '', 'role' => 1]);
 
     /**
      * Report Send

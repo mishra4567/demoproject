@@ -15,21 +15,33 @@
 
                             <!-- Category Name -->
                             <div class="col-md-6">
-                                <label class="form-label">Category Name</label>
+                                <label class="form-label">Category Name
+                                    @include('admin.partials.field_info', [
+                                        'info' => $info['category_name'] ?? '',
+                                    ])
+                                </label>
                                 <input type="text" name="category_name" value="{{ $category_name ?? '' }}"
                                     class="form-control" required>
                             </div>
 
                             <!-- Slug -->
                             <div class="col-md-6">
-                                <label class="form-label">Category Slug</label>
+                                <label class="form-label">Category Slug
+                                    @include('admin.partials.field_info',[
+                                        'info'=>$info['slug']
+                                    ])
+                                </label>
                                 <input type="text" name="category_slug" value="{{ $category_slug ?? '' }}"
                                     class="form-control" required>
                             </div>
 
                             <!-- Parent Category -->
                             <div class="col-md-6">
-                                <label class="form-label">Parent Category</label>
+                                <label class="form-label">Parent Category
+                                    @include('admin.partials.field_info',[
+                                        'info'=>$info['parent_category']
+                                    ])
+                                </label>
                                 <select name="parent_id" class="form-control">
                                     <option value="0">Main Category</option>
 

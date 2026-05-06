@@ -16,6 +16,11 @@
             'title' => 'No Variants Found',
             'message' => 'No product attributes linked yet.',
         ],
+        'tecnicalspecs' => [
+            'icon' => 'fa-cogs',
+            'title' => 'No Technical Specs Found',
+            'message' => 'No technical specifications added yet.',
+        ],
         'size' => ['icon' => 'fa-ruler', 'title' => 'No Sizes Found', 'message' => 'No sizes have been added yet.'],
         'color' => [
             'icon' => 'fa-palette',

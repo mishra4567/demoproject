@@ -16,11 +16,18 @@ class LinkproductController extends Controller
     {
         // $result['data'] = ::all();
         // $linkProduct = DB::table('linkproducts')->get();
-        $linkProduct = DB::table('linkproducts')
+        $data = DB::table('linkproducts')
             ->leftJoin('create_media_tables', 'linkproducts.media_id', '=', 'create_media_tables.id')
             ->select('linkproducts.*', 'create_media_tables.file_name')
+            ->where('linkproducts.is_deleted', 0)
             ->get();
-        return view('admin.product.linkproduct', compact('linkProduct'));
+        $deletedData = DB::table('linkproducts')
+            ->leftJoin('create_media_tables', 'linkproducts.media_id', '=', 'create_media_tables.id')
+            ->select('linkproducts.*', 'create_media_tables.file_name')
+            ->where('linkproducts.is_deleted', 1)
+            ->get();
+        $info = config('field_info.linkproduct');
+        return view('admin.product.linkproduct', compact('data', 'deletedData', 'info'));
     }
     /**
      *  Form link product
@@ -72,8 +79,9 @@ class LinkproductController extends Controller
         $products = DB::table('products')->select('id')->where('status', 1)->get();
         $sizes    = DB::table('sizes')->where('status', 1)->get();
         $colors   = DB::table('colors')->where('status', 1)->get();
+        $info     = config('field_info.linkproduct');
 
-        return view('admin.product.addlinkproduct', compact('productAttrArr', 'products', 'sizes', 'colors'));
+        return view('admin.product.addlinkproduct', compact('productAttrArr', 'products', 'sizes', 'colors', 'info'));
     }
     public function processlinkproduct(Request $request)
     {
@@ -94,6 +102,8 @@ class LinkproductController extends Controller
                 'size_id'  => $request->size_id[$key],
                 'color_id' => $request->color_id[$key],
                 'qty'      => $request->qty[$key],
+                'who_create' => session('ADMIN_ID'),
+                'created_at' => now(),
                 'status'   => 1,
             ];
 
@@ -132,11 +142,35 @@ class LinkproductController extends Controller
     {
         $product = Linkproduct::find($id);
         if (!$product) {
-            return redirect('admin/product')
+            return redirect()->back()
                 ->with('error', 'Product not found');
         }
-        $product->delete();
+        $product->is_deleted = 1;
+        $product->deleted_at = now();
+        $product->who_delete = session('ADMIN_ID');
+        $product->save();
+        // $product->delete();
         return redirect()->back()->with('success', 'Linked Product Deleted Successfully...');
+    }
+    public function restore(Request $request, $id)
+    {
+        $product = Linkproduct::find($id);
+        if (!$product) {
+            return redirect()->back()
+                ->with('error', 'Product not found');
+        }
+        $product->is_deleted = 0;
+        $product->deleted_at = null;
+        $product->who_delete = null;
+        $product->save();
+        return redirect()->back()->with('success', 'Linked Product Restored Successfully...');
+    }
+    public function permanentDelete($id)
+    {
+        // Linkproduct::findOrFail($id)->delete();
+        // return redirect()->route('linkproduct')
+        //     ->with('success', 'Linked Product permanently deleted.');
+        return back()->with('error', 'Delete action is not allowed ❌');
     }
     /**
      * Bulk Action
@@ -156,9 +190,24 @@ class LinkproductController extends Controller
             case 'deactivate':
                 Linkproduct::whereIn('id', $ids)->update(['status' => 0]);
                 break;
-            case 'delete':
-                // Category::whereIn('id', $ids)->delete();
-                return back()->with('error', 'Delete action is not allowed ❌');
+            case 'trash':
+                Linkproduct::whereIn('id', $ids)->update([
+                    'is_deleted' => 1,
+                    'deleted_at' => now(),
+                    'who_delete' => session('ADMIN_ID')
+                ]);
+                // return back()->with('error', 'Delete action is not allowed ❌');
+                break;
+            case 'restore':
+                Linkproduct::whereIn('id', $ids)->update([
+                    'is_deleted' => 0,
+                    'deleted_at' => null,
+                    'who_delete' => null
+                ]);
+                break;
+            case 'permanent_delete':
+                // Color::whereIn('id', $ids)->delete();
+                return back()->with('error', 'Permanent delete is not allowed ❌');
                 break;
         }
         return back()->with([

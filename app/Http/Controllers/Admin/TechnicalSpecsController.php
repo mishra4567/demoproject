@@ -14,12 +14,19 @@ class TechnicalSpecsController extends Controller
 {
     public function index()
     {
-        $technicalSpecs = DB::table('technical_specs')
+        $data = DB::table('technical_specs')
             ->leftJoin('products', 'technical_specs.product_id', '=', 'products.id')
             ->select('technical_specs.*', 'products.name as product_name')
+            ->where('technical_specs.is_deleted', 0)
             ->get();
+        $deletedData = DB::table('technical_specs')
+            ->leftJoin('products', 'technical_specs.product_id', '=', 'products.id')
+            ->select('technical_specs.*', 'products.name as product_name')
+            ->where('technical_specs.is_deleted', 1)
+            ->get();
+        $info = config('field_info.technical_specification');
 
-        return view('admin.product.technical_specs', compact('technicalSpecs'));
+        return view('admin.product.technical_specs', compact('data', 'deletedData', 'info'));
     }
     public function addTechnicalSpecs(Request $request, $id = null)
     {
@@ -64,8 +71,9 @@ class TechnicalSpecsController extends Controller
                     'status' => '',
                 ];
         }
+        $info = config('field_info.technical_spec');
         $products = DB::table('products')->where('status', 1)->get();
-        return view('admin.product.manage_technical_specs', compact('result', 'products'));
+        return view('admin.product.manage_technical_specs', compact('result', 'products', 'info'));
     }
     public function processTechnicalSpecs(Request $request)
     {
@@ -96,6 +104,7 @@ class TechnicalSpecsController extends Controller
         $proTechnicalSpecs->is_featured = $request->has('is_featured') ? 1 : 0;
         $proTechnicalSpecs->is_discounted = $request->has('is_discounted') ? 1 : 0;
         $proTechnicalSpecs->is_trending = $request->has('is_trending') ? 1 : 0;
+        $proTechnicalSpecs->who_create = session('ADMIN_ID');
         $proTechnicalSpecs->status = '1';
         $proTechnicalSpecs->created_at = now();
         if ($id) {
@@ -114,17 +123,31 @@ class TechnicalSpecsController extends Controller
     {
         // // it is get methode to performe delete
         // // we have post methode to delete
-        // // color delete
-        $color = TechnicalSpecs::find($id);
-        if (!$color) return redirect('admin/color')->with('error', 'color not found');
-
-        $color->delete();
-
-        return redirect('admin/color')->with('success', 'color Deleted Successfully...');
-        // echo "color deleted" ;
-        // echo "this is for color delete";
+        // // TecnicalSpecs delete
+        $teschspecs = TechnicalSpecs::find($id);
+        if (!$teschspecs) return redirect()->back()->with('error', 'Tecnical Specs not found');
+        $teschspecs->is_deleted = 1;
+        $teschspecs->deleted_at = now();
+        $teschspecs->who_delete = session('ADMIN_ID');
+        $teschspecs->save();
+        return redirect()->back()->with('success', 'Tecnical Specs Deleted Successfully...');
     }
-
+    public function restore($id)
+    {
+        $teschspecs = TechnicalSpecs::find($id);
+        if (!$teschspecs) return redirect()->back()->with('error', 'Tecnical Specs not found');
+        $teschspecs->is_deleted = 0;
+        $teschspecs->deleted_at = null;
+        $teschspecs->who_delete = null;
+        $teschspecs->save();
+        return redirect()->back()->with('success', 'Tecnical Specs Restored Successfully...');
+    }
+    public function permanentDelete($id)
+    {
+        // TechnicalSpecs::findOrFail($id)->delete();
+        // return redirect()->back()->with('success', 'Tecnical Specs Permanently Deleted Successfully...');
+        return back()->with('error', 'Delete action is not allowed ❌');
+    }
     /**
      * Show the form for editing the specified resource.
      */
@@ -158,9 +181,24 @@ class TechnicalSpecsController extends Controller
             case 'deactivate':
                 TechnicalSpecs::whereIn('id', $ids)->update(['status' => 0]);
                 break;
-            case 'delete':
-                // Category::whereIn('id', $ids)->delete();
-                return back()->with('error', 'Delete action is not allowed ❌');
+            case 'trash':
+                TechnicalSpecs::whereIn('id', $ids)->update([
+                    'is_deleted' => 1,
+                    'deleted_at' => now(),
+                    'who_delete' => session('ADMIN_ID')
+                ]);
+                // return back()->with('error', 'Delete action is not allowed ❌');
+                break;
+            case 'restore':
+                TechnicalSpecs::whereIn('id', $ids)->update([
+                    'is_deleted' => 0,
+                    'deleted_at' => null,
+                    'who_delete' => null
+                ]);
+                break;
+            case 'permanent_delete':
+                // Color::whereIn('id', $ids)->delete();
+                return back()->with('error', 'Permanent delete is not allowed ❌');
                 break;
         }
         return back()->with([

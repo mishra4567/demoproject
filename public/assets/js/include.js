@@ -52,16 +52,6 @@ document.addEventListener("click", function (e) {
 /**
  *Search routing End
  */
-/**
- * All Pages Bulk Action
- */
-document.getElementById("select_all").addEventListener("click", function () {
-    let checkboxes = document.querySelectorAll(".checkbox_ids");
-
-    checkboxes.forEach((cb) => {
-        cb.checked = this.checked;
-    });
-});
 
 /**
  * All Pages Bulk Action End
@@ -268,4 +258,60 @@ document.addEventListener('DOMContentLoaded', function () {
             item.pop.hide();
         });
     });
+});
+
+// ─── Trash Toggle ──────────────────────────────────
+
+let trashVisible = false;
+
+function toggleTrash() {
+    trashVisible = !trashVisible;
+
+    const btn        = document.getElementById('trash_toggle_btn');
+    if (!btn) return; // safe exit if button not on page
+    const trashRows  = document.querySelectorAll('.trash-row');
+    const activeRows = document.querySelectorAll('.active-row');
+    // Switch bulk options
+    const bulkType = document.getElementById('bulk_type')
+    const bulkSelect = document.getElementById('bulk_action')
+    const activeOptions = document.querySelectorAll('.active-option');
+    const deletedOptions = document.querySelectorAll('.deleted-option');
+
+    if (trashVisible) {
+        // Show Deleted rows
+        trashRows.forEach(r  => r.classList.remove('d-none'));
+        activeRows.forEach(r => r.classList.add('d-none'));
+        // Switsh bulk options to deleted
+        if (bulkType) bulkType.value = 'deleted';
+        if (bulkSelect) bulkSelect.value = '';
+        activeOptions.forEach(o => o.classList.add('d-none'));
+        deletedOptions.forEach(o => o.classList.remove('d-none'));
+        btn.innerHTML = '<i class="fa fa-list me-1"></i> Show Active';
+        btn.classList.replace('btn-secondary', 'btn-success');
+    } else {
+        // Show Active rows
+        trashRows.forEach(r  => r.classList.add('d-none'));
+        activeRows.forEach(r => r.classList.remove('d-none'));
+        // Switsh bulk options to active
+        if (bulkType) bulkType.value = 'active';
+        if (bulkSelect) bulkSelect.value = '';
+        activeOptions.forEach(o => o.classList.remove('d-none'));
+        deletedOptions.forEach(o => o.classList.add('d-none'));
+        btn.innerHTML = '<i class="fa fa-trash me-1"></i> Show Deleted';
+        btn.classList.replace('btn-success', 'btn-secondary');
+    }
+}
+// Select all checkboxes
+document.addEventListener('DOMContentLoaded', function () {
+    const selectAll = document.getElementById('select_all');
+    if (selectAll) {
+        selectAll.addEventListener('change', function () {
+            // Only select visible rows checkboxes
+            document.querySelectorAll(
+                trashVisible
+                    ? '.trash-row .checkbox_ids'
+                    : '.active-row .checkbox_ids'
+            ).forEach(cb => cb.checked = this.checked);
+        });
+    }
 });

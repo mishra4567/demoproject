@@ -13,8 +13,10 @@ class CustomerController extends Controller
 {
     public function index()
     {
-        $custodetails = DB::table('customers')->get();
-        return view('admin.customer.customer', compact('custodetails'));
+        $data = Customer::where('is_deleted', 0)->get();
+        $deletedData = Customer::where('is_deleted', 1)->get();
+        $info = config('field_info.customer');
+        return view('admin.customer.customer', compact('data', 'deletedData', 'info'));
     }
     public function managecustomer(Request $request, $id = null)
     {
@@ -48,8 +50,9 @@ class CustomerController extends Controller
         // print_r($result);
         // echo "</pre";
         // die();
+        $info = config('field_info.customer');
         $custo_add = DB::table('cust_addresses')->where('customer_id', $id)->get();
-        return view('admin.customer.manage_customer', compact('result', 'custo_add'));
+        return view('admin.customer.manage_customer', compact('result', 'custo_add','info'));
     }
     public function managecustomerprocess(Request $request, $id)
     {
@@ -76,7 +79,8 @@ class CustomerController extends Controller
         $data->email = $request->email;
         $data->phone = $request->phone;
         $data->status = $request->status ? 1 : 0;
-
+        $data->who_created = session('ADMIN_ID') ?? 0; // Assuming you have admin authentication
+        $data->created_at = now();
         // ✅ Password only if filled
         if (!empty($request->password)) {
             $data->password = bcrypt($request->password);
@@ -111,6 +115,8 @@ class CustomerController extends Controller
         $data->country = $request->country;
         $data->label = $request->label;
         $data->is_default = $request->is_default ? 1 : 0;
+        $data->who_created = session('ADMIN_ID') ?? 0;
+        $data->created_at = now();
         $data->save();
         // If this address is being set as default,
         // remove default from all other addresses of the same customer
@@ -133,12 +139,29 @@ class CustomerController extends Controller
         // // Customer Add delete
         $data = Customer::find($id);
         if (!$data) return back()->with('error', 'Customer not found');
-
-        $data->delete();
-
+        $data->is_deleted = 1;
+        $data->deleted_at = now();
+        $data->who_delete = session('ADMIN_ID') ?? 0;
+        $data->save();
         return back()->with('success', 'Customer Deleted Successfully...');
         // echo "data deleted" ;
         // echo "this is for data delete";
+    }
+    public function restore(Request $request, $id)
+    {
+        $data = Customer::find($id);
+        if (!$data) return back()->with('error', 'Customer not found');
+        $data->is_deleted = 0;
+        $data->deleted_at = null;
+        $data->who_delete = null;
+        $data->save();
+        return back()->with('success', 'Customer Restored Successfully...');
+    }
+    public function permanentDelete($id)
+    {
+        // Customer::findOrFail($id)->delete();
+        // return back()->with('success', 'Customer permanently deleted.');
+        return back()->with('error', 'Delete action is not allowed ❌');
     }
     /**
      * Show the form for editing the specified resource.
@@ -172,9 +195,24 @@ class CustomerController extends Controller
             case 'deactivate':
                 Customer::whereIn('id', $ids)->update(['status' => 0]);
                 break;
-            case 'delete':
-                // Category::whereIn('id', $ids)->delete();
-                return back()->with('error', 'Delete action is not allowed ❌');
+            case 'trash':
+                Customer::whereIn('id', $ids)->update([
+                    'is_deleted' => 1,
+                    'deleted_at' => now(),
+                    'who_delete' => session('ADMIN_ID')
+                ]);
+                // return back()->with('error', 'Delete action is not allowed ❌');
+                break;
+            case 'restore':
+                Customer::whereIn('id', $ids)->update([
+                    'is_deleted' => 0,
+                    'deleted_at' => null,
+                    'who_delete' => null
+                ]);
+                break;
+            case 'permanent_delete':
+                // ::whereIn('id', $ids)->delete();
+                return back()->with('error', 'Permanent delete is not allowed ❌');
                 break;
         }
         return back()->with([
@@ -194,8 +232,36 @@ class CustomerController extends Controller
         if (!$data) {
             return redirect()->back()->with('error', 'Address not found');
         }
-        $data->delete();
-
+        $data->is_deleted = 1;
+        $data->deleted_at = now();
+        $data->who_delete = session('ADMIN_ID') ?? 0;
+        $data->save();
         return redirect()->back()->with('success', 'Address Deleted Successfully');
+    }
+    public function restoreAddress(Request $request, $id = null, $addid = null)
+    {
+        // $id = customer_id
+        // $addid = address_id
+
+        $data = Cust_address::where('id', $addid)
+            ->where('customer_id', $id)
+            ->first();
+        if (!$data) {
+            return redirect()->back()->with('error', 'Address not found');
+        }
+        $data->is_deleted = 0;
+        $data->deleted_at = null;
+        $data->who_delete = null;
+        $data->save();
+        return redirect()->back()->with('success', 'Address Restored Successfully');
+    }
+    public function permanentDeleteAddress(Request $request, $id = null, $addid = null)
+    {
+        // $id = customer_id
+        // $addid = address_id
+
+        // Cust_address::findOrFail($addid)->delete();
+        // return redirect()->back()->with('success', 'Address permanently deleted.');
+        return redirect()->back()->with('error', 'Delete action is not allowed ❌');
     }
 }
