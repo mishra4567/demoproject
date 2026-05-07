@@ -9,10 +9,10 @@
             </a> --}}
             {{-- Trash Toggle --}}
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h3 class="title-5 m-b-0">Color</h3>
+                <h3 class="title-5 m-b-0">Link Product</h3>
                 <a href="{{ route('product.addlinkproduct') }}">
                     <button type="button" class="btn btn-success">
-                        <i class="fa fa-plus me-1"></i> Add Color
+                        <i class="fa fa-plus me-1"></i> Add link Product
                     </button>
                 </a>
             </div>

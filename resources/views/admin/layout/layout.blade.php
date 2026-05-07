@@ -166,115 +166,151 @@
             <div class="menu-sidebar__content js-scrollbar1">
                 <nav class="navbar-sidebar">
                     <ul class="list-unstyled navbar__list">
-                        <li class="has-sub @yield('dashboard_select')">
-                            <a href="{{ route('dashboard') }}">
-                                <i class="fas fa-tachometer-alt"></i>Dashboard</a>
-                        </li>
-                        <li class="has-sub @yield('calender_select')">
-                            <a href="{{ route('calendar') }}">
-                                <i class="fa-regular fa-calendar-days"></i>Calender</a>
-                        </li>
-                        <li class="has-sub @yield('category_select')">
-                            <a href="{{ route('category') }}">
-                                <i class="fa-solid fa-layer-group"></i>Category</a>
-                        </li>
-                        <li class="has-sub @yield('coupon_select')">
-                            <a href="{{ route('coupons') }}">
-                                <i class="fa-solid fa-ticket"></i>Coupons</a>
-                        </li>
-                        <li class="has-sub @yield('size_select')">
-                            <a href="{{ route('size') }}">
-                                <i class="fa-solid fa-minimize"></i>size</a>
-                        </li>
-                        <li class="has-sub @yield('color_select')">
-                            <a href="{{ route('color') }}">
-                                <i class="fa-solid fa-fill-drip"></i>color</a>
-                        </li>
-                        <li class="has-sub @yield('brands_select')">
-                            <a href="{{ route('brands') }}">
-                                <i class="fa-solid fa-fill-drip"></i>Brans</a>
-                        </li>
+                        @role('dashboard', 'view')
+                            <li class="has-sub @yield('dashboard_select')">
+                                <a href="{{ route('dashboard') }}">
+                                    <i class="fas fa-tachometer-alt"></i>Dashboard</a>
+                            </li>
+                        @endrole
+                        @role('calendar', 'view')
+                            <li class="has-sub @yield('calender_select')">
+                                <a href="{{ route('calendar') }}">
+                                    <i class="fa-regular fa-calendar-days"></i>Calender</a>
+                            </li>
+                        @endrole
+                        @role('category', 'view')
+                            <li class="has-sub @yield('category_select')">
+                                <a href="{{ route('category') }}">
+                                    <i class="fa-solid fa-layer-group"></i>Category</a>
+                            </li>
+                        @endrole
+                        @role('coupon', 'view')
+                            <li class="has-sub @yield('coupon_select')">
+                                <a href="{{ route('coupons') }}">
+                                    <i class="fa-solid fa-ticket"></i>Coupons</a>
+                            </li>
+                        @endrole
+                        @role('size', 'view')
+                            <li class="has-sub @yield('size_select')">
+                                <a href="{{ route('size') }}">
+                                    <i class="fa-solid fa-minimize"></i>size</a>
+                            </li>
+                        @endrole
+                        @role('color', 'view')
+                            <li class="has-sub @yield('color_select')">
+                                <a href="{{ route('color') }}">
+                                    <i class="fa-solid fa-fill-drip"></i>color</a>
+                            </li>
+                        @endrole
+                        @role('brands', 'view')
+                            <li class="has-sub @yield('brands_select')">
+                                <a href="{{ route('brands') }}">
+                                    <i class="fa-solid fa-fill-drip"></i>Brans</a>
+                            </li>
+                        @endrole
                         {{-- <li class="has-sub @yield('product_select')">
                             <a href="{{ route('product') }}">
                                 <i class="fa-brands fa-product-hunt"></i>product</a>
                         </li> --}}
-                        <li class="has-sub">
-                            <a class="js-arrow" href="#">
-                                <i class="fas fa-copy"></i>product
-                                {{-- <span class="arrow">
+                        @role('product', 'view')
+                            <li class="has-sub">
+                                <a class="js-arrow" href="#">
+                                    <i class="fas fa-copy"></i>product
+                                    {{-- <span class="arrow">
                                     <i class="fas fa-angle-down"></i>
                                 </span> --}}
-                            </a>
-                            <ul class="list-unstyled navbar__sub-list js-sub-list">
-                                <li>
-                                    <a href="{{ route('product') }}">
-                                        <i class="fas fa-sign-in-alt"></i>All Product</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('product.manage') }}">
-                                        <i class="fas fa-user"></i>Add Product</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('product.linkproduct') }}">
-                                        <i class="fas fa-user"></i>Link Product</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('product.addlinkproduct') }}">
-                                        <i class="fas fa-user"></i> Add Link Product</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('product.tecnicalspacs') }}">
-                                        <i class="fas fa-user"></i>Tecnical Specs</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('product.addtecnicalspecs') }}">
-                                        <i class="fas fa-user"></i> Add Tecnical Specs</a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="has-sub">
-                            <a class="js-arrow" href="#">
-                                <i class="fas fa-copy"></i>Media
-                            </a>
-                            <ul class="list-unstyled navbar__sub-list js-sub-list">
-                                <li>
-                                    <a href="{{ route('media') }}">
-                                        <i class="fas fa-sign-in-alt"></i>Library</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('media.managemedia') }}">
-                                        <i class="fas fa-user"></i>Add Media File</a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="has-sub @yield('customer_select')">
-                            <a href="{{ route('customer') }}">
-                                <i class="fa-solid fa-fill-drip"></i>Customers</a>
-                        </li>
-                        <li class="has-sub">
-                            <a class="js-arrow" href="#">
-                                <i class="fas fa-copy"></i>Report
-                            </a>
-                            <ul class="list-unstyled navbar__sub-list js-sub-list">
-                                <li>
-                                    <a href="{{ route('admin.reportsView') }}">
-                                        <i class="fas fa-sign-in-alt"></i>View</a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('admin.reports') }}">
-                                        <i class="fas fa-user"></i>Add</a>
-                                </li>
-                            </ul>
-                        </li>
+                                </a>
+                                <ul class="list-unstyled navbar__sub-list js-sub-list">
+                                    <li>
+                                        <a href="{{ route('product') }}">
+                                            <i class="fas fa-sign-in-alt"></i>All Product</a>
+                                    </li>
+                                    @role('product', 'create')
+                                        <li>
+                                            <a href="{{ route('product.manage') }}">
+                                                <i class="fas fa-user"></i>Add Product</a>
+                                        </li>
+                                    @endrole
+                                    @role('linkproduct', 'view')
+                                        <li>
+                                            <a href="{{ route('product.linkproduct') }}">
+                                                <i class="fas fa-user"></i>Link Product</a>
+                                        </li>
+                                    @endrole
+                                    @role('linkproduct', 'create')
+                                        <li>
+                                            <a href="{{ route('product.addlinkproduct') }}">
+                                                <i class="fas fa-user"></i> Add Link Product</a>
+                                        </li>
+                                    @endrole
+                                    @role('technical_spec', 'view')
+                                        <li>
+                                            <a href="{{ route('product.tecnicalspacs') }}">
+                                                <i class="fas fa-user"></i>Tecnical Specs</a>
+                                        </li>
+                                    @endrole
+                                    @role('technical_spec', 'create')
+                                        <li>
+                                            <a href="{{ route('product.addtecnicalspecs') }}">
+                                                <i class="fas fa-user"></i> Add Tecnical Specs</a>
+                                        </li>
+                                    @endrole
+                                </ul>
+                            </li>
+                        @endrole
+                        @role('media', 'view')
+                            <li class="has-sub @yield('media_select')">
+                                <a class="js-arrow" href="#">
+                                    <i class="fas fa-copy"></i>Media
+                                </a>
+                                <ul class="list-unstyled navbar__sub-list js-sub-list">
+                                    <li>
+                                        <a href="{{ route('media') }}">
+                                            <i class="fas fa-sign-in-alt"></i>Library</a>
+                                    </li>
+                                    @role('media', 'create')
+                                        <li>
+                                            <a href="{{ route('media.managemedia') }}">
+                                                <i class="fas fa-user"></i>Add Media File</a>
+                                        </li>
+                                    @endrole
+                                </ul>
+                            </li>
+                        @endrole
+                        @role('customer', 'view')
+                            <li class="has-sub @yield('customer_select')">
+                                <a href="{{ route('customer') }}">
+                                    <i class="fa-solid fa-fill-drip"></i>Customers</a>
+                            </li>
+                        @endrole
+                        @role('dashboard', 'view')
+                            <li class="has-sub" @yield('report_select')>
+                                <a class="js-arrow" href="#">
+                                    <i class="fas fa-copy"></i>Report
+                                </a>
+                                <ul class="list-unstyled navbar__sub-list js-sub-list">
+                                    <li>
+                                        <a href="{{ route('admin.reportsView') }}">
+                                            <i class="fas fa-sign-in-alt"></i>View</a>
+                                    </li>
+                                    <li>
+                                        <a href="{{ route('admin.reports') }}">
+                                            <i class="fas fa-user"></i>Add</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        @endrole
                         <li class="has-sub">
                             <a class="js-arrow" href="#">
                                 <i class="fa-solid fa-gear"></i>Settings
                             </a>
                             <ul class="list-unstyled navbar__sub-list js-sub-list">
-                                <li>
-                                    <a href="{{ route('admin.settings') }}">
-                                        <i class="fa-solid fa-address-card"></i>Profile View</a>
-                                </li>
+                                @superadmin()
+                                    <li>
+                                        <a href="{{ route('admin.settings') }}">
+                                            <i class="fa-solid fa-address-card"></i>Profile View</a>
+                                    </li>
+                                @endsuperadmin
                                 <li>
                                     <a href="{{ route('admin.change.password') }}">
                                         <i class="fa-solid fa-key"></i>Password</a>

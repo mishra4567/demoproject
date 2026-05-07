@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\RoleHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Brands;
 use Illuminate\Http\Request;
@@ -71,6 +72,11 @@ class brandsController extends Controller
      */
     public function managebrandsprocess(Request $request)
     {
+        // Role logic
+        if (RoleHelper::cannot('product', 'create')) {
+            return redirect()->back()
+                ->with('error', 'You do not have permission to add products.');
+        }
         // Code frome chatgpt
         $id = $request->post('id');
         $request->validate([
@@ -129,6 +135,10 @@ class brandsController extends Controller
 
     public function permanentDelete(Request $request, $id)
     {
+        if (RoleHelper::cannot('product', 'delete')) {
+            return redirect()->back()
+                ->with('error', 'You do not have permission to delete products.');
+        }
         // $brands = Brands::find($id);
         // if (!$brands) return redirect('admin/brands')->with('error', 'brands not found');
         // $brands->delete();

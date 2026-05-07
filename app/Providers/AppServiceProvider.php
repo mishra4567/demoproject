@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Helpers\RoleHelper;
 use App\Models\CreateMediaTable;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
@@ -40,5 +41,19 @@ class AppServiceProvider extends ServiceProvider
             $view->with('upcomingEvents', $upcomingEvents);
         });
         Blade::component('admin.partials.not_found_page', 'not-found');
+        // ✅ @role('module', 'action') — show if allowed
+        Blade::if('role', function (string $module, string $action) {
+            return RoleHelper::can($module, $action);
+        });
+
+        // ✅ @norole('module', 'action') — show if NOT allowed
+        Blade::if('norole', function (string $module, string $action) {
+            return RoleHelper::cannot($module, $action);
+        });
+
+        // ✅ @superadmin — show only for super admin
+        Blade::if('superadmin', function () {
+            return session('ADMIN_IS_SUPER') == 1;
+        });
     }
 }

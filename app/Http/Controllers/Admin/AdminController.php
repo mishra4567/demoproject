@@ -93,6 +93,8 @@ class AdminController extends Controller
         $request->session()->put('ADMIN_ROLE', $admin->admin_role);
         $request->session()->put('ADMIN_NAME', $admin->name);
 
+        $request->session()->put('ADMIN_IS_SUPER', $admin->is_super_admin);
+
         return redirect()->intended('admin/dashboard')
             ->with('success', 'Welcome back, ' . $admin->name . '!');
     }
@@ -195,7 +197,10 @@ class AdminController extends Controller
     public function settings()
     {
         $profile = DB::table('admins')
-            ->where('is_super_admin', 0) // ← exclude super admin
+            ->where(function ($query) {
+                $query->where('is_super_admin', 0) // ← exclude super admin
+                    ->orWhereNull('is_super_admin');
+            })
             ->orderByRaw("
             CASE status
                 WHEN 0 THEN 1
@@ -205,6 +210,7 @@ class AdminController extends Controller
             END
         ")
             ->get();
+
         return view('admin.settings.settings', compact('profile'));
     }
 

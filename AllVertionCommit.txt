@@ -1,6 +1,10 @@
 
-
-29-6.4.2026:-
+7.5.26:-
+Vertion:- 1.10.12
+Comment:- Adding Restrictions For administrator, manager, Editor, Reviewer.
+Pending:- Bug Fixing(not logging, route colling view )
+29-6.4-5.2026:-
+Vertion:- 1.9.12
 Comment:- Adding Bulk Action for delete, Restore, parmanent delete And fix few bug.
 Pending TODO List:-
    "I want to add role restriction system now"
