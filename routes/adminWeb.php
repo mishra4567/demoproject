@@ -65,6 +65,33 @@ Route::prefix('admin')->group(function () {
 // // Registration process Routes End
 // Route::post('admin/auth', [AdminController::class, 'auth'])
 //     ->name('admin.auth');
+Route::fallback(function () {
+    // Admin logged in
+    if (session()->has('ADMIN_LOGIN')) {
+
+        return response()->view(
+            'admin.partials.not_found_page',
+            [
+                'type'    => '404',
+                'icon'    => 'fa-exclamation-triangle',
+                'title'   => 'Page Not Found',
+                'message' => 'The page you are looking for does not exist.',
+                'btnText' => 'Go Dashboard',
+                'btnUrl'  => url('admin/dashboard'),
+            ],
+            404
+        );
+    }
+    // Guest user
+    return response()->view('admin.errors.404', [
+        'type'    => '404',
+        'icon'    => 'fa-exclamation-triangle',
+        'title'   => 'Page Not Found',
+        'message' => 'The page you are looking for does not exist.',
+        'btnText' => 'Dashboard',
+        'btnUrl'  => url('admin/dashboard'),
+    ], 404);
+});
 Route::group(['middleware' => 'admin_auth'], function () {
 
     Route::get('admin/search-routes', [RouteSearchController::class, 'ajaxSearch'])

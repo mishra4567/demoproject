@@ -1,5 +1,10 @@
 
 7.5.26:-
+Vertion:- 1.10.13
+Comment:- Bug fix 
+Bug:- If super admin rejected no longer eccess site.=> Fixed
+Bug:- If not logging and call rong route that display dashboard style.=> Fixed.
+7.5.26:-
 Vertion:- 1.10.12
 Comment:- Adding Restrictions For administrator, manager, Editor, Reviewer.
 Pending:- Bug Fixing(not logging, route colling view )

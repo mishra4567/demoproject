@@ -74,17 +74,36 @@ class AdminController extends Controller
                 ->with('error', 'Please verify your email before logging in')
                 ->withInput();
         }
-        // Not approved by super admin
-        if ($admin->admin_appr != 1) {
-            return redirect('admin')
-                ->with('error', 'Your account is pending approval by the super admin')
-                ->withInput();
-        }
-        // Account suspended and inactive
-        if ($admin->status != 1) {
-            return redirect('admin')
-                ->with('error', 'Your account is suspended. Please contact support.')
-                ->withInput();
+        // // Not approved by super admin
+        // if ($admin->admin_appr != 1) {
+        //     return redirect('admin')
+        //         ->with('error', 'Your account is pending approval by the super admin')
+        //         ->withInput();
+        // }
+        // // Account suspended and inactive
+        // if ($admin->status != 1) {
+        //     return redirect('admin')
+        //         ->with('error', 'Your account is suspended. Please contact support.')
+        //         ->withInput();
+        // }
+        // Normal admins only
+        if ($admin->is_super_admin != 1) {
+
+            // Approval check
+            if ($admin->admin_appr != 1) {
+
+                return redirect('admin')
+                    ->with('error', 'Your account is pending approval by the super admin')
+                    ->withInput();
+            }
+
+            // Status check
+            if ($admin->status != 1) {
+
+                return redirect('admin')
+                    ->with('error', 'Your account is suspended. Please contact support.')
+                    ->withInput();
+            }
         }
 
         // put admin data in session
