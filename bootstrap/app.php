@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -17,6 +18,16 @@ return Application::configure(basePath: dirname(__DIR__))
             'role'  => \App\Http\Middleware\RoleMiddleware::class,
             'admin_auth' => \App\Http\Middleware\AdminAuth::class,
         ]);
+    })
+    ->withExceptions(function (Exceptions $exceptions) {
+        $exceptions->render(function (AuthenticationException $e, $request) {
+            if ($request->is('api/*') || $request->expectsJson()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Unauthenticated. Please login.'
+                ], 401);
+            }
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Adding custom exception handler for 404 errors

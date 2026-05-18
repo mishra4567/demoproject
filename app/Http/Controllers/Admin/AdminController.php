@@ -111,6 +111,7 @@ class AdminController extends Controller
         $request->session()->put('ADMIN_ID', $admin->id);
         $request->session()->put('ADMIN_ROLE', $admin->admin_role);
         $request->session()->put('ADMIN_NAME', $admin->name);
+        $request->session()->put('ADMIN_EMAIL', $admin->email);
 
         $request->session()->put('ADMIN_IS_SUPER', $admin->is_super_admin);
 

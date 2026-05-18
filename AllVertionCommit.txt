@@ -1,7 +1,31 @@
-
+18.5.26:-
+Vertion:- 1.11.13
+API vertion:- 1.0.2
+Comment:- API Authentication using:- sanctum & Route Development & Controller Development
+API:- Development for frontEnd API
+route:-
+    using postman-
+        http://127.0.0.1:8000/api/register
+            {
+                "name": "John",
+                "email": "john@gmail.com",
+                "password": "123456",
+                "password_confirmation": "123456"
+            }
+        http://127.0.0.1:8000/api/login
+            {
+                "email": "john@gmail.com",
+                "password": "123456"
+            }
+        http://127.0.0.1:8000/api/profile
+            Authorization -> Auth Type ->Bearer token->Token-> 7|q3HnmWCvSvFZbviHWSzV28hgkh1sENUrKLIMzzsxcbbb
+            The authorization header will be automatically generated when you send the request.
+        http://127.0.0.1:8000/api/logout
+            Authorization -> Auth Type ->Bearer token->Token-> 7|q3HnmWCvSvFZbviHWSzV28hgkh1sENUrKLIMzzsxcbbb
+            The authorization header will be automatically generated when you send the request.
 7.5.26:-
 Vertion:- 1.10.13
-Comment:- Bug fix 
+Comment:- Bug fix
 Bug:- If super admin rejected no longer eccess site.=> Fixed
 Bug:- If not logging and call rong route that display dashboard style.=> Fixed.
 7.5.26:-

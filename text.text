@@ -45,6 +45,14 @@ This time i using clodinary for upload image and vodeo
         public config command:-
                 php artisan vendor:publish --tag=cloudinary
                 php artisan optimize:clear
+        public catch clear:-
+                php artisan clear:cache
+/**** Building API Controller
+    Installation of sanctum
+        composer require laravel/sanctum
+        php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+    Migrate
+        php artisan migrate
 
 
 
@@ -56,6 +64,124 @@ Folder structure for blade file
     |-- dashboard.blade.php
 
 */
+/****
+In React Front end :----------------
+    After login, save the token from the response:
+        const login = async () => {
+            const response = await fetch('http://127.0.0.1:8000/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: 'john@gmail.com',
+                    password: '123456'
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.status) {
+                localStorage.setItem('token', data.token); // save it
+            }
+        }
+    Then use it in protected requests:
+        const getProfile = async () => {
+            const token = localStorage.getItem('token'); // retrieve it
+
+            const response = await fetch('http://127.0.0.1:8000/api/profile', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                }
+            });
+
+            const data = await response.json();
+        }
+    And on logout, clear it:
+        const logout = async () => {
+            const token = localStorage.getItem('token');
+
+            await fetch('http://127.0.0.1:8000/api/logout', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json',
+                }
+            });
+
+            localStorage.removeItem('token'); // clear it
+        }
+    /***********************************************************************\
+        Now on the React side, here's the complete auth flow:
+
+**1. Install axios (easier than fetch):**
+```bash
+npm install axios
+```
+
+**2. Create `src/api/axios.js`:**
+```js
+import axios from 'axios';
+
+const api = axios.create({
+    baseURL: 'http://127.0.0.1:8000/api',
+    headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+    }
+});
+
+// automatically attach token to every request
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
+export default api;
+```
+
+**3. Create `src/api/auth.js`:**
+```js
+import api from './axios';
+
+export const register = (data) => api.post('/register', data);
+export const login    = (data) => api.post('/login', data);
+export const profile  = ()     => api.get('/profile');
+export const logout   = ()     => api.post('/logout');
+```
+
+---
+
+Now you just call these anywhere in React:
+
+```js
+import { login, profile, logout } from '../api/auth';
+
+// Login
+const res = await login({ email, password });
+localStorage.setItem('token', res.data.token);
+
+// Profile
+const res = await profile();
+console.log(res.data.customer);
+
+// Logout
+await logout();
+localStorage.removeItem('token');
+```
+
+---
+
+Are you using **React Router** for navigation? That decides how we handle protected routes next.
+    \***********************************************************************/
+****/
 
 
 
