@@ -4,6 +4,7 @@ use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Middleware\HandleCors;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -17,6 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role'  => \App\Http\Middleware\RoleMiddleware::class,
             'admin_auth' => \App\Http\Middleware\AdminAuth::class,
+        ]);
+        $middleware->api(prepend:[
+            HandleCors::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
