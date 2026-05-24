@@ -22,4 +22,7 @@ class Customer extends Authenticatable
         'password',
         'remember_token',
     ];
+    protected $casts = [
+        'status' => 'integer',
+    ];
 }

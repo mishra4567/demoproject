@@ -1,4 +1,9 @@
 24.5.26:-
+version:- 1.11.16
+API vertion:- 1.0.5
+Comment:- API Authentication Bug Fixing
+API:- Development for frontEnd API, fixing to send status.
+24.5.26:-
 Vertion:- 1.11.15
 API vertion:- 1.0.4
 Comment:- API Login & Product Details API Development
