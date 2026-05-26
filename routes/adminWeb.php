@@ -88,7 +88,7 @@ Route::fallback(function () {
         'icon'    => 'fa-exclamation-triangle',
         'title'   => 'Page Not Found',
         'message' => 'The page you are looking for does not exist.',
-        'btnText' => 'Dashboard',
+        // 'btnText' => 'Dashboard',
         'btnUrl'  => url('admin/dashboard'),
     ], 404);
 });

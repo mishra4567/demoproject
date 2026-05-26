@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Middleware\HandleVendorRequests;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\HandleCors;
+use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -13,15 +15,24 @@ return Application::configure(basePath: dirname(__DIR__))
         api: __DIR__ . '/../routes/api.php',
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
+        // vendor routes
+        then: function () {
+            Route::middleware('web')
+                ->group(base_path('routes/vendor.php'));
+        }
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'role'  => \App\Http\Middleware\RoleMiddleware::class,
             'admin_auth' => \App\Http\Middleware\AdminAuth::class,
         ]);
-        $middleware->api(prepend:[
+        $middleware->api(prepend: [
             HandleCors::class,
         ]);
+        // middleware for vendor routes
+        // $middleware->web(prepend: [
+        //     HandleVendorRequests::class,
+        // ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (AuthenticationException $e, $request) {

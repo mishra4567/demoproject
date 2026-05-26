@@ -33,6 +33,7 @@ command
                php artisan make:root laptop
                php artisan make:website laptop
                php artisan make:api laptop
+               php artisan make:vendor laptop
     **********\
 
 /****  In Admin Controller
@@ -54,7 +55,19 @@ This time i using clodinary for upload image and vodeo
     Migrate
         php artisan migrate
 
-
+/**
+my vendor structure
+resources/
+    |-css/
+    |   |-app.css
+    |
+    |-js/
+    |   |-vendor/
+    |   |    |-Layouts/
+    |   |    |-Pages/
+    |   |    |-app.js
+    |   |-bootstrap.js
+**/
 
 /**
 Folder structure for blade file
