@@ -1,5 +1,5 @@
 <?php
-
+// Controller/Admin/ViewProductController.php
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
@@ -36,9 +36,9 @@ class ViewProductController extends Controller
             // ->where('products.status', 1)
             ->first();
         if (!$product) {
-            return view('admin.partials.not_found_page',[
-                'type'=>'404',
-                'title'=>'Product Not Found',
+            return view('admin.partials.not_found_page', [
+                'type' => '404',
+                'title' => 'Product Not Found',
                 'message' => 'The product you are looking for does not exist or has been removed.',
                 'btnText' => 'Back to Products',
                 'btnUrl'  => route('product'),
@@ -66,7 +66,8 @@ class ViewProductController extends Controller
             ->select(
                 'linkproducts.*',
                 'sizes.size as size_name',
-                'colors.color as color_name',
+                'colors.color_name as color_name',
+                'colors.hex_id as color_hex',        // ✅ Add this
                 'attr_media.file_name as media_url',
             )
             ->where('linkproducts.product_id', $id)
@@ -131,8 +132,10 @@ class ViewProductController extends Controller
         // print_r($media_url);
         // echo "</pre>";
         // die();
-        return view('admin.product.viewproduct',
-        compact('product', 'technical_specification', 'attributes', 'gallery', 'categoryName', 'brand_name', 'media_url'));
+        return view(
+            'admin.product.viewproduct',
+            compact('product', 'technical_specification', 'attributes', 'gallery', 'categoryName', 'brand_name', 'media_url')
+        );
         // echo "This is for size" ;
     }
 }

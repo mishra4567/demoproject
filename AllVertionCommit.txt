@@ -1,32 +1,37 @@
 27.5.26:-
+version:- 1.12.19
+API version:- 1.0.6
+Vendor version:- 1.0.1
+Comment:- Admin:- Color and Color_hex fix || API:- folder validation 
+27.5.26:-
 version:- 1.12.18
-API vertion:- 1.0.5
-Vendor Vertion:- 1.0.1
+API version:- 1.0.5
+Vendor version:- 1.0.1
 Comment:- Adding Logout Functionality for Vendor, and add middleware for vendor route.
 26.5.26:-
 version:- 1.12.17
-API vertion:- 1.0.5
-Vendor Vertion:- 1.0.0
+API version:- 1.0.5
+Vendor version:- 1.0.0
 Comment:- Building Vendor Page using Vue And Inertia js. @alrite
 Vendor Comment:- Build vendor page
 24.5.26:-
 version:- 1.11.16
-API vertion:- 1.0.5
+API version:- 1.0.5
 Comment:- API Authentication Bug Fixing
 API:- Development for frontEnd API, fixing to send status.
 24.5.26:-
-Vertion:- 1.11.15
-API vertion:- 1.0.4
+version:- 1.11.15
+API version:- 1.0.4
 Comment:- API Login & Product Details API Development
 API:- Development for frontEnd API
 19.5.26:-
-Vertion:- 1.11.14
-API vertion:- 1.0.3
+version:- 1.11.14
+API version:- 1.0.3
 Comment:- API Product Details API Development
 API:- Development for frontEnd API
 18.5.26:-
-Vertion:- 1.11.13
-API vertion:- 1.0.2
+version:- 1.11.13
+API version:- 1.0.2
 Comment:- API Authentication using:- sanctum & Route Development & Controller Development
 API:- Development for frontEnd API
 route:-
@@ -50,80 +55,80 @@ route:-
             Authorization -> Auth Type ->Bearer token->Token-> 7|q3HnmWCvSvFZbviHWSzV28hgkh1sENUrKLIMzzsxcbbb
             The authorization header will be automatically generated when you send the request.
 7.5.26:-
-Vertion:- 1.10.13
+version:- 1.10.13
 Comment:- Bug fix
 Bug:- If super admin rejected no longer eccess site.=> Fixed
 Bug:- If not logging and call rong route that display dashboard style.=> Fixed.
 7.5.26:-
-Vertion:- 1.10.12
+version:- 1.10.12
 Comment:- Adding Restrictions For administrator, manager, Editor, Reviewer.
 Pending:- Bug Fixing(not logging, route colling view )
 29-6.4-5.2026:-
-Vertion:- 1.9.12
+version:- 1.9.12
 Comment:- Adding Bulk Action for delete, Restore, parmanent delete And fix few bug.
 Pending TODO List:-
    "I want to add role restriction system now"
 28.4.2026:-
-vertion:- 1.9.11
+version:- 1.9.11
 Comment:- Add few Authentication (forgot password, reset password, email verification) for admin user, Fix some bug in admin login and register page.
 27.4.2026
-vertion:- 1.8.11
+version:- 1.8.11
 Comment:- Add new page for admin settings, Add new page for admin profile update,
             Add new page for change password, Fix some bug in admin login and register page.
             And add email verification for admin registration.
             Fix bug for admin login and register page.
 22-23.4.2026
-vertion:- 1.7.10
+version:- 1.7.10
 Comment:- Add Custom page not found in Every where Page, Fix Security Bug in Product Details Page, Add New Field in Product Details Page.
 19.04.2026
-vertion:- 1.7.9
+version:- 1.7.9
 Comment:- Fix Security Bug in Product Details Page, Add Custom page not found in Every where Page.
 16.4.2026 - 17.4.2026
-vertion:- 1.6.9
+version:- 1.6.9
 Command:- Add Customer address and report page (report page has bug)
 fixing some bug in customer details page and add new field in database and form.
             & Adding New Page for Customer Address (Add, Update, Delete)
             & pop up to add new address in customer details page.
 14.4.2026
-vertion:- 1.6.8
+version:- 1.6.8
 Command:- Adding Customer Details Page (Add, Update, Delete, status)
 12.4.2026
-vertion::- 1.5.8
+version::- 1.5.8
 Comment:- In Category page add parent category ( dropdown, database, controller), Bug Fix.
 9-12.4.2026
-vertion:- 1.5.7
+version:- 1.5.7
 Comment:- (1.5.6) Add technical_specification field page and add in product details page.
 (1.5.7) Bug Fix,
 **** I am confusing about the product details page, I am not sure about the design and how to show all details, so I am working on it, I will update you soon. ****
 8.4.2026
-vertion:- 1.4.6
+version:- 1.4.6
 Comment:- Add barcode Generetor in project BUT not fully function yet, need to work on it.
 
 6.4.2026
-vertion:- 1.4.5
+version:- 1.4.5
 Comment:- Adding Media Search And Fix Styling.
-vertion:- 1.4.4
+version:- 1.4.4
 Comment:- Add Brand page and dropdown, Add full product view.
 
 5.4.2026
-vertion:- 1.3.3
+version:- 1.3.3
 Comment:- Bug fix:- Calendar Event,
 
 31-03.2026
-vertion:- 1.3.2
+version:- 1.3.2
 Adding Calendar Page in Project
 Full Function:- Add, update, delete, view, sibar show list
 
 29.03.2026
-vertion:- 1.2.2
+version:- 1.2.2
 filter Command in creating Controller, Model, Migration On single Command.
 Command:- php artisan make:root <Name>
 28.03.2026
-vertion:- 1.1.2
+version:- 1.1.2
 Adding View Full Product Details.
 Full Mixed all Product, linked Product, Catagory, Media, coller, size
 Url:- http://localhost:8000/admin/product/productview/id
 27.03.2026
-Vertion:- 1.1.1
-Started Adding All vertion Details
+version:- 1.1.1
+Started Adding All version Details
 Adding All Pages Bulk Action (Active, Deactive, Delete)

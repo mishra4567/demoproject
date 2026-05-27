@@ -158,10 +158,18 @@
                                                     <td>{{ $attr->size_name ?? 'N/A' }}</td>
                                                     <td>
                                                         @if ($attr->color_name)
-                                                            <span class="badge"
-                                                                style="background-color: {{ $attr->color_name }};">
+                                                            <div class="d-flex align-items-center gap-2">
+                                                                <span
+                                                                    style="
+                                                                        display:inline-block;
+                                                                        width:20px;
+                                                                        height:20px;
+                                                                        border-radius:50%;
+                                                                        background-color: {{ $attr->color_hex ?? '#ccc' }};
+                                                                        border: 1px solid #aaa;">
+                                                                </span>
                                                                 {{ $attr->color_name }}
-                                                            </span>
+                                                            </div>
                                                         @else
                                                             N/A
                                                         @endif

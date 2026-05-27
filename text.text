@@ -22,6 +22,8 @@ command
             php artisan db:seed --class=(name_table)Seeder
     Storage link (Publik folder link):-
         php artisan storage:link
+    Storage unlink (Publik folder link):-
+        php artisan storage:unlink
     /*** 7.6.26 -> add barcode generator in project ***/
         composer require picqer/php-barcode-generator
 
