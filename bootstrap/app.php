@@ -25,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role'  => \App\Http\Middleware\RoleMiddleware::class,
             'admin_auth' => \App\Http\Middleware\AdminAuth::class,
+            'vendor.auth' => \App\Http\Middleware\VendorAuth::class,
         ]);
         $middleware->api(prepend: [
             HandleCors::class,

@@ -1,5 +1,6 @@
+// Vendor/Pages/Dashboard.vue
 <script setup>
-import VendorLayout from '../Layouts/VendorLayout.vue';
+import VendorLayout from './Layouts/VendorLayout.vue';
 
 defineOptions({
     layout: VendorLayout,

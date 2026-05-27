@@ -1,3 +1,8 @@
+27.5.26:-
+version:- 1.12.18
+API vertion:- 1.0.5
+Vendor Vertion:- 1.0.1
+Comment:- Adding Logout Functionality for Vendor, and add middleware for vendor route.
 26.5.26:-
 version:- 1.12.17
 API vertion:- 1.0.5
