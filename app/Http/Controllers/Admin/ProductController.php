@@ -81,6 +81,8 @@ class ProductController extends Controller
                 'slug' => $product->slug,
                 'image' => $product->file_name,
                 'brand' => $product->brand,
+                'price' => $product->price,
+                'mrp' => $product->mrp,
                 'model' => $product->model,
                 'short_desc' => $product->short_desc,
                 'desc' => $product->desc,
@@ -100,6 +102,8 @@ class ProductController extends Controller
                 'slug' => '',
                 'image' => '',
                 'brand' => '',
+                'price' => '',
+                'mrp' => '',
                 'model' => '',
                 'short_desc' => '',
                 'desc' => '',
@@ -164,6 +168,8 @@ class ProductController extends Controller
         $product->name = $request->name;
         $product->slug = $request->slug;
         $product->brand = $request->brand_id;
+        $product->price = $request->price;
+        $product->mrp = $request->mrp;
         $product->model = $request->model;
         $product->coupon_id = $request->coupon_id;
         $product->short_desc = $request->short_desc;
@@ -172,7 +178,15 @@ class ProductController extends Controller
         $product->technical_specification = $request->technical_specification;
         $product->uses = $request->uses;
         $product->warranty = $request->warranty;
-        $product->who_create = session('ADMIN_ID');
+        if ($id) {
+            $product->is_vendor = 'ADMIN';
+            $product->who_edited = session('ADMIN_NAME');
+            $product->edited_by =  session('ADMIN_ID');
+        } else {
+            $product->is_vendor = 'ADMIN';
+            $product->who_create = session('ADMIN_NAME');
+            $product->created_by = session('ADMIN_ID');
+        }
         $product->created_at = now();
         $product->status = 1;
         // Auto Generate Barcode if not exists

@@ -2,6 +2,7 @@
 // routes/vendor.php
 
 use App\Http\Controllers\Vendor\AuthController;
+use App\Http\Controllers\Vendor\VendorProductController;
 use App\Http\Middleware\HandleVendorRequests;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -17,6 +18,9 @@ Route::prefix('vendor')->name('vendor.')
         });
         Route::middleware('vendor.auth')->group(function () {
             Route::get('/', fn() => Inertia::render('Dashboard'))->name('dashboard');
-            Route::post('logout',  [AuthController::class, 'logout'])->name('logout');
+            Route::post('/logout',  [AuthController::class, 'logout'])->name('logout');
+            Route::get('/products', [VendorProductController::class, 'index'])->name('products.index');
+            Route::get('/products/manageproduct/{id?}', [VendorProductController::class, 'manageproduct'])->name('product.manage');
+            Route::post('/products/manageproductprocess', [VendorProductController::class, 'manageproductprocess'])->name('product.manageprocess');
         });
     });

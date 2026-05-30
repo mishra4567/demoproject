@@ -1,8 +1,15 @@
+28-30.5.26:-
+version:- 1.12.20
+API version:- 1.0.6
+Vendor version:- 1.1.2
+Comment:- Admin:- Fixing few bug in admin And Product Velidation
+          Vendor:- Vendor Back Folder:- useProducts|productService for already loaded ,
+                 Add new page for vendor Product Page,
 27.5.26:-
 version:- 1.12.19
 API version:- 1.0.6
 Vendor version:- 1.0.1
-Comment:- Admin:- Color and Color_hex fix || API:- folder validation 
+Comment:- Admin:- Color and Color_hex fix || API:- folder validation
 27.5.26:-
 version:- 1.12.18
 API version:- 1.0.5

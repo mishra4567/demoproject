@@ -29,7 +29,17 @@ class AuthController extends Controller
 
         Auth::guard('vendor')->login($vendor);
 
-        return redirect()->route('vendor.dashboard');
+        // Regenerate session
+        $request->session()->regenerate();
+
+        // Optional session data
+        session([
+            'vendor_id'    => $vendor->id,
+            'vendor_name'  => $vendor->name,
+            'vendor_email' => $vendor->email,
+        ]);
+
+        return to_route('vendor.dashboard');
     }
     // ── Login ─────────────────────────────────
     public function showLogin()
@@ -50,18 +60,32 @@ class AuthController extends Controller
             ]);
         }
 
+        // Regenerate session
         $request->session()->regenerate();
 
-        return redirect()->route('vendor.dashboard');
+        // Logged vendor
+        $vendor = Auth::guard('vendor')->user();
+
+        // Optional session data
+        session([
+            'vendor_id'    => $vendor->id,
+            'vendor_name'  => $vendor->name,
+            'vendor_email' => $vendor->email,
+        ]);
+
+        return to_route('vendor.dashboard');
     }
     // ── Logout ────────────────────────────────
     public function logout(Request $request)
     {
         Auth::guard('vendor')->logout();
 
+        // Clear session
         $request->session()->invalidate();
+
+        // Regenerate CSRF token
         $request->session()->regenerateToken();
 
-        return redirect()->route('vendor.login');
+        return to_route('vendor.login');
     }
 }

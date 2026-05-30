@@ -99,6 +99,26 @@
                                         </div>
                                     </div>
                                     <div class="mb-3">
+                                        <div class="col-md-6">
+                                            <label for="price" class="control-label mb-1">Product Price
+                                            @include('admin.partials.field_info', [
+                                                'info' => $info['price'] ?? '',
+                                            ])
+                                        </label>
+                                        <input id="price" name="price" value="{{ $price }}" type="text"
+                                            class="form-control" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="mrp" class="control-label mb-1">Product MRP
+                                            @include('admin.partials.field_info', [
+                                                'info' => $info['mrp'] ?? '',
+                                            ])
+                                        </label>
+                                        <input id="mrp" name="mrp" value="{{ $mrp }}" type="text"
+                                            class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
                                         <div class="row">
                                             <label for="media" class="control-label mb-1">Product Image
                                                 @include('admin.partials.field_info', [
