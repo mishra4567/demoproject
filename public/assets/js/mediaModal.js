@@ -80,68 +80,7 @@ document.addEventListener("change", function (e) {
     }
 });
 
-/**
- *  Media Model
- */
-
-// let selectedMedia = null;
-
-// function addMedia() {
-//     let modal = new bootstrap.Modal(document.getElementById("mediaModal"));
-//     modal.show();
-// }
-
-// // Click on media image
-// // document.addEventListener("click", function (e) {
-// //     if (e.target.closest(".media-card")) {
-// //         let card = e.target.closest(".media-card");
-
-// //         let mediaId = card.getAttribute("data-id");
-// //         let fileName = card.getAttribute("data-file");
-
-// //         selectedMedia = {
-// //             id: mediaId,
-// //             file: fileName,
-// //         };
-
-// //         // highlight selected
-// //         document.querySelectorAll(".media-card").forEach((el) => {
-// //             el.classList.remove("border-primary");
-// //         });
-
-// //         card.classList.add("border-primary");
-// //     }
-// // });
-
-// // Click ADD button
-// function addMediaButton() {
-//     let selected = document.querySelector(
-//         'input[name="selected_media"]:checked',
-//     );
-
-//     if (!selected) {
-//         alert("Please select an image");
-//         return;
-//     }
-
-//     let mediaId = selected.value;
-//     let fileName = selected.getAttribute("data-file");
-
-//     // save media id to hidden input
-//     document.getElementById("product_media_id").value = mediaId;
-
-//     // show preview
-//     document.getElementById("product_media_preview").innerHTML =
-//         `<img src="/storage/media/${fileName}"
-//         class="img-fluid border rounded"
-//         style="max-height:120px;">`;
-
-//     // close modal
-//     let modal = bootstrap.Modal.getInstance(
-//         document.getElementById("mediaModal"),
-//     );
-//     modal.hide();
-// }
+// ./backuop/mediaModel.js
 
 
 let mediaTarget = "";

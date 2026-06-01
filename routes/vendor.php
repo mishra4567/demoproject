@@ -11,10 +11,10 @@ use Inertia\Inertia;
 Route::prefix('vendor')->name('vendor.')
     ->middleware(['web', HandleVendorRequests::class])->group(function () {
         Route::middleware('guest:vendor')->group(function () {
-            Route::get('register', [AuthController::class, 'showRegister'])->name('register');
-            Route::post('register', [AuthController::class, 'register']);
-            Route::get('login',    [AuthController::class, 'showLogin'])->name('login');
-            Route::post('login',   [AuthController::class, 'login']);
+            Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+            Route::post('/register', [AuthController::class, 'register']);
+            Route::get('/login',    [AuthController::class, 'showLogin'])->name('login');
+            Route::post('/login',   [AuthController::class, 'login']);
         });
         Route::middleware('vendor.auth')->group(function () {
             Route::get('/', fn() => Inertia::render('Dashboard'))->name('dashboard');

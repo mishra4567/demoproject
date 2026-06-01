@@ -15,6 +15,17 @@ export default function useProducts() {
         perPage: page.props.products?.per_page ?? 12,
     }));
 
+    // ── Manage Product Page Data ──────────────────────────────────────────────────
+    const product = computed(() => page.props.product ?? null);
+    const categories = computed(() => page.props.categories ?? []);
+    const brands = computed(() => page.props.brands ?? []);
+    const coupons = computed(() => page.props.coupons ?? []);
+    const media = computed(() => page.props.media ?? []);
+    const isEdit = computed(() => page.props.isEdit ?? []);
+    // ── Manage Product Save ──────────────────────────────────────────────────
+    const saveProduct = (form, options = {}) =>
+        productService.save(form, options);
+
     // ── Actions ──────────────────────────────────────────────────
 
     const deleteProduct = (id) => {
@@ -30,8 +41,18 @@ export default function useProducts() {
     const editProduct = (id) => productService.manage(id);
 
     return {
+        // list data
         products,
         pagination,
+        // manage data
+        product,
+        categories,
+        brands,
+        coupons,
+        media,
+        isEdit,
+        // actions
+        saveProduct,
         goToPage,
         deleteProduct,
         editProduct,

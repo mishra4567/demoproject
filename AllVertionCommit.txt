@@ -1,3 +1,9 @@
+31-1.5.26:-
+version:- 1.12.20
+API version:- 1.0.6
+Vendor version:- 1.2.3
+Comment:- Vendor:- Few Function added in login and register page,
+            fixing bashboard page, and add new page for vendor product details page.
 28-30.5.26:-
 version:- 1.12.20
 API version:- 1.0.6

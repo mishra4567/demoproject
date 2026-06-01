@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Middleware;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -27,6 +28,14 @@ class HandleVendorRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        return array_merge(parent::share($request), []);
+        return array_merge(parent::share($request), [
+            'auth' => [
+                'vendor' => Auth::guard('vendor')->user(),
+            ],
+            'flash' => [
+                'success' => session('success'),
+                'error'   => session('error'),
+            ],
+        ]);
     }
 }

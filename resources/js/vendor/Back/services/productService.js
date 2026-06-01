@@ -19,8 +19,12 @@ const productService = {
     //     router.post(route("vendor.products.store"), data, options),
     // update: (id, data, options = {}) =>
     //     router.put(route("vendor.products.update", id), data, options),
-    save: (data, options = {}) => {
-        router.post("/vendor/product/manageproductprocess", data, options);
+    save: (form, options = {}) => {
+        form.post("/vendor/products/manageproductprocess", {
+            onSuccess: () => router.get("/vendor/products"),
+            onError: (e) => console.error("Save failed", e),
+            ...options,
+        });
     },
     destroy: (id, options = {}) =>
         router.delete(`/vendor/products/${id}`, options),

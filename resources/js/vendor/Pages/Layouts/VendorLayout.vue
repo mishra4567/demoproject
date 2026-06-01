@@ -1,6 +1,7 @@
 // Vendor/Layouts/VendorLayout.vue
 <script setup>
-import Navbar from '../Components/Navbar.vue';
+// import Navbar from '../Components/Navbar.vue';
+import { Message, Navbar } from '../Components';
 </script>
 
 <template>
@@ -8,6 +9,7 @@ import Navbar from '../Components/Navbar.vue';
         <Navbar />
 
         <main class="p-6">
+            <Message/>
             <slot />
         </main>
     </div>

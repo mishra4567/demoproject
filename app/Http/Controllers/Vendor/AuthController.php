@@ -73,7 +73,8 @@ class AuthController extends Controller
             'vendor_email' => $vendor->email,
         ]);
 
-        return to_route('vendor.dashboard');
+        return to_route('vendor.dashboard')
+            ->with('success', 'Welcome back, ' . Auth::guard('vendor')->user()->name . '!');;
     }
     // ── Logout ────────────────────────────────
     public function logout(Request $request)
@@ -86,6 +87,7 @@ class AuthController extends Controller
         // Regenerate CSRF token
         $request->session()->regenerateToken();
 
-        return to_route('vendor.login');
+        return to_route('vendor.login')
+            ->with('success', 'You have been logged out successfully.');
     }
 }
