@@ -1,6 +1,6 @@
 <!-- resources/js/Pages/Vendor/Products/Index.vue -->
 <script setup>
-import VendorLayout from '../Layouts/VendorLayout.vue';
+import VendorLayout from '../../Layouts/VendorLayout.vue';
 import { useProducts } from '@/vendor/Back/index.js';
 
 const {

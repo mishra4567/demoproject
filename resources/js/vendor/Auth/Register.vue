@@ -1,4 +1,4 @@
-<!-- resources/js/Pages/Vendor/Auth/Register.vue -->
+<!-- resources/js/Vendor/Auth/Register.vue -->
 <script setup>
 import { useForm } from '@inertiajs/vue3'
 import { useAuth } from '@/vendor/Back'

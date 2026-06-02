@@ -2,8 +2,8 @@
 <script setup>
 import { ref, computed }     from 'vue'
 import { router, useForm }   from '@inertiajs/vue3'
-import VendorLayout          from '../Layouts/VendorLayout.vue'
-import { MediaModal }        from '../Components'
+import VendorLayout          from '../../Layouts/VendorLayout.vue'
+import { MediaModal }        from '../Media/'
 import { useProducts }       from '@/vendor/Back'
 
 const { categories, brands, coupons, media, product, isEdit, saveProduct } = useProducts()

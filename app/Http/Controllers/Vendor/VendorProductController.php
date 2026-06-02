@@ -35,7 +35,7 @@ class VendorProductController extends Controller
             ->paginate(12);
 
         // For now, just return a simple view. You can replace this with actual product listing logic later.
-        return Inertia::render('Products/Index', [
+        return Inertia::render('Pages/Products/Index', [
             'products' => $products,
         ]);
     }
@@ -101,7 +101,7 @@ class VendorProductController extends Controller
             ];
         }
 
-        return Inertia::render('Products/ManageProduct', [  // ← fixed path
+        return Inertia::render('Pages/Products/ManageProduct', [  // ← fixed path
             'product'    => $result,
             'categories' => DB::table('categories')->where('status', 1)->get(),
             'brands'     => DB::table('brands')->where('status', 1)->get(),

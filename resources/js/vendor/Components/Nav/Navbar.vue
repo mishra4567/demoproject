@@ -3,7 +3,7 @@ import { Link }    from '@inertiajs/vue3'
 import { ref }     from 'vue'
 import { useAuth } from '@/vendor/Back'
 import { usePage } from '@inertiajs/vue3'
-import { Icons, SearchBar }    from '@/vendor/Pages/Components/index'       // ← import Icon
+import { Icons, SearchBar }    from '@/vendor/Components/index'       // ← import Icon
 import { useClickOutside } from '@/vendor/assets'
 
 const { vendor, initial, logout } = useAuth()
@@ -138,18 +138,18 @@ const isActive = (path) => {
       <!-- Desktop secondary nav bar -->
       <div class="hidden md:block" style="border-top:0.5px solid #2e2e2b;">
         <div class="container mx-auto px-4">
-          <div class="flex items-center gap-1 h-10">
-            <Link
-              v-for="link in navLinks" :key="link.href" :href="link.href"
-              class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
-              :style="isActive(link.href) ? 'background:#1c1c1a;color:white;' : 'color:#9e9890;'"
-            >
-              <Icons :name="link.icon" class="w-3.5 h-3.5" />
-              {{ link.label }}
-            </Link>
-          </div>
+            <div class="flex items-center gap-1 h-10">
+                <Link
+                    v-for="link in navLinks" :key="link.href" :href="link.href"
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
+                    :style="isActive(link.href) ? 'background:#1c1c1a;color:white;' : 'color:#9e9890;'"
+                >
+                    <Icons :name="link.icon" class="w-3.5 h-3.5" />
+                    {{ link.label }}
+                </Link>
+            </div>
         </div>
-      </div>
+    </div>
     </nav>
 
     <!-- Mobile sidebar overlay + drawer unchanged below -->

@@ -9,8 +9,8 @@ import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 createInertiaApp({
     resolve: (name) =>
         resolvePageComponent(
-            `./Pages/${name}.vue`,
-            import.meta.glob("./Pages/**/*.vue"),
+            `./${name}.vue`,
+            import.meta.glob("./**/*.vue"),
         ),
 
     setup({ el, App, props, plugin }) {
