@@ -1,3 +1,10 @@
+3-6.6.26:-
+version:- 1.12.22
+API version:- 1.0.6
+Vendor version:- 1.4.5
+Comment:- Vendor:- Adding Coupon Page For Vendor, and add few function in coupon page.
+                    Adding Create, Update, Delete, Restore, Permanent Delete, Bulk Action For Coupon.
+        Admin:- Pending Bug Fixing For Admin Page.
 2.6.26:-
 version:- 1.12.21
 API version:- 1.0.6

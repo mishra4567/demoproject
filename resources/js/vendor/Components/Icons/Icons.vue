@@ -187,4 +187,16 @@ defineProps({
       2.5 0 001.224 0zM6.364 17.382l-1.53-1.53A9.958 9.958 0 012 10.999a10 10
       0 011.58-5.394l1.53 1.53A7.96 7.96 0 003 11a7.96 7.96 0 003.364 6.382z" />
   </svg>
+  <!-- ── Media Library ── -->
+    <svg
+    v-else-if="name === 'media'"
+    viewBox="0 0 20 20"
+    fill="currentColor"
+    :class="$props.class"
+    >
+    <path
+        d="M4 3a2 2 0 00-2 2v8a2 2 0 002 2h1v1a2 2 0 002 2h9a2 2 0 002-2V8a2 2 0
+        00-2-2h-1V5a2 2 0 00-2-2H4zm0 2h9v8H4V5zm4 2a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm-2 5l2-2 3 3H6z"
+    />
+    </svg>
 </template>

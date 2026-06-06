@@ -1,7 +1,7 @@
-<!-- resources/js/Pages/Vendor/Products/Index.vue -->
+<!-- resources/js/Vendor/Pages/Products/Index.vue -->
 <script setup>
 import VendorLayout from '../../Layouts/VendorLayout.vue';
-import { useProducts } from '@/vendor/Back/index.js';
+import { useProducts } from '../../Back/index';
 
 const {
     products,

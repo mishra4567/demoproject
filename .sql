@@ -1,0 +1,1 @@
+ALTER TABLE `coupons` ADD `is_vendor` VARCHAR(100) NULL DEFAULT NULL AFTER `deleted_at`, ADD `created_by` VARCHAR(100) NULL DEFAULT NULL AFTER `is_vendor`, ADD `who_edited` VARCHAR(100) NULL DEFAULT NULL AFTER `created_by`, ADD `edited_by` VARCHAR(100) NULL DEFAULT NULL AFTER `who_edited`;

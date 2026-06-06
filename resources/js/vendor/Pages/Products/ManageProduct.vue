@@ -3,7 +3,7 @@
 import { ref, computed }     from 'vue'
 import { router, useForm }   from '@inertiajs/vue3'
 import VendorLayout          from '../../Layouts/VendorLayout.vue'
-import { MediaModal }        from '../Media/'
+import { MediaModal }        from '../index'
 import { useProducts }       from '@/vendor/Back'
 
 const { categories, brands, coupons, media, product, isEdit, saveProduct } = useProducts()
