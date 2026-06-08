@@ -1,3 +1,10 @@
+7-8.6.26:-
+version:- 1.12.23
+API version:- 1.0.6
+Vendor version:- 1.5.6
+Comment:- Vendor:- Fixing few bug in vendor coupon page, Ading new Brand Page For Vendor, and add few function in Brand page.
+                    Adding Create, Update, Delete, Restore, Permanent Delete, Bulk Action For Brand.
+        Admin:- Fixing few bug in admin And Config Velidation
 3-6.6.26:-
 version:- 1.12.22
 API version:- 1.0.6

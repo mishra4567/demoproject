@@ -21,7 +21,7 @@ class VendorCouponController extends Controller
     }
     private function authorise(Coupon $coupon): void
     {
-        abort_if($coupon->created_by !== $this->vendorId(), 403);
+        abort_if((int) $coupon->created_by !== (int) $this->vendorId(), 403);
     }
     public function index()
     {
@@ -82,10 +82,25 @@ class VendorCouponController extends Controller
                 : 'Coupon created successfully!'
         );
     }
+    public function status(Coupon $coupon)
+    {
+        $this->authorise($coupon);
+        $newStatus = $coupon->status == 1 ? 0 : 1;
+        $coupon->update([
+            'status'          => $newStatus,
+            'statusupdate_by' => $newStatus == 1 ? $this->vendorId() : null,
+            'statusupdate_at' => $newStatus == 1 ? now()             : null,
+        ]);
+        return back()->with('success', 'Status updated!');
+    }
     public function destroy(Coupon $coupon)
     {
         $this->authorise($coupon);
-        $coupon->update(['is_deleted' => 1]);
+        $coupon->update([
+            'is_deleted' => 1,
+            'who_delete' => $this->vendorId(),
+            'deleted_at' => now(),
+        ]);
         return back()->with('success', 'Coupon moved to trash!');
         // dd([
         //     'coupon_created_by' => $coupon->created_by,
@@ -96,7 +111,11 @@ class VendorCouponController extends Controller
     public function restore(Coupon $coupon)
     {
         $this->authorise($coupon);
-        $coupon->update(['is_deleted' => 0]);
+        $coupon->update([
+            'is_deleted' => 0,
+            'deleted_at' => null,
+            'who_delete' => null
+        ]);
         return back()->with('success', 'Coupon restored!');
     }
     public function permanentDelete(Coupon $coupon)
@@ -126,16 +145,32 @@ class VendorCouponController extends Controller
         $message = '';
 
         match ($request->action) {
-            'activate'   => ($coupons->update(['status' => 1])
+            'activate'   => ($coupons->update([
+                'status' => 1,
+                'statusupdate_by' => $this->vendorId(),
+                'statusupdate_at' => now(),
+            ])
                 && $message = "{$count} coupon(s) activated successfully!"),
 
-            'deactivate' => ($coupons->update(['status' => 0])
+            'deactivate' => ($coupons->update([
+                'status' => 0,
+                'statusupdate_by' => null,
+                'statusupdate_at' => null,
+            ])
                 && $message = "{$count} coupon(s) deactivated successfully!"),
 
-            'trash'      => ($coupons->update(['is_deleted' => 1])
+            'trash'      => ($coupons->update([
+                'is_deleted' => 1,
+                'who_delete' => $this->vendorId(),
+                'deleted_at' => now(),
+            ])
                 && $message = "{$count} coupon(s) moved to trash!"),
 
-            'restore'    => ($coupons->update(['is_deleted' => 0])
+            'restore'    => ($coupons->update([
+                'is_deleted' => 0,
+                'deleted_at' => null,
+                'who_delete' => null,
+            ])
                 && $message = "{$count} coupon(s) restored successfully!"),
 
             'permanent_delete' => $message = 'Coupon permanently delete not allowed!',

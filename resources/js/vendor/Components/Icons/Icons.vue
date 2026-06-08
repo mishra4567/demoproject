@@ -199,4 +199,45 @@ defineProps({
         00-2-2h-1V5a2 2 0 00-2-2H4zm0 2h9v8H4V5zm4 2a1.5 1.5 0 110 3 1.5 1.5 0 010-3zm-2 5l2-2 3 3H6z"
     />
     </svg>
+    <!-- ── Coupon Discount ── -->
+<svg
+  v-else-if="name === 'coupons'"
+  viewBox="0 0 20 20"
+  fill="currentColor"
+  :class="$props.class"
+>
+  <path
+    fill-rule="evenodd"
+    d="M4 4a2 2 0 012-2h8a2 2 0 012 2v2a1 1 0 000 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V8a1 1 0 000-2V4zm3 1.5a1 1 0 100 2 1 1 0 000-2zm6 7a1 1 0 100 2 1 1 0 000-2zm-5.47 1.53a.75.75 0 001.06 0l4.88-4.88a.75.75 0 10-1.06-1.06l-4.88 4.88a.75.75 0 000 1.06z"
+    clip-rule="evenodd"
+  />
+</svg>
+<!-- ── Brands ── -->
+<svg
+  v-else-if="name === 'brands'"
+  viewBox="0 0 20 20"
+  fill="currentColor"
+  :class="$props.class"
+>
+  <path
+    d="M10 2a6 6 0 100 12A6 6 0 0010 2zm0 2a4 4 0 110 8 4 4 0 010-8z"
+  />
+  <path
+    d="M4 16a6 6 0 0112 0v1H4v-1z"
+  />
+</svg>
+<!-- ── Chevron Left ── -->
+<svg
+  v-else-if="name === 'chevron-left'"
+  viewBox="0 0 20 20"
+  fill="currentColor"
+  :class="$props.class"
+>
+  <path
+    fill-rule="evenodd"
+    d="M12.78 15.53a.75.75 0 01-1.06 0l-5-5a.75.75 0 010-1.06l5-5a.75.75 0 111.06 1.06L8.31 10l4.47 4.47a.75.75 0 010 1.06z"
+    clip-rule="evenodd"
+  />
+</svg>
+
 </template>

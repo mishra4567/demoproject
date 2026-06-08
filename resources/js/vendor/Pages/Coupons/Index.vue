@@ -158,7 +158,7 @@ const {
                             <!-- Status -->
                             <td class="px-4 py-3">
                                 <button @click="toggleStatus(coupon.id)"
-                                    class="px-2 py-0.5 rounded text-xs transition-colors"
+                                    class="px-2 py-0.5 rounded text-xs transition-colors cursor-pointer"
                                     :style="coupon.status
                                         ? 'background:#1a2e1a;color:#4ade80;'
                                         : 'background:#2e1a1a;color:#f87171;'">
@@ -170,14 +170,14 @@ const {
                             <td class="px-4 py-3">
                                 <div v-if="!showDeleted" class="flex items-center gap-2">
                                     <button @click="openEdit(coupon)"
-                                        class="flex items-center gap-1 px-2 py-1 rounded text-xs"
+                                        class="flex items-center gap-1 px-2 py-1 rounded text-xs cursor-pointer"
                                         style="color:#9e9890;border:0.5px solid #2e2e2b;background:transparent;"
                                         onmouseover="this.style.color='white'"
                                         onmouseout="this.style.color='#9e9890'">
                                         <Icons name="edit" class="w-3.5 h-3.5" /> Edit
                                     </button>
                                     <button @click="deleteCoupon(coupon.id)"
-                                        class="flex items-center gap-1 px-2 py-1 rounded text-xs"
+                                        class="flex items-center gap-1 px-2 py-1 rounded text-xs cursor-pointer"
                                         style="color:#ef4444;border:0.5px solid #2e2e2b;background:transparent;"
                                         onmouseover="this.style.background='#280e0e'"
                                         onmouseout="this.style.background='transparent'">
@@ -186,14 +186,14 @@ const {
                                 </div>
                                 <div v-else class="flex items-center gap-2">
                                     <button @click="restoreCoupon(coupon.id)"
-                                        class="flex items-center gap-1 px-2 py-1 rounded text-xs"
+                                        class="flex items-center gap-1 px-2 py-1 rounded text-xs cursor-pointer"
                                         style="color:#4ade80;border:0.5px solid #2e2e2b;background:transparent;"
                                         onmouseover="this.style.background='#1a2e1a'"
                                         onmouseout="this.style.background='transparent'">
                                         Restore
                                     </button>
                                     <button @click="forceDeleteCoupon(coupon.id)"
-                                        class="flex items-center gap-1 px-2 py-1 rounded text-xs"
+                                        class="flex items-center gap-1 px-2 py-1 rounded text-xs cursor-pointer"
                                         style="color:#ef4444;border:0.5px solid #2e2e2b;background:transparent;"
                                         onmouseover="this.style.background='#280e0e'"
                                         onmouseout="this.style.background='transparent'">
