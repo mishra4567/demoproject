@@ -1,3 +1,10 @@
+9-14.6.26:-
+version:- 1.13.24
+API version:- 1.0.6
+Vendor version:- 1.9.6
+Comment:- Vendor:- Adding Brand, Category, Product, Coupon Page For Vendor, and add few function in Brand, Category, Product, Coupon page.
+                    Adding Create, Update, Delete, Restore, Permanent Delete, Bulk Action For Brand, Category, Product, Coupon.
+        Admin:- Fixing few bug in admin And Config Velidation
 7-8.6.26:-
 version:- 1.12.23
 API version:- 1.0.6

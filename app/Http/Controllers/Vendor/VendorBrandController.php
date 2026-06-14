@@ -91,11 +91,11 @@ class VendorBrandController extends Controller
     public function status(Brands $brand)
     {
         $this->authorise($brand);
-        $newStatus = $brand->status == 1 ? 0 : 1;
+        $newStatus = $brand->status == 0 ? 1 : 0;
         $brand->update([
             'status'          => $newStatus,
-            'statusupdate_by' => $newStatus == 1 ? $this->vendorId() : null,
-            'statusupdate_at' => $newStatus == 1 ? now()             : null,
+            'statusupdate_by' => $newStatus == 0 ? $this->vendorId() : null,
+            'statusupdate_at' => $newStatus == 0 ? now()             : null,
         ]);
         return back()->with('success', 'Status updated!');
     }
@@ -138,7 +138,6 @@ class VendorBrandController extends Controller
 
         $brands = Brands::where('created_by', $this->vendorId())
             ->whereIn('id', $request->ids);
-
         $count   = $brands->count();
         $message = '';
 

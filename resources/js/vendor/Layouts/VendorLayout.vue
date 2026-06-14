@@ -19,12 +19,13 @@ const {isActive}= useActiveLink()
                 <!-- Secondary navbar — right of sidebar -->
                 <div style="background:#111110; border-bottom:0.5px solid #2e2e2b;">
                     <div class="px-4">
-                        <div class="flex items-center gap-1 h-10">
+                        <div class="flex items-center gap-1 h-10 overflow-x-auto whitespace-nowrap
+                            scrollbar-none">
                             <Link
                                 v-for="link in navLinks" :key="link.href"
                                 :href="link.href"
                                 class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg
-                                    text-xs font-medium transition-colors"
+                                    text-xs font-medium transition-colors shrink-0"
                                 :style="isActive(link.href)
                                     ? 'background:#1c1c1a;color:white;'
                                     : 'color:#9e9890;'"

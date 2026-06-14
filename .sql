@@ -1,12 +1,12 @@
 -- Pages/Coupons/Index
-ALTER TABLE `brands` ADD `is_vendor` VARCHAR(100) NULL DEFAULT NULL AFTER `deleted_at`,
-ADD `statusupdate_by` BIGINT NULL DEFAULT NULL AFTER `status`,
-ADD `statusupdate_at` TIMESTAMP NULL DEFAULT NULL AFTER `statusupdate_by`,
-ADD `created_by` BIGINT(100) NULL DEFAULT NULL AFTER `is_vendor`,
-ADD `who_edited` VARCHAR(100) NULL DEFAULT NULL AFTER `created_by`,
-ADD `edited_by` BIGINT(100) NULL DEFAULT NULL AFTER `who_edited`,
-ADD `edited_at` TIMESTAMP NULL DEFAULT NULL AFTER `edited_by`;
-
+ALTER TABLE `categories`
+    ADD `is_vendor` VARCHAR(100) NULL DEFAULT NULL AFTER `updated_at`,
+    ADD `created_by` BIGINT NULL DEFAULT NULL AFTER `is_vendor`,
+    ADD `who_edited` VARCHAR(100) NULL DEFAULT NULL AFTER `created_by`,
+    ADD `edited_by` BIGINT NULL DEFAULT NULL AFTER `who_edited`,
+    ADD `edited_at` TIMESTAMP NULL DEFAULT NULL AFTER `edited_by`,
+    ADD `statusupdate_by` BIGINT NULL DEFAULT NULL AFTER `edited_at`,
+    ADD `statusupdate_at` TIMESTAMP NULL DEFAULT NULL AFTER `statusupdate_by`;
 
 ALTER TABLE `brands`
     ADD COLUMN `statusupdate_by` bigint(20) DEFAULT NULL AFTER `status`,

@@ -3,9 +3,14 @@
 
 use App\Http\Controllers\Vendor\AuthController;
 use App\Http\Controllers\Vendor\VendorBrandController;
+use App\Http\Controllers\Vendor\VendorCategoryController;
+use App\Http\Controllers\Vendor\VendorColorController;
 use App\Http\Controllers\Vendor\VendorCouponController;
+use App\Http\Controllers\Vendor\VendorLinkProductController;
 use App\Http\Controllers\Vendor\VendorMediaController;
 use App\Http\Controllers\Vendor\VendorProductController;
+use App\Http\Controllers\Vendor\VendorSizeController;
+use App\Http\Controllers\Vendor\VendorTechnicalSpecsController;
 use App\Http\Middleware\HandleVendorRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -58,5 +63,46 @@ Route::prefix('vendor')->name('vendor.')
             Route::patch('brands/{brand}/restore', [VendorBrandController::class, 'restore'])->name('brands.restore');
             Route::delete('brands/{brand}',        [VendorBrandController::class, 'destroy'])->name('brands.destroy');
             Route::delete('brands/{brand}/force',  [VendorBrandController::class, 'permanentDelete'])->name('brands.force');
+            // Category routes
+            Route::get('categories',                        [VendorCategoryController::class, 'index'])->name('categories.index');
+            Route::post('categories/save',                  [VendorCategoryController::class, 'save'])->name('categories.save');
+            Route::post('categories/bulk',                  [VendorCategoryController::class, 'bulk'])->name('categories.bulk');
+            Route::patch('categories/{category}/status',    [VendorCategoryController::class, 'status'])->name('categories.status');
+            Route::patch('categories/{category}/restore',   [VendorCategoryController::class, 'restore'])->name('categories.restore');
+            Route::delete('categories/{category}',          [VendorCategoryController::class, 'destroy'])->name('categories.destroy');
+            Route::delete('categories/{category}/force',    [VendorCategoryController::class, 'permanentDelete'])->name('categories.force');
+            // Color routes
+            Route::get('colors',                      [VendorColorController::class, 'index'])->name('colors.index');
+            Route::post('colors/save',                [VendorColorController::class, 'save'])->name('colors.save');
+            Route::post('colors/bulk',                [VendorColorController::class, 'bulk'])->name('colors.bulk');
+            Route::patch('colors/{color}/status',     [VendorColorController::class, 'status'])->name('colors.status');
+            Route::patch('colors/{color}/restore',    [VendorColorController::class, 'restore'])->name('colors.restore');
+            Route::delete('colors/{color}',           [VendorColorController::class, 'destroy'])->name('colors.destroy');
+            Route::delete('colors/{color}/force',     [VendorColorController::class, 'permanentDelete'])->name('colors.force');
+            // Link-product routes
+            Route::get('link-products',                           [VendorLinkProductController::class, 'index'])->name('link-products.index');
+            Route::post('link-products/save',                     [VendorLinkProductController::class, 'save'])->name('link-products.save');
+            Route::post('link-products/bulk',                     [VendorLinkProductController::class, 'bulk'])->name('link-products.bulk');
+            Route::patch('link-products/{linkProduct}/status',    [VendorLinkProductController::class, 'status'])->name('link-products.status');
+            Route::patch('link-products/{linkProduct}/restore',   [VendorLinkProductController::class, 'restore'])->name('link-products.restore');
+            Route::delete('link-products/{linkProduct}',          [VendorLinkProductController::class, 'destroy'])->name('link-products.destroy');
+            Route::delete('link-products/{linkProduct}/force',    [VendorLinkProductController::class, 'permanentDelete'])->name('link-products.force');
+            Route::post('link-products/bulk-save',                [VendorLinkProductController::class, 'bulkSave'])->name('link-products.bulk-save');
+            // Technical Specs routes
+            Route::get('technical-specs',                             [VendorTechnicalSpecsController::class, 'index'])->name('technical-specs.index');
+            Route::post('technical-specs/save',                       [VendorTechnicalSpecsController::class, 'save'])->name('technical-specs.save');
+            Route::post('technical-specs/bulk',                       [VendorTechnicalSpecsController::class, 'bulk'])->name('technical-specs.bulk');
+            Route::patch('technical-specs/{technicalSpec}/status',    [VendorTechnicalSpecsController::class, 'status'])->name('technical-specs.status');
+            Route::patch('technical-specs/{technicalSpec}/restore',   [VendorTechnicalSpecsController::class, 'restore'])->name('technical-specs.restore');
+            Route::delete('technical-specs/{technicalSpec}',          [VendorTechnicalSpecsController::class, 'destroy'])->name('technical-specs.destroy');
+            Route::delete('technical-specs/{technicalSpec}/force',    [VendorTechnicalSpecsController::class, 'permanentDelete'])->name('technical-specs.force');
+            // Sizes routes
+            Route::get('sizes',                     [VendorSizeController::class, 'index'])->name('sizes.index');
+            Route::post('sizes/save',               [VendorSizeController::class, 'save'])->name('sizes.save');
+            Route::post('sizes/bulk',               [VendorSizeController::class, 'bulk'])->name('sizes.bulk');
+            Route::patch('sizes/{size}/status',     [VendorSizeController::class, 'status'])->name('sizes.status');
+            Route::patch('sizes/{size}/restore',    [VendorSizeController::class, 'restore'])->name('sizes.restore');
+            Route::delete('sizes/{size}',           [VendorSizeController::class, 'destroy'])->name('sizes.destroy');
+            Route::delete('sizes/{size}/force',     [VendorSizeController::class, 'permanentDelete'])->name('sizes.force');
         });
     });

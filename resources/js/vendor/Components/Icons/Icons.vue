@@ -239,5 +239,76 @@ defineProps({
     clip-rule="evenodd"
   />
 </svg>
-
+<!-- ── Categories Folder ── -->
+<svg
+  v-else-if="name === 'category'"
+  viewBox="0 0 20 20"
+  fill="currentColor"
+  :class="$props.class"
+>
+  <path
+    d="M2 5a2 2 0 012-2h3l2 2h7a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V5z"
+  />
+</svg>
+<!-- ── Color / Palette ── -->
+<svg
+  v-else-if="name === 'colors'"
+  viewBox="0 0 20 20"
+  fill="currentColor"
+  :class="$props.class"
+>
+  <path
+    d="M10 2a8 8 0 100 16h1.5a1.5 1.5 0 001.06-2.56l-.23-.23a1 1 0 01.71-1.71H14a4 4 0 004-4 8 8 0 00-8-8z"
+  />
+  <circle cx="6.5" cy="8" r="1" />
+  <circle cx="9" cy="5.5" r="1" />
+  <circle cx="13.5" cy="8" r="1" />
+  <circle cx="7.5" cy="12" r="1" />
+</svg>
+<!-- ── Link Product ── -->
+<svg
+  v-else-if="name === 'link-product'"
+  viewBox="0 0 20 20"
+  fill="currentColor"
+  :class="$props.class"
+>
+  <path
+    fill-rule="evenodd"
+    d="M4.75 3A1.75 1.75 0 003 4.75v4.5C3 10.216 3.784 11 4.75 11h4.5A1.75 1.75 0 0011 9.25v-4.5A1.75 1.75 0 009.25 3h-4.5zm0 1.5h4.5a.25.25 0 01.25.25v4.5a.25.25 0 01-.25.25h-4.5a.25.25 0 01-.25-.25v-4.5a.25.25 0 01.25-.25z"
+    clip-rule="evenodd"
+  />
+  <path
+    d="M8.5 10.75a.75.75 0 01.75-.75h1.5a3.25 3.25 0 010 6.5h-1.5a.75.75 0 010-1.5h1.5a1.75 1.75 0 000-3.5h-1.5a.75.75 0 01-.75-.75z"
+  />
+  <path
+    d="M11.5 9.25a.75.75 0 01-.75.75h-1.5a3.25 3.25 0 010-6.5h1.5a.75.75 0 010 1.5h-1.5a1.75 1.75 0 000 3.5h1.5a.75.75 0 01.75.75z"
+  />
+</svg>
+<!-- ── Technical Specs (Gear) ── -->
+<svg
+  v-else-if="name === 'technical-specs'"
+  viewBox="0 0 20 20"
+  fill="currentColor"
+  :class="$props.class"
+>
+  <path
+    d="M10 2a1 1 0 011 1v1.09a4.98 4.98 0 011.57.65l.77-.77a1 1 0 011.41 1.41l-.77.77c.3.49.52 1.02.65 1.57H16a1 1 0 110 2h-1.09a4.98 4.98 0 01-.65 1.57l.77.77a1 1 0 01-1.41 1.41l-.77-.77a4.98 4.98 0 01-1.57.65V17a1 1 0 11-2 0v-1.09a4.98 4.98 0 01-1.57-.65l-.77.77a1 1 0 01-1.41-1.41l.77-.77A4.98 4.98 0 015.09 11H4a1 1 0 110-2h1.09c.13-.55.35-1.08.65-1.57l-.77-.77a1 1 0 011.41-1.41l.77.77A4.98 4.98 0 019 4.09V3a1 1 0 011-1zm0 5a3 3 0 100 6 3 3 0 000-6z"
+  />
+</svg>
+<!-- ── Size / Measurement ── -->
+<svg
+  v-else-if="name === 'size'"
+  viewBox="0 0 20 20"
+  fill="currentColor"
+  :class="$props.class"
+>
+  <path
+    fill-rule="evenodd"
+    d="M13.28 2.22a.75.75 0 011.06 0l3.44 3.44a.75.75 0 010 1.06l-9.5 9.5a2 2 0 01-1.414.586H3.75a.75.75 0 01-.75-.75v-3.116a2 2 0 01.586-1.414l9.694-9.306zM14 4.31L5.06 13.25a.5.5 0 00-.146.354v1.896h1.896a.5.5 0 00.354-.146L16.1 6.42 14 4.31z"
+    clip-rule="evenodd"
+  />
+  <path
+    d="M11.5 5.75a.75.75 0 011.5 0v1a.75.75 0 01-1.5 0v-1zM9.5 7.75a.75.75 0 011.5 0v1a.75.75 0 01-1.5 0v-1zM7.5 9.75a.75.75 0 011.5 0v1a.75.75 0 01-1.5 0v-1z"
+  />
+</svg>
 </template>
