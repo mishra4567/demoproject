@@ -10,18 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
-class VendorCategoryController extends Controller
+class VendorCategoryController extends BaseVendorController
 {
-    private function vendorId()
-    {
-        return Auth::guard('vendor')->id();
-    }
-
-    private function vendorName()
-    {
-        return Auth::guard('vendor')->user()->name;
-    }
-
     private function authorise(Category $category): void
     {
         abort_if((int) $category->created_by !== (int) $this->vendorId(), 403);
@@ -29,19 +19,29 @@ class VendorCategoryController extends Controller
 
     public function index()
     {
-        $data = Category::where('is_deleted', 0)
-            ->where('created_by', $this->vendorId())
+        $data = Category::where('created_by', $this->vendorId())
+            ->where('is_vendor', $this->vendor())
+            ->where(function ($q) {
+                $q->where('is_deleted', 0)
+                    ->orWhereNull('is_deleted');
+            })
             ->latest()->get();
 
         $deletedData = Category::where('is_deleted', 1)
             ->where('created_by', $this->vendorId())
+            ->where('is_vendor', $this->vendor())
             ->latest()->get();
 
         $parents = Category::where('status', 1)
-            ->where('is_deleted', 0)
+            ->where('parent_id', 0)
+            ->where(function ($q) {
+                $q->where('is_deleted', 0)
+                    ->orWhereNull('is_deleted');
+            })
+            ->where('created_by', $this->vendorId())
+            ->where('is_vendor', $this->vendor())
             ->orderBy('category_name')
             ->get(['id', 'category_name']);
-
         return Inertia::render(
             'Pages/Categories/Index',
             compact('data', 'deletedData', 'parents')
@@ -62,19 +62,24 @@ class VendorCategoryController extends Controller
             'category_slug.unique' => 'This category already exists',
         ]);
 
-        $model = $id ? Category::findOrFail($id) : new Category();
-
+        // $model = $id ? Category::findOrFail($id) : new Category();
+        if ($id) {
+            $model = Category::findOrFail($id);
+            $this->authorise($model);
+        } else {
+            $model = new Category();
+        }
         $model->category_name = $request->category_name;
         $model->category_slug = $request->category_slug;
         $model->parent_id     = $request->parent_id ?? 0;
         $model->status        = 1;
-
+        $model->is_vendor  = "VENDOR";
         if ($id) {
             $model->who_edited = $this->vendorName();
             $model->edited_by  = $this->vendorId();
             $model->edited_at  = now();
         } else {
-            $model->who_created = $this->vendorName();
+            $model->who_create = $this->vendorName();
             $model->created_by  = $this->vendorId();
             $model->created_at  = now();
         }
@@ -104,7 +109,7 @@ class VendorCategoryController extends Controller
         $this->authorise($category);
         $category->update([
             'is_deleted' => 1,
-            'who_delete' => $this->vendorName(),
+            'who_delete' => $this->vendorId(),
             'deleted_at' => now(),
         ]);
         return back()->with('success', 'Category moved to trash!');
@@ -134,6 +139,7 @@ class VendorCategoryController extends Controller
         ]);
 
         $categories = Category::where('created_by', $this->vendorId())
+            ->where('is_vendor', $this->vendor())
             ->whereIn('id', $request->ids);
 
         $count   = $categories->count();

@@ -19,8 +19,8 @@
                                         'info' => $info['title'] ?? '',
                                     ])
                                 </label>
-                                <input type="text" name="title" value="{{ $title }}" class="form-control"
-                                    placeholder="Enter coupon title" required>
+                                <input type="text" name="title" value="{{ old('title', $title ?? '') }}"
+                                    class="form-control" placeholder="Enter coupon title" required>
                             </div>
                             <!-- Code -->
                             <div class="col-md-6">
@@ -29,8 +29,8 @@
                                         'info' => $info['code'] ?? '',
                                     ])
                                 </label>
-                                <input type="text" name="code" value="{{ $code }}" class="form-control"
-                                    placeholder="Enter coupon code" required>
+                                <input type="text" name="code" value="{{ old('code', $code ?? '') }}"
+                                    class="form-control" placeholder="Enter coupon code" required>
                             </div>
                             <!-- Value -->
                             <div class="col-md-6">
@@ -39,8 +39,8 @@
                                         'info' => $info['discount'] ?? '',
                                     ])
                                 </label>
-                                <input type="number" name="value" value="{{ $value }}" class="form-control"
-                                    placeholder="Enter value" required>
+                                <input type="number" name="value" value="{{ old('value', $value ?? '') }}"
+                                    class="form-control" placeholder="Enter value" required>
                             </div>
                             <!-- Value -->
                             <div class="col-md-6">
@@ -49,8 +49,9 @@
                                         'info' => $info['min_order'] ?? '',
                                     ])
                                 </label>
-                                <input type="number" name="min_order_amt" value="{{ $min_order_amt }}" class="form-control"
-                                    placeholder="Enter value" required>
+                                <input type="number" name="min_order_amt"
+                                    value="{{ old('min_order_amt', $min_order_amt ?? '') }}" class="form-control"
+                                    placeholder="Enter value">
                             </div>
                             <!-- Type -->
                             <div class="col-md-6">
@@ -60,17 +61,29 @@
                                     ])
                                 </label>
                                 <select name="type" class="form-control">
-                                    <option value="value" {{ ($type ?? '') == 'value' ? 'selected' : '' }}>Value</option>
-                                    <option value="per" {{ ($type ?? '') == 'per' ? 'selected' : '' }}>Percent
+                                    <option value="value" {{ old('type', $type ?? '') == 'value' ? 'selected' : '' }}>
+                                        Fixed Amount
+                                    </option>
+                                    <option value="percent" {{ old('type', $type ?? '') == 'percent' ? 'selected' : '' }}>
+                                        Percentage
                                     </option>
                                 </select>
                             </div>
-                            <!-- Promo Switch -->
+                            {{-- Expiry --}}
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    Expiry Date & Time
+                                </label>
+
+                                <input type="datetime-local" name="expiry"
+                                    value="{{ !empty($expiry) ? \Carbon\Carbon::parse($expiry)->format('Y-m-d\TH:i') : '' }}"
+                                    class="form-control">
+                            </div>
                             <div class="col-md-6 d-flex align-items-center">
                                 <div class="form-check form-switch mt-3">
-                                    <input type="checkbox" name="is_promo" class="form-check-input" id="is_promo"
+                                    <input type="checkbox" name="is_one_time" class="form-check-input" id="is_one_time"
                                         value="1" {{ ($is_one_time ?? 0) == 1 ? 'checked' : '' }}>
-                                    <label class="form-check-label ms-2" for="is_promo">One Time Usable
+                                    <label class="form-check-label ms-2" for="is_one_time">One Time Usable
                                         @include('admin.partials.field_info', [
                                             'info' => $info['one_time'] ?? '',
                                         ])

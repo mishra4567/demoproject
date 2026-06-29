@@ -32,25 +32,24 @@
 
                                 {{-- Hex Code + Picker --}}
                                 <div class="mb-3">
-                                    <label for="color" class="control-label mb-1">
+                                    <label for="hex_id" class="control-label mb-1">
                                         Hex Code
                                         @include('admin.partials.field_info', [
-                                            'info' =>
-                                                $info['color'] ?? ''
+                                            'info' => $info['hex_id'] ?? '',
                                         ])
                                     </label>
                                     <div class="d-flex gap-2 align-items-center">
-                                        <input id="color" name="color" value="{{ old('color', $color ?? '') }}"
-                                            type="text" class="form-control @error('color') is-invalid @enderror"
+                                        <input id="hex_id" name="hex_id" value="{{ old('hex_id', $hex_id ?? '') }}"
+                                            type="text" class="form-control @error('hex_id') is-invalid @enderror"
                                             placeholder="#FF0000" oninput="updateFromText(this.value)" required>
                                         <input type="color" id="color_picker"
-                                            value="{{ old('color', $hex_id ?: '#000000') }}"
+                                            value="{{ old('hex_id', $hex_id ?? '#000000') }}"
                                             style="width:45px; height:38px; padding:2px;
-                                                   border:1px solid #ddd; border-radius:6px;
-                                                   cursor:pointer;"
+                                                border:1px solid #ddd; border-radius:6px;
+                                                cursor:pointer;"
                                             oninput="updateFromPicker(this.value)" title="Pick a color">
                                     </div>
-                                    @error('color')
+                                    @error('hex_id')
                                         <div class="text-danger small mt-1">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -64,7 +63,7 @@
                                         <div id="color_circle"
                                             style="
                                                 width:45px; height:45px;
-                                                background:{{ old('color', $hex_id ?: '#000000') }};
+                                                background:{{ old('hex_id', $hex_id ?: '#000000') }};
                                                 border-radius:50%;
                                                 border:2px solid #ddd;
                                                 transition:background 0.2s;">
@@ -72,7 +71,7 @@
                                         <div id="color_square"
                                             style="
                                                 width:45px; height:45px;
-                                                background:{{ old('color', $hex_id ?: '#000000') }};
+                                                background:{{ old('hex_id', $hex_id ?: '#000000') }};
                                                 border-radius:6px;
                                                 border:2px solid #ddd;
                                                 transition:background 0.2s;">
@@ -86,7 +85,7 @@
                                         <div>
                                             <span class="text-muted small d-block">Hex</span>
                                             <strong id="color_hex_label">
-                                                {{ old('color', $hex_id ?: '#000000') }}
+                                                {{ old('hex_id', $hex_id ?: '#000000') }}
                                             </strong>
                                         </div>
                                     </div>

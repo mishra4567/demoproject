@@ -25,7 +25,12 @@ class AppServiceProvider extends ServiceProvider
     {
         // For My Media Model to show media all over admin panal
         View::composer('admin.include.mediamodal', function ($view) {
-            $media = CreateMediaTable::where('status', 1)->get();
+            $media = CreateMediaTable::where('is_deleted', 0)
+                ->where('is_vendor', 'ADMIN')
+                // ✅ no status filter, no is_vendor filter — show everything non-deleted
+                ->orderBy('created_at', 'desc')
+                ->get();
+
             $view->with('media', $media);
         });
         View::composer('admin.component.upevent', function ($view) {

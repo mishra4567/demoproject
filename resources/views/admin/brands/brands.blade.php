@@ -8,10 +8,13 @@
 
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h3 class="title-5 m-b-0">Brands</h3>
-                <a href="{{ route('brands.add_brands') }}">
+                {{-- <a href="{{ route('brands.add_brands') }}">
                     <button type="button" class="btn btn-success">
                         <i class="fa fa-plus me-1"></i> Add Brand
                     </button>
+                </a> --}}
+                <a href="{{ route('brands.add_brands') }}" class="btn btn-success">
+                    <i class="fa fa-plus me-1"></i> Add Brand
                 </a>
             </div>
             <div class="d-flex gap-2 mb-3">
@@ -47,6 +50,7 @@
                                 <tr>
                                     <th><input type="checkbox" id="select_all"></th>
                                     <th>Brand ID</th>
+                                    <th>Added By</th>
                                     <th>Brand Name</th>
                                     <th>Image</th>
                                     <th>Action</th>
@@ -62,6 +66,11 @@
                                                 class="checkbox_ids">
                                         </td>
                                         <td>{{ $list->id }}</td>
+                                        <td>
+                                            <p class="small">By:- {{ $list->is_vendor }}</p>
+                                            <p class="small">created By:- {{ $list->who_create }}</p>
+                                            <p class="small">Edited By:- {{ $list->who_edited }}</p>
+                                        </td>
                                         <td>{{ $list->name }}</td>
                                         <td>
                                             @if ($list->file_name)
@@ -76,22 +85,26 @@
                                                 class="btn btn-outline-{{ $list->status == 1 ? 'info' : 'warning' }} btn-sm">
                                                 {{ $list->status == 1 ? 'Active' : 'Deactive' }}
                                             </a>
-                                            <a href="{{ route('brands.add_brands', $list->id) }}">
-                                                <button type="button" class="btn btn-outline-success btn-sm">
-                                                    Edit
+                                            @if ($list->locked)
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" disabled>
+                                                    <i class="fa fa-lock"></i> Vendor Brand
                                                 </button>
-                                            </a>
-                                            <a href="{{ route('brands.delete', $list->id) }}"
-                                                onclick="return confirm('Move {{ $list->name }} to trash?')">
-                                                <button type="button" class="btn btn-outline-danger btn-sm">
-                                                    Delete
-                                                </button>
-                                            </a>
+                                            @else
+                                                <a href="{{ route('brands.add_brands', $list->id) }}"
+                                                    class="btn btn-outline-success btn-sm">
+                                                    <i class="fa fa-pencil"></i> Edit
+                                                </a>
+
+                                                <a href="{{ route('brands.delete', $list->id) }}"
+                                                    class="btn btn-outline-danger btn-sm">
+                                                    <i class="fa fa-trash"></i> Delete
+                                                </a>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty
                                     <tr class="active-row">
-                                        <td colspan="5">
+                                        <td colspan="6">
                                             @include('admin.partials.not_found', [
                                                 'type' => 'empty',
                                                 'btnText' => 'Add Brand',
@@ -109,6 +122,11 @@
                                                 class="checkbox_ids">
                                         </td>
                                         <td>{{ $list->id }}</td>
+                                        <td>
+                                            <p class="small">By:- {{ $list->is_vendor }}</p>
+                                            <p class="small">created By:- {{ $list->who_create }}</p>
+                                            <p class="small">Edited By:- {{ $list->who_edited }}</p>
+                                        </td>
                                         <td class="text-muted text-decoration-line-through">
                                             {{ $list->name }}
                                         </td>

@@ -1,3 +1,9 @@
+15-29.6.26:-
+API version:- 1.0.6
+Vendor version:- 2.0.16
+Admin version:- 1.13.31
+Comment:- Vendor:- Fixing BUG --
+Comment:- Admin:- Fixing BUG --
 9-14.6.26:-
 version:- 1.13.24
 API version:- 1.0.6

@@ -19,7 +19,8 @@ export default function useCoupons() {
     const displayed = computed(() =>
         showDeleted.value ? deletedData.value : data.value,
     );
-
+    // console.log("Page Props:", page.props);
+    // console.log("Data:", page.props.data);
     // Form
     const form = useForm({
         id: null,
@@ -27,6 +28,8 @@ export default function useCoupons() {
         code: "",
         value: "",
         type: "flat",
+        min_order_amt: "",
+        is_one_time: false,
         expiry: "",
     });
 
@@ -43,7 +46,11 @@ export default function useCoupons() {
         form.code = coupon.code;
         form.value = coupon.value;
         form.type = coupon.type;
-        form.expiry = coupon.expiry ?? "";
+        form.min_order_amt = coupon.min_order_amt;
+        form.is_one_time = coupon.is_one_time == 1;
+        form.expiry = coupon.expiry
+            ? coupon.expiry.replace(" ", "T").substring(0, 16)
+            : "";
         showForm.value = true;
     };
 

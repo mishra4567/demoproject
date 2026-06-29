@@ -47,6 +47,7 @@
                                 <tr>
                                     <th><input type="checkbox" id="select_all"></th>
                                     <th>ID</th>
+                                    <th>Added By</th>
                                     <th>Title</th>
                                     <th>Product</th>
                                     <th>Lead Time</th>
@@ -67,6 +68,11 @@
                                         <td>
                                             {{ $list->id }}<br>
                                             <small class="text-muted">{{ $list->product_name ?? 'N/A' }}</small>
+                                        </td>
+                                        <td>
+                                            <p class="small">By:- {{ $list->is_vendor }}</p>
+                                            <p class="small">created By:- {{ $list->who_create }}</p>
+                                            <p class="small">Edited By:- {{ $list->who_edited }}</p>
                                         </td>
                                         <td>{{ $list->title }}</td>
                                         <td>{{ $list->product_name ?? $list->product_id }}</td>
@@ -91,17 +97,21 @@
                                                 class="btn btn-outline-{{ $list->status == 1 ? 'info' : 'warning' }} btn-sm">
                                                 {{ $list->status == 1 ? 'Active' : 'Deactive' }}
                                             </a>
-                                            <a href="{{ route('product.addtecnicalspecs', $list->id) }}">
-                                                <button type="button" class="btn btn-outline-success btn-sm">
-                                                    Edit
+                                            @if ($list->locked)
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" disabled>
+                                                    <i class="fa fa-lock"></i> Vendor Tecnical Specs
                                                 </button>
-                                            </a>
-                                            <a href="{{ route('product.tecnicalspecsdelete', $list->id) }}"
-                                                onclick="return confirm('Move {{ $list->title }} to trash?')">
-                                                <button type="button" class="btn btn-outline-danger btn-sm">
-                                                    Delete
-                                                </button>
-                                            </a>
+                                            @else
+                                                <a href="{{ route('product.addtecnicalspecs', $list->id) }}"
+                                                    class="btn btn-outline-success btn-sm">
+                                                    <i class="fa fa-pencil"></i> Edit
+                                                </a>
+
+                                                <a href="{{ route('product.tecnicalspecsdelete', $list->id) }}"
+                                                    class="btn btn-outline-danger btn-sm">
+                                                    <i class="fa fa-trash"></i> Delete
+                                                </a>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty
@@ -128,6 +138,11 @@
                                         <td>
                                             {{ $list->id }}<br>
                                             <small class="text-muted">{{ $list->product_name ?? 'N/A' }}</small>
+                                        </td>
+                                        <td>
+                                            <p class="small">By:- {{ $list->is_vendor }}</p>
+                                            <p class="small">created By:- {{ $list->who_create }}</p>
+                                            <p class="small">Edited By:- {{ $list->who_edited }}</p>
                                         </td>
                                         <td class="text-muted text-decoration-line-through">
                                             {{ $list->title }}

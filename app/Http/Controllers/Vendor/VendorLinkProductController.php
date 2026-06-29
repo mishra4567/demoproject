@@ -8,23 +8,18 @@ use App\Models\Linkproduct;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
-class VendorLinkProductController extends Controller
+class VendorLinkProductController extends BaseVendorController
 {
-    private function vendorId()
-    {
-        return Auth::guard('vendor')->id();
-    }
-
-    private function vendorName()
-    {
-        return Auth::guard('vendor')->user()->name;
-    }
-
     private function authorise(Linkproduct $item): void
     {
-        abort_if((int) $item->created_by !== (int) $this->vendorId(), 403);
+        abort_if(
+            (int) $item->created_by !== (int) $this->vendorId()
+                || $item->is_vendor !== $this->vendor(),
+            403
+        );
     }
 
     public function index()
@@ -44,6 +39,7 @@ class VendorLinkProductController extends Controller
             )
             ->where('linkproducts.is_deleted', 0)
             ->where('linkproducts.created_by', $this->vendorId())
+            ->where('linkproducts.is_vendor', $this->vendor())
             ->latest('linkproducts.created_at')
             ->get();
 
@@ -62,6 +58,7 @@ class VendorLinkProductController extends Controller
             )
             ->where('linkproducts.is_deleted', 1)
             ->where('linkproducts.created_by', $this->vendorId())
+            ->where('linkproducts.is_vendor', $this->vendor())
             ->latest('linkproducts.created_at')
             ->get();
 
@@ -71,8 +68,14 @@ class VendorLinkProductController extends Controller
             ->select('id', 'name')
             ->get();
 
-        $sizes  = DB::table('sizes')->where('status', 1)->select('id', 'size')->get();
-        $colors = DB::table('colors')->where('status', 1)->select('id', 'color_name', 'hex_id')->get();
+        $sizes  = DB::table('sizes')->where('status', 1)
+            ->where('created_by', $this->vendorId())
+            ->where('is_vendor', $this->vendor())
+            ->select('id', 'size')->get();
+        $colors = DB::table('colors')->where('status', 1)
+            ->where('created_by', $this->vendorId())
+            ->where('is_vendor', $this->vendor())
+            ->select('id', 'color_name', 'hex_id')->get();
 
         return Inertia::render(
             // C: \xampp\htdocs\project2nd\demoproject\resources\js\vendor\ . vue
@@ -87,7 +90,16 @@ class VendorLinkProductController extends Controller
 
         $request->validate([
             'product_id' => 'required',
-            'sku'        => 'required|string|max:255',
+            'sku'        =>  [
+                'required',
+                Rule::unique('linkproducts', 'sku')
+                    ->ignore($id)
+                    ->where(
+                        fn($q) => $q
+                            ->where('created_by', $this->vendorId())
+                            ->where('is_vendor', $this->vendor())
+                    ),
+            ],
             'price'      => 'required|numeric|min:0',
             'mrp'        => 'nullable|numeric|min:0',
             'qty'        => 'required|integer|min:0',
@@ -96,8 +108,13 @@ class VendorLinkProductController extends Controller
             'media_id'   => 'nullable',
         ]);
 
-        $model = $id ? Linkproduct::findOrFail($id) : new Linkproduct();
-
+        // $model = $id ? Linkproduct::findOrFail($id) : new Linkproduct();
+        if ($id) {
+            $model = Linkproduct::findOrFail($id);
+            $this->authorise($model);
+        } else {
+            $model = new Linkproduct();
+        }
         $model->product_id = $request->product_id;
         $model->sku        = $request->sku;
         $model->mrp        = $request->mrp;
@@ -106,7 +123,8 @@ class VendorLinkProductController extends Controller
         $model->size_id    = $request->size_id;
         $model->color_id   = $request->color_id;
         $model->media_id   = $request->media_id;
-
+        $model->status     = 1;
+        $model->is_vendor = $this->vendor();
         if ($id) {
             $model->who_edited = $this->vendorName();
             $model->edited_by  = $this->vendorId();
@@ -115,7 +133,6 @@ class VendorLinkProductController extends Controller
             $model->who_create = $this->vendorName();
             $model->created_by = $this->vendorId();
             $model->created_at = now();
-            $model->status     = 1;
         }
 
         $model->save();
@@ -146,6 +163,7 @@ class VendorLinkProductController extends Controller
             $model->size_id    = $row['size_id']  ?? null;
             $model->color_id   = $row['color_id'] ?? null;
             $model->media_id   = $row['media_id'] ?? null;
+            $model->is_vendor  = 'VENDOR';
             $model->who_create = $this->vendorName();
             $model->created_by = $this->vendorId();
             $model->created_at = now();
@@ -159,7 +177,7 @@ class VendorLinkProductController extends Controller
     public function status(Linkproduct $linkProduct)
     {
         $this->authorise($linkProduct);
-        $linkProduct->status = $linkProduct->status == 1 ? 0 : 1;
+        $linkProduct->status = $linkProduct->status == 0 ? 1 : 0;
         $linkProduct->save();
         return back()->with('success', 'Status updated!');
     }
@@ -199,6 +217,7 @@ class VendorLinkProductController extends Controller
         ]);
 
         $items   = Linkproduct::where('created_by', $this->vendorId())
+            ->where('is_vendor', $this->vendor())
             ->whereIn('id', $request->ids);
         $count   = $items->count();
         $message = '';

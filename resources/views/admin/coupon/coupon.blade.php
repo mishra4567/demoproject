@@ -49,6 +49,7 @@
                                         <input type="checkbox" id="select_all">
                                     </th>
                                     <th>Coupon ID</th>
+                                    <th>Added By</th>
                                     <th>Coupon Title</th>
                                     <th>Coupon code</th>
                                     <th>Coupon value</th>
@@ -64,6 +65,11 @@
                                                 class="checkbox_ids">
                                         </td>
                                         <td>{{ $list->id }}</td>
+                                        <td>
+                                            <p class="small">By:- {{ $list->is_vendor }}</p>
+                                            <p class="small">created By:- {{ $list->who_create }}</p>
+                                            <p class="small">Edited By:- {{ $list->who_edited }}</p>
+                                        </td>
                                         <td>{{ $list->title }}</td>
                                         <td>{{ $list->code }}</td>
                                         <td>{{ $list->value }}</td>
@@ -72,13 +78,21 @@
                                                 class="btn btn-outline-{{ $list->status == 1 ? 'info' : 'warning' }} btn-sm ">
                                                 {{ $list->status == 1 ? 'Active' : 'Deactive' }}
                                             </a>
-                                            <a href="{{ route('coupons.edit_coupons', $list->id) }}">
-                                                <button type="button" class="btn btn-outline-success btn-sm">Edit </button>
-                                            </a>
-                                            <a href="{{ route('coupons.delete', $list->id) }}">
-                                                <button type="button" class="btn btn-outline-danger btn-sm">Delete
+                                            @if ($list->locked)
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" disabled>
+                                                    <i class="fa fa-lock"></i> Vendor Coupon
                                                 </button>
-                                            </a>
+                                            @else
+                                                <a href="{{ route('coupons.edit_coupons', $list->id) }}"
+                                                    class="btn btn-outline-success btn-sm">
+                                                    <i class="fa fa-pencil"></i> Edit
+                                                </a>
+
+                                                <a href="{{ route('coupons.delete', $list->id) }}"
+                                                    class="btn btn-outline-danger btn-sm">
+                                                    <i class="fa fa-trash"></i> Delete
+                                                </a>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty
@@ -100,6 +114,11 @@
                                                 class="checkbox_ids">
                                         </td>
                                         <td>{{ $list->id }}</td>
+                                        <td>
+                                            <p class="small">By:- {{ $list->is_vendor }}</p>
+                                            <p class="small">created By:- {{ $list->who_create }}</p>
+                                            <p class="small">Edited By:- {{ $list->who_edited }}</p>
+                                        </td>
                                         <td>{{ $list->title }}</td>
                                         <td>{{ $list->code }}</td>
                                         <td>{{ $list->value }}</td>

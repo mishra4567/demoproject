@@ -11,13 +11,36 @@ use Illuminate\Validation\Rule;
 
 class CategoryController extends Controller
 {
+    protected function adminId()
+    {
+        return session('ADMIN_ID');
+    }
+
+    protected function adminName()
+    {
+        return session('ADMIN_NAME');
+    }
     /**
      * Index Page for Category
      */
     public function index()
     {
-        $data = Category::where('is_deleted', 0)->get();
-        $deletedData = Category::where('is_deleted', 1)->get();
+        // $data = Category::where('is_deleted', 0)->get();
+        $data = Category::where(function ($q) {
+            $q->where('is_deleted', 0)
+                ->orWhereNull('is_deleted');
+        })
+            ->latest()
+            ->get()
+            ->each(function ($data) {
+                $data->locked = $data->is_vendor === 'VENDOR';
+            });
+        $deletedData = Category::where('is_deleted', 1)
+            ->where('is_vendor', 'ADMIN')
+            ->get()
+            ->each(function ($data) {
+                $data->locked = $data->is_vendor === 'VENDOR';
+            });
         $info = config('field_info.category');
         return view('admin.category', compact('data', 'deletedData', 'info'));
     }
@@ -27,16 +50,22 @@ class CategoryController extends Controller
      */
     public function managecategory(Request $request, $id = null)
     {
-        $parentQuery = Category::where('status', 1);
+        $parentQuery = Category::where('status', 1)
+            ->where('parent_id', 0)
+            ->where(function ($q) {
+                $q->where('is_deleted', 0)
+                    ->orWhereNull('is_deleted');
+            })
+            ->where('is_vendor', 'ADMIN')
+            ->where('created_by', $this->adminId());
         if (!empty($id) && is_numeric($id)) {
-
             $category = Category::findOrFail($id);
-
             if (!$category) {
                 abort(404);
             }
-            $parent_categories = $parentQuery->where('id', '!=', $id)->get();
-
+            $parent_categories = $parentQuery->where('id', '!=', $id)
+                ->orderBy('category_name')
+                ->get(['id', 'category_name']);
             $result = [
                 'category_name' => $category->category_name,
                 'category_slug' => $category->category_slug,
@@ -86,9 +115,19 @@ class CategoryController extends Controller
         $model->category_name = $request->category_name;
         $model->category_slug = $request->category_slug;
         $model->parent_id = $request->parent_id;
-        $model->who_created = session('ADMIN_ID');
-        $model->created_at = now();
+        // $model->who_created = session('ADMIN_ID');
+        // $model->created_at = now();
         $model->status = 1;
+        $model->is_vendor = 'ADMIN';
+        if ($id) {
+            $model->who_edited = session('ADMIN_NAME');
+            $model->edited_by =  session('ADMIN_ID');
+            $model->edited_at = now();
+        } else {
+            $model->who_create = session('ADMIN_NAME');
+            $model->created_by = session('ADMIN_ID');
+            $model->created_at = now();
+        }
         $model->save();
 
         return redirect('admin/category')
@@ -105,52 +144,48 @@ class CategoryController extends Controller
      */
     public function delete(Request $request, $id)
     {
-        // it is get methode to performe delete
-        // we have post methode to delete
-        // category delete
-        $category = Category::find($id);
-        if (!$category) return redirect('admin/category')->with('error', 'Category not found');
-        $category->is_deleted = 1;
-        $category->who_delete = session('ADMIN_ID');
-        $category->deleted_at = now();
-        $category->save();
+        $category = Category::findOrFail($id);
 
-        return redirect('admin/category')->with('success', 'Category Deleted Successfully...');
+        $category->update([
+            'is_deleted' => 1,
+            'who_delete' => session('ADMIN_ID'),
+            'deleted_at' => now(),
+        ]);
 
-        // echo "category deleted" ;
+        return redirect('admin/category')
+            ->with('success', 'Category moved to trash!');
     }
 
     public function restore(Request $request, $id)
     {
-        $category = Category::find($id);
-        if (!$category) return redirect('admin/category')->with('error', 'Category not found');
-        $category->is_deleted = 0;
-        $category->who_delete = null;
-        $category->save();
+        $category = Category::findOrFail($id);
+        $category->update([
+            'is_deleted' => 0,
+            'deleted_at' => null,
+            'who_delete' => null,
+        ]);
         return redirect('admin/category')
             ->with('success', 'Category Restored Successfully...');
     }
+
     public function permanentDelete($id)
     {
-        // Category::findOrFail($id)->delete();
-        // return redirect('admin/category')
-        // ->with('success', 'Category Permanently Deleted Successfully...');
         return back()->with('error', 'Delete action is not allowed ❌');
     }
-
 
     /**
      * Show the form for editing the specified resource.
      */
     public function status($id)
     {
-        $model = Category::find($id);
-
-        // toggle between 1 and 0
-        $model->status = ($model->status == 1) ? 0 : 1;
-        $model->save();
-
-        return redirect()->back()->with('success', 'Status Updated');
+        $model = Category::findOrFail($id);
+        $newStatus = $model->status == 1 ? 0 : 1;
+        $model->update([
+            'status'          => $newStatus,
+            'statusupdate_by' => $newStatus == 0 ? session('ADMIN_ID') : null,
+            'statusupdate_at' => $newStatus == 0 ? now() : null,
+        ]);
+        return back()->with('success', 'Status Updated');
     }
 
     /**
@@ -158,7 +193,6 @@ class CategoryController extends Controller
      */
     public function bulkAction(Request $request)
     {
-        // $ids = (array) $request->ids;
         $ids = $request->ids ?? [];
         $action = $request->action;
         if (!$ids || !$action) {
@@ -166,34 +200,44 @@ class CategoryController extends Controller
         }
         switch ($action) {
             case 'activate':
-                Category::whereIn('id', $ids)->update(['status' => 1]);
+                Category::whereIn('id', $ids)->update([
+                    'status' => 1,
+                    'statusupdate_by' => session('ADMIN_ID'),
+                    'statusupdate_at' => now(),
+                ]);
                 break;
             case 'deactivate':
-                Category::whereIn('id', $ids)->update(['status' => 0]);
+                Category::whereIn('id', $ids)->update([
+                    'status' => 0,
+                    'statusupdate_by' => session('ADMIN_ID'),
+                    'statusupdate_at' => now(),
+                ]);
                 break;
             case 'trash':
-                Category::whereIn('id', $ids)->update([
-                    'is_deleted' => 1,
-                    'deleted_at' => now(),
-                    'who_delete' => session('ADMIN_ID')
-                ]);
+                Category::whereIn('id', $ids)
+                    ->where(function ($q) {
+                        $q->where('is_vendor', '!=', 'VENDOR')
+                            ->orWhereNull('is_vendor');
+                    })
+                    ->update([
+                        'is_deleted' => 1,
+                        'deleted_at' => now(),
+                        'who_delete' => session('ADMIN_ID'),
+                    ]);
                 break;
             case 'restore':
                 Category::whereIn('id', $ids)->update([
                     'is_deleted' => 0,
                     'deleted_at' => null,
-                    'who_delete' => null
+                    'who_delete' => null,
                 ]);
                 break;
             case 'permanent_delete':
-                // Category::whereIn('id', $ids)->delete();
                 return back()->with('error', 'Permanent delete is not allowed ❌');
-                break;
         }
         return back()->with([
-            'bulk-success' => $request->action,
-            'ids' => is_array($ids) ? $ids : [$ids], // ✅ FIX
+            'bulk-success' => $action,
+            'ids' => (array) $ids,
         ]);
-        // return back()->with('success', 'Bulk action applied');
     }
 }

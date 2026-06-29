@@ -9,35 +9,54 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
-class VendorProductController extends Controller
+class VendorProductController extends BaseVendorController
 {
+    private function authorise(Product $product): void
+    {
+        abort_if(
+            (int) $product->created_by !== (int) $this->vendorId()
+                || $product->is_vendor !== $this->vendor(),
+            403
+        );
+    }
     public function index()
     {
-        // $data = DB::table('products')
-        //     ->leftJoin('create_media_tables', 'products.media_ids', '=', 'create_media_tables.id')
-        //     ->select('products.*', 'create_media_tables.file_name')
-        //     ->where('products.is_deleted', 0)
-        //     ->get();
-
         $products = DB::table('products')
-            ->leftJoin(
-                'create_media_tables',
-                'products.media_ids',
-                '=',
-                'create_media_tables.id'
-            )
+            ->leftJoin('create_media_tables', 'products.media_ids', '=', 'create_media_tables.id')
+            ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
+            ->leftJoin('brands', 'products.brand', '=', 'brands.id')
             ->select(
                 'products.*',
-                'create_media_tables.file_name'
+                'create_media_tables.file_name',
+                'categories.category_name',                                      // ← now included
+                'brands.name as brand_name',
             )
-            ->where('products.is_deleted', 0)
-            ->where('products.created_by', Auth::guard('vendor')->id())
+            ->where('products.created_by', $this->vendorId())
+            ->where('products.is_vendor', $this->vendor())
+            ->where(function ($q) {
+                $q->where('products.is_deleted', 0)
+                    ->orWhereNull('products.is_deleted');
+            })
+            ->latest('products.created_at')
             ->paginate(12);
+        $deleteProducts = DB::table('products')
+            ->leftJoin('create_media_tables', 'products.media_ids', '=', 'create_media_tables.id')
+            ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
+            ->leftJoin('brands', 'products.brand', '=', 'brands.id')
+            ->select(
+                'products.*',
+                'create_media_tables.file_name',
+                'categories.category_name',
+                'brands.name as brand_name',
+            )
+            ->where('products.created_by', $this->vendorId())
+            ->where('products.is_vendor', $this->vendor())
+            ->where('products.is_deleted', 1)              // ← strict, no orWhereNull
+            ->latest('products.created_at')
+            ->get();                                        // ← get(), not paginate()
 
         // For now, just return a simple view. You can replace this with actual product listing logic later.
-        return Inertia::render('Pages/Products/Index', [
-            'products' => $products,
-        ]);
+        return Inertia::render('Pages/Products/Index', compact('products', 'deleteProducts'));
     }
     public function manageproduct(Request $request, $id = null)
     {
@@ -67,7 +86,8 @@ class VendorProductController extends Controller
                 ->leftJoin('create_media_tables', 'products.media_ids', '=', 'create_media_tables.id')
                 ->select('products.*', 'create_media_tables.file_name')
                 ->where('products.id', $id)
-                ->where('products.created_by', Auth::guard('vendor')->id())
+                ->where('products.created_by', $this->vendorId())
+                ->where('products.is_vendor', $this->vendor())
                 ->first();
 
             if (!$product) abort(404);
@@ -103,12 +123,30 @@ class VendorProductController extends Controller
 
         return Inertia::render('Pages/Products/ManageProduct', [  // ← fixed path
             'product'    => $result,
-            'categories' => DB::table('categories')->where('status', 1)->get(),
-            'brands'     => DB::table('brands')->where('status', 1)->get(),
-            'sizes'      => DB::table('sizes')->where('status', 1)->get(),
-            'colors'     => DB::table('colors')->where('status', 1)->get(),
-            'media'      => DB::table('create_media_tables')->where('status', 1)->get(),
-            'coupons'    => DB::table('coupons')->where('status', 1)->get(),
+            'categories' => DB::table('categories')->where('status', 1)
+                ->where('created_by', $this->vendorId())
+                ->where('is_vendor', $this->vendor())
+                ->get(),
+            'brands'     => DB::table('brands')->where('status', 1)
+                ->where('created_by', $this->vendorId())
+                ->where('is_vendor', $this->vendor())
+                ->get(),
+            'sizes'      => DB::table('sizes')->where('status', 1)
+                ->where('created_by', $this->vendorId())
+                ->where('is_vendor', $this->vendor())
+                ->get(),
+            'colors'     => DB::table('colors')->where('status', 1)
+                ->where('created_by', $this->vendorId())
+                ->where('is_vendor', $this->vendor())
+                ->get(),
+            'media'      => DB::table('create_media_tables')->where('status', 1)
+                ->where('created_by', $this->vendorId())
+                ->where('is_vendor', $this->vendor())
+                ->get(),
+            'coupons'    => DB::table('coupons')->where('status', 1)
+                ->where('created_by', $this->vendorId())
+                ->where('is_vendor', $this->vendor())
+                ->get(),
             'isEdit'     => (bool) $id,
         ]);
     }
@@ -129,11 +167,12 @@ class VendorProductController extends Controller
         ]);
 
         // ── Insert or Update ──────────────────────────────────────────
-        $product = $id ? Product::findOrFail($id) : new Product();
-
-        // Security — vendor can only edit their own product
-        if ($id && $product->created_by !== (string) Auth::guard('vendor')->id()) {
-            abort(403);
+        // $product = $id ? Product::findOrFail($id) : new Product();
+        if ($id) {
+            $product = Product::findOrFail($id);
+            $this->authorise($product);
+        } else {
+            $product = new Product();
         }
 
         // Image
@@ -156,19 +195,17 @@ class VendorProductController extends Controller
         $product->uses                    = $request->uses;
         $product->warranty                = $request->warranty;
         $product->status                  = 1;
-
+        $product->is_vendor               = $this->vendor();
         if ($id) {
             // Update
-            $product->is_vendor   = 'VENDOR';
-            $product->who_edited  = Auth::guard('vendor')->user()->name;
-            $product->edited_by   = Auth::guard('vendor')->id();
-            $product->edited_at   = now();
+            $product->who_edited = $this->vendorName();
+            $product->edited_by  = $this->vendorId();
+            $product->edited_at  = now();
         } else {
             // Create
-            $product->is_vendor   = 'VENDOR';
-            $product->who_create  = Auth::guard('vendor')->user()->name;
-            $product->created_by  = Auth::guard('vendor')->id();
-            $product->created_at  = now();
+            $product->who_create = $this->vendorName();
+            $product->created_by = $this->vendorId();
+            $product->created_at = now();
 
             // Auto generate barcode
             if (!$product->barcode) {
@@ -204,5 +241,113 @@ class VendorProductController extends Controller
         // ── Inertia redirect back to products list ────────────────────
         session()->flash('success', $id ? 'Product updated successfully' : 'Product created successfully');
         return Inertia::location('/vendor/products');
+    }
+    public function status(Product $product)
+    {
+        $this->authorise($product);
+
+        $newStatus = $product->status == 0 ? 1 : 0;
+
+        $product->update([
+            'status'          => $newStatus,
+            'statusupdate_by' => $newStatus == 1 ? $this->vendorId() : null,
+            'statusupdate_at' => $newStatus == 1 ? now() : null,
+        ]);
+
+        return back()->with('success', 'Status updated!');
+    }
+    public function destroy(Product $product)
+    {
+        $this->authorise($product);
+
+        $product->update([
+            'is_deleted' => 1,
+            'who_delete' => $this->vendorName(),
+            'deleted_at' => now(),
+        ]);
+
+        return back()->with('success', 'Product moved to trash!');
+    }
+    public function restore(Product $product)
+    {
+        $this->authorise($product);
+
+        $product->update([
+            'is_deleted' => 0,
+            'deleted_at' => null,
+            'who_delete' => null,
+        ]);
+
+        return back()->with('success', 'Product restored!');
+    }
+    public function permanentDelete(Product $product)
+    {
+        return back()->with(
+            'error',
+            'Product permanently delete not allowed!'
+        );
+    }
+    public function bulk(Request $request)
+    {
+        $request->validate([
+            'action' => 'required|in:activate,deactivate,trash,restore,permanent_delete',
+            'ids'    => 'required|array',
+        ]);
+
+        $products = Product::where('created_by', $this->vendorId())
+            ->where('is_vendor', $this->vendor())
+            ->whereIn('id', $request->ids);
+
+        $count   = $products->count();
+        $message = '';
+
+        match ($request->action) {
+
+            'activate' => (
+                $products->update([
+                    'status' => 1,
+                    'statusupdate_by' => $this->vendorId(),
+                    'statusupdate_at' => now(),
+                ])
+                && $message = "{$count} product(s) activated!"
+            ),
+
+            'deactivate' => (
+                $products->update([
+                    'status' => 0,
+                    'statusupdate_by' => null,
+                    'statusupdate_at' => null,
+                ])
+                && $message = "{$count} product(s) deactivated!"
+            ),
+
+            'trash' => (
+                $products->update([
+                    'is_deleted' => 1,
+                    'who_delete' => $this->vendorName(),
+                    'deleted_at' => now(),
+                ])
+                && $message = "{$count} product(s) moved to trash!"
+            ),
+
+            'restore' => (
+                $products->update([
+                    'is_deleted' => 0,
+                    'who_delete' => null,
+                    'deleted_at' => null,
+                ])
+                && $message = "{$count} product(s) restored!"
+            ),
+
+            'permanent_delete' => (
+                $message = 'Product permanently delete not allowed!'
+            ),
+        };
+
+        if ($request->action === 'permanent_delete') {
+            return back()->with('error', $message);
+        }
+
+        return back()->with('success', $message);
     }
 }

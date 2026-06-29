@@ -21,6 +21,9 @@ export default function useSizes() {
     const form = useForm({
         id: null,
         size: "",
+        type: "",
+        custom_type: "",
+        details: "",
     });
 
     const openCreate = () => {
@@ -33,6 +36,9 @@ export default function useSizes() {
         editTarget.value = item;
         form.id = item.id;
         form.size = item.size;
+        form.type = size.type;
+        form.custom_type = ""; 
+        form.details = size.details;
         showForm.value = true;
     };
 

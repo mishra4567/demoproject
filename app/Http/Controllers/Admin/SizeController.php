@@ -9,13 +9,36 @@ use Illuminate\Validation\Rule;
 
 class SizeController extends Controller
 {
+    protected function adminId()
+    {
+        return session('ADMIN_ID');
+    }
+
+    protected function adminName()
+    {
+        return session('ADMIN_NAME');
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $data = Size::where('is_deleted', 0)->get();
-        $deletedData = Size::where('is_deleted', 1)->get();
+        $data = Size::where(function ($q) {
+            $q->where('is_deleted', 0)
+                ->orWhereNull('is_deleted');
+        })
+            ->get()
+            ->each(function ($size) {
+                $size->locked = $size->is_vendor === 'VENDOR';
+            });
+        $deletedData = Size::where(function ($q) {
+            $q->where('is_deleted', 1)
+                ->orWhereNull('is_deleted');
+        })
+            ->get()
+            ->each(function ($size) {
+                $size->locked = $size->is_vendor === 'VENDOR';
+            });
         $info = config('field_info.size');
         return view('admin.size.size', compact('data', 'deletedData', 'info'));
         // echo "This is for size" ;
@@ -33,14 +56,23 @@ class SizeController extends Controller
             if (!$size) {
                 abort(404);
             }
+            $standardTypes = ['Clothing', 'Shoes', 'Other'];
+            $isCustomType  = !in_array($size->type, $standardTypes);
+
             $result = [
                 'size'   => $size->size,
+                'type'        => $isCustomType ? 'Other' : $size->type,   // ← dropdown shows "Other"
+                'custom_type' => $isCustomType ? $size->type : '',         // ← input shows the actual value
+                'details' => $size->details,
                 'status' => $size->status,
                 'id'     => $size->id,
             ];
         } else {
             $result = [
                 'size'   => '',
+                'type'    => '',
+                'custom_type' => '',
+                'details' => '',
                 'status' => '',
                 'id'     => 0,
             ];
@@ -59,16 +91,30 @@ class SizeController extends Controller
         $request->validate([
             'size' => [
                 'required',
-                Rule::unique('sizes', 'size')->ignore($id),
             ],
-        ], [
-            'size.unique' => 'This size already exists',
+            'type' => 'nullable|string|max:50',
+            'details' => 'nullable|string|max:255',
         ]);
+        // type checking
+        $type = $request->type;
+        if ($type === 'Other' && !empty($request->custom_type)) {
+            $type = $request->custom_type;
+        }
         $model = $id ? Size::findOrFail($id) : new Size();
         $model->size = $request->size;
-        $model->who_create = session('ADMIN_ID');
-        $model->created_at = now();
+        $model->type = $type;
+        $model->details = $request->details;
+        $model->is_vendor = 'ADMIN';
         $model->status = 1;
+        if ($id) {
+            $model->who_edited = $this->adminName();
+            $model->edited_by =  $this->adminId();
+            $model->edited_at = now();
+        } else {
+            $model->who_create = $this->adminName();
+            $model->created_by = $this->adminId();
+            $model->created_at = now();
+        }
         $model->save();
 
         return redirect('admin/size')
@@ -88,10 +134,11 @@ class SizeController extends Controller
         // // size delete
         $size = Size::find($id);
         if (!$size) return redirect('admin/size')->with('error', 'size not found');
-        $size->is_deleted = 1;
-        $size->deleted_at = now();
-        $size->who_delete = session('ADMIN_ID');
-        $size->save();
+        $size->update([
+            'is_deleted' => 1,
+            'who_delete' => $this->adminId(),
+            'deleted_at' => now(),
+        ]);
         return redirect('admin/size')->with('success', 'size Deleted Successfully...');
         // echo "size deleted" ;
         // echo "this is for size delete";
@@ -100,10 +147,11 @@ class SizeController extends Controller
     {
         $size = Size::find($id);
         if (!$size) return redirect('admin/size')->with('error', 'size not found');
-        $size->is_deleted = 0;
-        $size->deleted_at = null;
-        $size->who_delete = null;
-        $size->save();
+        $size->update([
+            'is_deleted' => 0,
+            'who_delete' => null,
+            'deleted_at' => null,
+        ]);
         return redirect('admin/size')->with('success', 'size Restored Successfully...');
     }
     public function permanentDelete(Request $request, $id)
@@ -121,11 +169,15 @@ class SizeController extends Controller
     public function status($id)
     {
         $size = Size::find($id);
-
-        // toggle between 1 and 0
-        $size->status = ($size->status == 1) ? 0 : 1;
-        $size->save();
-
+        if (!$size) {
+            return back()->with('error', 'Size not found');
+        }
+        $newStatus = $size->status == 0 ? 1 : 0;
+        $size->update([
+            'status'          => $newStatus,
+            'statusupdate_by' => $newStatus == 0 ? $this->adminId() : null,
+            'statusupdate_at' => $newStatus == 0 ? now() : null,
+        ]);
         return redirect()->back()->with('success', 'Status Updated');
         // echo "this is for size status";
     }
@@ -143,18 +195,31 @@ class SizeController extends Controller
         }
         switch ($action) {
             case 'activate':
-                Size::whereIn('id', $ids)->update(['status' => 1]);
+                Size::whereIn('id', $ids)->update([
+                    'status' => 1,
+                    'statusupdate_by' => $this->adminId(),
+                    'statusupdate_at' => now(),
+                ]);
                 break;
             case 'deactivate':
-                Size::whereIn('id', $ids)->update(['status' => 0]);
+                Size::whereIn('id', $ids)->update([
+                    'status' => 0,
+                    'statusupdate_by' => null,
+                    'statusupdate_at' => null,
+                ]);
                 break;
             case 'trash':
                 // Category::whereIn('id', $ids)->delete();
-                Size::whereIn('id', $ids)->update([
-                    'is_deleted' => 1,
-                    'deleted_at' => now(),
-                    'who_delete' => session('ADMIN_ID'),
-                ]);
+                Size::whereIn('id', $ids)
+                    ->where(function ($q) {
+                        $q->where('is_vendor', '!=', 'VENDOR')
+                            ->orWhereNull('is_vendor');
+                    })
+                    ->update([
+                        'is_deleted' => 1,
+                        'deleted_at' => now(),
+                        'who_delete' => $this->adminId(),
+                    ]);
                 // return back()->with('error', 'Delete action is not allowed ❌');
                 break;
             case 'restore':

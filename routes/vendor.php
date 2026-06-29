@@ -28,25 +28,21 @@ Route::prefix('vendor')->name('vendor.')
         Route::middleware('vendor.auth')->group(function () {
             Route::get('/', fn() => Inertia::render('Dashboard'))->name('dashboard');
             Route::post('/logout',  [AuthController::class, 'logout'])->name('logout');
+            // Product routes
             Route::get('/products', [VendorProductController::class, 'index'])->name('products.index');
-            Route::get('/products/manageproduct/{id?}', [VendorProductController::class, 'manageproduct'])->name('product.manage');
-            Route::post('/products/manageproductprocess', [VendorProductController::class, 'manageproductprocess'])->name('product.manageprocess');
+            Route::get('/products/manageproduct/{id?}',     [VendorProductController::class, 'manageproduct'])->name('product.manage');
+            Route::post('/products/manageproductprocess',   [VendorProductController::class, 'manageproductprocess'])->name('product.manageprocess');
+            Route::patch('products/{product}/status',         [VendorProductController::class, 'status'])->name('products.status');      // ← add
+            Route::delete('products/{product}',               [VendorProductController::class, 'destroy'])->name('products.destroy');
+            Route::patch('products/{product}/restore',        [VendorProductController::class, 'restore'])->name('products.restore');
+            Route::delete('products/{product}/force',         [VendorProductController::class, 'permanentDelete'])->name('products.force');
+            Route::post('products/bulk',                     [VendorProductController::class, 'bulk'])->name('products.bulk');
             // media routes
             Route::get('/media', [VendorMediaController::class, 'mediaIndex'])->name('media.index');
             Route::get('/media/upload', [VendorMediaController::class, 'create'])->name('media.create');
             Route::post('/media/store', [VendorMediaController::class, 'store'])->name('media.store');
-            // Media search — reuse admin media
-            Route::get('media/search', function (Request $request) {
-                $query = $request->get('query', '');
-                return \App\Models\CreateMediaTable::where('status', 1)
-                    ->when(
-                        $query,
-                        fn($q, $query) =>
-                        $q->where('tags', 'like', "%{$query}%")
-                            ->orWhere('file_name', 'like', "%{$query}%")
-                    )
-                    ->get(['id', 'file_name', 'tags']);
-            })->name('media.search');
+            // Route::get('media/view/', [VendorMediaController::class, 'show'])->name('media.view');
+            Route::get('media/search', [VendorMediaController::class, 'search'])->name('media.search');
             // Coupon routes
             Route::get('/coupons', [VendorCouponController::class, 'index'])->name('coupons.index');
             Route::post('/coupons/save', [VendorCouponController::class, 'save'])->name('coupons.manageprocess');

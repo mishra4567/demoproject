@@ -9,20 +9,24 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
-class VendorMediaController extends Controller
+class VendorMediaController extends BaseVendorController
 {
-    private function vendorId()
+    private function authorise(CreateMediaTable $media): void
     {
-        return Auth::guard('vendor')->id();
-    }
-    private function vendorName()
-    {
-        return Auth::guard('vendor')->user()->name;
+        abort_if(
+            (int) $media->created_by !== (int) $this->vendorId()
+                || $media->is_vendor !== $this->vendor(),
+            403
+        );
     }
     public function mediaIndex()
     {
-        $media = CreateMediaTable::where('is_deleted', 0)
-            ->where('created_by', $this->vendorId())
+        $media = CreateMediaTable::where('created_by', $this->vendorId())
+            ->where('is_vendor', $this->vendor())
+            ->where(function ($q) {
+                $q->where('is_deleted', 0)
+                    ->orWhereNull('is_deleted');
+            })
             ->latest()
             ->paginate(20);
 
@@ -59,7 +63,7 @@ class VendorMediaController extends Controller
                     'description' => $request->description[$key] ?? null,
                     'created_by'   => $this->vendorId(),
                     'status'      => 1,
-                    'is_vendor'   => 'VENDOR',
+                    'is_vendor'   => $this->vendor(),
                     'who_create'  => $this->vendorName(),
                     'created_at'  => now(),
                     'updated_at'  => now(),
@@ -68,5 +72,27 @@ class VendorMediaController extends Controller
         }
 
         return back()->with('success', 'Media uploaded successfully');
+    }
+    public function search(Request $request)
+    {
+        $query = $request->get('query', '');
+
+        return CreateMediaTable::query()
+            ->where('status', 1)
+            ->where('is_vendor', $this->vendor())
+            ->where('created_by', $this->vendorId())
+            ->where(function ($q) {
+                $q->where('is_deleted', 0)
+                    ->orWhereNull('is_deleted');
+            })
+            ->when($query, function ($q) use ($query) {
+                $q->where(function ($sub) use ($query) {
+                    $sub->where('tags', 'like', "%{$query}%")
+                        ->orWhere('file_name', 'like', "%{$query}%");
+                });
+            })
+            ->select('id', 'file_name', 'tags')
+            ->latest('id')
+            ->get();
     }
 }

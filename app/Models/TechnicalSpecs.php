@@ -17,6 +17,7 @@ class TechnicalSpecs extends Model
 
         'tax',
         'tax_type',
+        'custom_tax_type',
 
         'is_promo',
         'is_featured',

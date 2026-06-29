@@ -9,8 +9,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
-class brandsController extends Controller
+class BrandsController  extends Controller
 {
+    protected function adminId()
+    {
+        return session('ADMIN_ID');
+    }
+
+    protected function adminName()
+    {
+        return session('ADMIN_NAME');
+    }
     /**
      * Display a listing of the resource.
      */
@@ -20,13 +29,19 @@ class brandsController extends Controller
             ->leftJoin('create_media_tables', 'brands.media_ids', '=', 'create_media_tables.id')
             ->select('brands.*', 'create_media_tables.file_name')
             ->where('brands.is_deleted', 0)
-            ->get();
+            ->get()
+            ->each(function ($brands) {
+                $brands->locked = $brands->is_vendor === 'VENDOR';
+            });
 
         $deleteData = DB::table('brands')
             ->leftJoin('create_media_tables', 'brands.media_ids', '=', 'create_media_tables.id')
             ->select('brands.*', 'create_media_tables.file_name')
             ->where('brands.is_deleted', 1)
-            ->get();
+            ->get()
+            ->each(function ($brands) {
+                $brands->locked = $brands->is_vendor === 'VENDOR';
+            });
 
         return view('admin.brands.brands', compact('data', 'deleteData'));
         // echo "This is for brands" ;
@@ -38,32 +53,26 @@ class brandsController extends Controller
     public function managebrands(Request $request, $id = null)
     {
         if (!empty($id) && is_numeric($id)) {
-
             // $brands = Brands::where('id', $id)->first();
             $brands = DB::table('brands')
                 ->leftJoin('create_media_tables', 'brands.media_ids', '=', 'create_media_tables.id')
                 ->select('brands.*', 'create_media_tables.file_name')
                 ->where('brands.id', $id)
                 ->first();
-
             if (!$brands) {
                 abort(404);
             }
-
             $result['name']  = $brands->name;
             $result['image']  = $brands->file_name;
             $result['status'] = $brands->status;
             $result['id']     = $brands->id;
         } else {
-
             $result['name']  = '';
             $result['image']  = '';
             $result['status'] = '';
             $result['id']     = 0;
         }
-
         return view('admin.brands.manage_brands', $result);
-
         // echo "This is for manage brands";
     }
 
@@ -73,7 +82,7 @@ class brandsController extends Controller
     public function managebrandsprocess(Request $request)
     {
         // Role logic
-        if (RoleHelper::cannot('product', 'create')) {
+        if (RoleHelper::cannot('brands', 'create')) {
             return redirect()->back()
                 ->with('error', 'You do not have permission to add products.');
         }
@@ -92,15 +101,21 @@ class brandsController extends Controller
         $model = $id ? Brands::findOrFail($id) : new Brands();
         $model->name = $request->name;
         $model->media_ids = $request->media_ids;
-        $model->who_create = session('ADMIN_ID');
-        $model->created_at = now();
         $model->status = 1;
+        $model->is_vendor = 'ADMIN';
+        if ($id) {
+            $model->who_edited = $this->adminName();
+            $model->edited_by =  $this->adminId();
+            $model->edited_at = now();
+        } else {
+            $model->who_create = $this->adminName();
+            $model->created_by = $this->adminId();
+            $model->created_at = now();
+        }
         $model->save();
-
         return redirect('admin/brands')
             ->with('success', $id ? 'brands Updated Successfully' : 'brands Inserted Successfully');
         // return $request->post();
-
         // echo "this is for brands manage";
     }
 
@@ -114,10 +129,11 @@ class brandsController extends Controller
         // // brands delete
         $brands = Brands::find($id);
         if (!$brands) return redirect('admin/brands')->with('error', 'brands not found');
-        $brands->is_deleted = 1;
-        $brands->who_delete = session('ADMIN_ID');
-        $brands->deleted_at = now();
-        $brands->save();
+        $brands->update([
+            'is_deleted' => 1,
+            'who_delete' => $this->adminId(),
+            'deleted_at' => now(),
+        ]);
         return redirect('admin/brands')->with('success', 'brands Deleted Successfully...');
         // echo "brands deleted" ;
         // echo "this is for brands delete";
@@ -126,16 +142,17 @@ class brandsController extends Controller
     {
         $brands = Brands::find($id);
         if (!$brands) return redirect('admin/brands')->with('error', 'brands not found');
-        $brands->is_deleted = 0;
-        $brands->deleted_at = null;
-        $brands->who_delete = null;
-        $brands->save();
+        $brands->update([
+            'is_deleted' => 0,
+            'who_delete' => null,
+            'deleted_at' => null,
+        ]);
         return redirect()->route('brands')->with('success', 'brands Restored Successfully...');
     }
 
     public function permanentDelete(Request $request, $id)
     {
-        if (RoleHelper::cannot('product', 'delete')) {
+        if (RoleHelper::cannot('brands', 'delete')) {
             return redirect()->back()
                 ->with('error', 'You do not have permission to delete products.');
         }
@@ -152,15 +169,18 @@ class brandsController extends Controller
     public function status($id)
     {
         $brands = Brands::find($id);
-
-        // toggle between 1 and 0
-        $brands->status = ($brands->status == 1) ? 0 : 1;
-        $brands->save();
-
+        if (!$brands) {
+            return back()->with('error', 'Brand not found');
+        }
+        $newStatus = $brands->status == 0 ? 1 : 0;
+        $brands->update([
+            'status'          => $newStatus,
+            'statusupdate_by' => $newStatus == 0 ? $this->adminId() : null,
+            'statusupdate_at' => $newStatus == 0 ? now() : null,
+        ]);
         return redirect()->back()->with('success', 'Status Updated');
         // echo "this is for brands status";
     }
-
     /**
      * Bulk Action
      */
@@ -174,17 +194,30 @@ class brandsController extends Controller
         }
         switch ($action) {
             case 'activate':
-                Brands::whereIn('id', $ids)->update(['status' => 1]);
+                Brands::whereIn('id', $ids)->update([
+                    'status' => 1,
+                    'statusupdate_by' => $this->adminId(),
+                    'statusupdate_at' => now(),
+                ]);
                 break;
             case 'deactivate':
-                Brands::whereIn('id', $ids)->update(['status' => 0]);
+                Brands::whereIn('id', $ids)->update([
+                    'status' => 0,
+                    'statusupdate_by' => null,
+                    'statusupdate_at' => null,
+                ]);
                 break;
             case 'trash':
-                Brands::whereIn('id', $ids)->update([
-                    'is_deleted' => 1,
-                    'who_delete' => session('ADMIN_ID'),
-                    'deleted_at' => now(),
-                ]);
+                Brands::whereIn('id', $ids)
+                    ->where(function ($q) {
+                        $q->where('is_vendor', '!=', 'VENDOR')
+                            ->orWhereNull('is_vendor');
+                    })
+                    ->update([
+                        'is_deleted' => 1,
+                        'deleted_at' => now(),
+                        'who_delete' => $this->adminId()
+                    ]);
                 // return back()->with('error', 'Delete  action is not allowed ❌');
                 break;
             case 'restore':

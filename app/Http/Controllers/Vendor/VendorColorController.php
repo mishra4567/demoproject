@@ -10,32 +10,33 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
-class VendorColorController extends Controller
+class VendorColorController extends BaseVendorController
 {
-    private function vendorId()
-    {
-        return Auth::guard('vendor')->id();
-    }
-
-    private function vendorName()
-    {
-        return Auth::guard('vendor')->user()->name;
-    }
-
     private function authorise(Color $color): void
     {
-        abort_if((int) $color->created_by !== (int) $this->vendorId(), 403);
+        abort_if(
+            (int) $color->created_by !== (int) $this->vendorId()
+                || $color->is_vendor !== $this->vendor(),
+            403
+        );
     }
 
     public function index()
     {
-        $data = Color::where('is_deleted', 0)
-            ->where('created_by', $this->vendorId())
-            ->latest()->get();
+        $data = Color::where('created_by', $this->vendorId())
+            ->where('is_vendor', $this->vendor())
+            ->where(function ($q) {
+                $q->where('is_deleted', 0)
+                    ->orWhereNull('is_deleted');
+            })
+            ->latest()
+            ->get();
 
         $deletedData = Color::where('is_deleted', 1)
             ->where('created_by', $this->vendorId())
-            ->latest()->get();
+            ->where('is_vendor', $this->vendor())
+            ->latest()
+            ->get();
 
         return Inertia::render('Pages/Colors/Index', compact('data', 'deletedData'));
     }
@@ -49,18 +50,25 @@ class VendorColorController extends Controller
             'hex_id'     => [
                 'required',
                 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/',
-                Rule::unique('colors', 'hex_id')->ignore($id),
+                // Rule::unique('colors', 'hex_id')->ignore($id),
             ],
         ], [
             'hex_id.regex'  => 'Please enter a valid hex color (e.g. #FF0000)',
             'hex_id.unique' => 'This color already exists',
         ]);
 
-        $model = $id ? Color::findOrFail($id) : new Color();
+        // $model = $id ? Color::findOrFail($id) : new Color();
+        if ($id) {
+            $model = Color::findOrFail($id);
+            $this->authorise($model);
+        } else {
+            $model = new Color();
+        }
 
         $model->color_name = $request->color_name;
         $model->hex_id     = $request->hex_id;
-
+        $model->is_vendor    = $this->vendor();
+        $model->status     = 1;
         if ($id) {
             $model->who_edited = $this->vendorName();
             $model->edited_by  = $this->vendorId();
@@ -69,9 +77,7 @@ class VendorColorController extends Controller
             $model->who_create = $this->vendorName();
             $model->created_by = $this->vendorId();
             $model->created_at = now();
-            $model->status     = 1;
         }
-
         $model->save();
 
         return back()->with(
@@ -100,7 +106,7 @@ class VendorColorController extends Controller
         $this->authorise($color);
         $color->update([
             'is_deleted' => 1,
-            'who_delete' => $this->vendorName(),
+            'who_delete' => $this->vendorId(),
             'deleted_at' => now(),
         ]);
         return back()->with('success', 'Color moved to trash!');
@@ -130,6 +136,7 @@ class VendorColorController extends Controller
         ]);
 
         $colors  = Color::where('created_by', $this->vendorId())
+            ->where('is_vendor', $this->vendor())
             ->whereIn('id', $request->ids);
         $count   = $colors->count();
         $message = '';

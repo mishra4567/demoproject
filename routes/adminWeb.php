@@ -165,9 +165,9 @@ Route::group(['middleware' => 'admin_auth'], function () {
         ->middleware('role:category,edit')
         ->name('category.bulkAction')->setDefaults(['label' => '', 'role' => 1]);
 
-    Route::get('/admin/categoty/restore/{id}', [CategoryController::class, 'restore'])
+    Route::get('/admin/category/restore/{id}', [CategoryController::class, 'restore'])
         ->middleware('role:category,delete')
-        ->name('categoty.restore')->setDefaults(['label' => '', 'role' => 1]);
+        ->name('category.restore')->setDefaults(['label' => '', 'role' => 1]);
 
     Route::get('/admin/category/permanent-delete/{id}', [CategoryController::class, 'permanentDelete'])
         ->middleware('role:category,delete')
@@ -349,6 +349,16 @@ Route::group(['middleware' => 'admin_auth'], function () {
     Route::get('/media/permanent-delete/{id}', [CreateMediaTableController::class, 'permanentDelete'])
         ->middleware('role:media,delete')
         ->name('media.permanent_delete')->setDefaults(['label' => '', 'role' => 1]);
+
+    // Simple direct serve (small videos)
+    Route::get('/media/serve/{filename}', [CreateMediaTableController::class, 'serveMedia'])
+        ->middleware('role:media,serve')
+        ->name('media.serve')->setDefaults(['label' => '', 'role' => 1]);
+
+    // Streamed playback (large videos, seek/range support)
+    Route::get('/media/stream/{filename}', [CreateMediaTableController::class, 'streamMedia'])
+        ->middleware('role:media,stream')
+        ->name('media.stream')->setDefaults(['label' => '', 'role' => 1]);
 
     // ─── Product ───────────────────────────────────
     Route::get('admin/product', [ProductController::class, 'index'])

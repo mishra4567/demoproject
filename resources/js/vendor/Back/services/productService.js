@@ -1,24 +1,18 @@
-// resources/js/services/productService.js
+// resources/js/vendor/Back/services/productService.js
 import { router } from "@inertiajs/vue3";
-// import { route } from "ziggy-js";
 
 const productService = {
     // ── Navigate to pages (Inertia visits) ──────────────────────
     index: (page = 1) =>
         router.get("/vendor/products", { page }, { preserveState: true }),
+
     // ── Manage Product Page (Create / Edit Same Page) ─────────
-    // create: () => router.get(route("vendor.products.create")),
-    // edit: (id) => router.get(route("vendor.products.edit", id)),
     manage: (id = null) =>
         id
             ? router.get(`/vendor/products/manageproduct/${id}`)
             : router.get("/vendor/products/manageproduct"),
 
-    // ── Form submissions (Inertia POST/PUT/DELETE) ───────────────
-    // store: (data, options = {}) =>
-    //     router.post(route("vendor.products.store"), data, options),
-    // update: (id, data, options = {}) =>
-    //     router.put(route("vendor.products.update", id), data, options),
+    // ── Form submission (Inertia POST via useForm) ───────────────
     save: (form, options = {}) => {
         form.post("/vendor/products/manageproductprocess", {
             onSuccess: () => router.get("/vendor/products"),
@@ -26,8 +20,26 @@ const productService = {
             ...options,
         });
     },
+
+    // ── Soft delete (move to trash) ──────────────────────────────
     destroy: (id, options = {}) =>
         router.delete(`/vendor/products/${id}`, options),
+
+    // ── Restore from trash ────────────────────────────────────────
+    restore: (id, options = {}) =>
+        router.patch(`/vendor/products/${id}/restore`, {}, options),
+
+    // ── Permanently delete (blocked server-side, shows error message) ──
+    permanentDelete: (id, options = {}) =>
+        router.delete(`/vendor/products/${id}/force`, options),
+
+    // ── Toggle active/inactive status ────────────────────────────
+    status: (id, options = {}) =>
+        router.patch(`/vendor/products/${id}/status`, {}, options),
+
+    // ── Bulk action (activate/deactivate/trash/restore/permanent_delete) ──
+    bulkAction: (data, options = {}) =>
+        router.post("/vendor/products/bulk", data, options),
 };
 
 export default productService;

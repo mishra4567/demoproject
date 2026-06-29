@@ -37,6 +37,7 @@
     <div class="page-wrapper">
         <!-- HEADER MOBILE-->
         @include('admin.include.mediamodal')
+        @include('admin.include.fullmedia_view')
         @include('admin.include.eventmodal')
         <header class="header-mobile d-block d-lg-none">
             <div class="header-mobile__bar">
@@ -423,7 +424,10 @@
     <!-- FullCalendar v6.1.11 -->
     <script src="{{ asset('assets/vendor/fullcalendar-6.1.11/fullcalendar.min.js') }}"></script>
     <script src="{{ asset('assets/js/calendar.js') }}"></script>
-
+    <script>
+        window.MEDIA_SERVE_BASE = "{{ route('media.serve', ['filename' => 'FILE']) }}".replace('FILE', '');
+        window.MEDIA_STREAM_BASE = "{{ route('media.stream', ['filename' => 'FILE']) }}".replace('FILE', '');
+    </script>
 </body>
 
 </html>

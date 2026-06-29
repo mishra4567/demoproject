@@ -12,18 +12,33 @@ use function Symfony\Component\Clock\now;
 
 class TechnicalSpecsController extends Controller
 {
+    protected function adminId()
+    {
+        return session('ADMIN_ID');
+    }
+
+    protected function adminName()
+    {
+        return session('ADMIN_NAME');
+    }
     public function index()
     {
         $data = DB::table('technical_specs')
             ->leftJoin('products', 'technical_specs.product_id', '=', 'products.id')
             ->select('technical_specs.*', 'products.name as product_name')
             ->where('technical_specs.is_deleted', 0)
-            ->get();
+            ->get()
+            ->each(function ($data) {
+                $data->locked = $data->is_vendor === 'VENDOR';
+            });
         $deletedData = DB::table('technical_specs')
             ->leftJoin('products', 'technical_specs.product_id', '=', 'products.id')
             ->select('technical_specs.*', 'products.name as product_name')
             ->where('technical_specs.is_deleted', 1)
-            ->get();
+            ->get()
+            ->each(function ($data) {
+                $data->locked = $data->is_vendor === 'VENDOR';
+            });
         $info = config('field_info.technical_specification');
 
         return view('admin.product.technical_specs', compact('data', 'deletedData', 'info'));
@@ -72,7 +87,9 @@ class TechnicalSpecsController extends Controller
                 ];
         }
         $info = config('field_info.technical_spec');
-        $products = DB::table('products')->where('status', 1)->get();
+        $products = DB::table('products')->where('status', 1)
+            ->where('is_vendor', 'ADMIN')
+            ->get();
         return view('admin.product.manage_technical_specs', compact('result', 'products', 'info'));
     }
     public function processTechnicalSpecs(Request $request)
@@ -88,30 +105,39 @@ class TechnicalSpecsController extends Controller
             'lead_time_from' => 'nullable|date',
             'lead_time_to'   => 'nullable|date|after_or_equal:lead_time_from',
             'tax'            => 'nullable|numeric|min:0|max:100',
-            'tax_type'       => 'nullable|in:inclusive,exclusive,none',
+            'tax_type'       => 'nullable|in:inclusive,exclusive,other,none',
+            'custom_tax_type' => 'nullable|string|max:100',
         ], [
             'product_id.unique' => 'This product already has a technical specification.',
         ]);
-        $proTechnicalSpecs = $id ? TechnicalSpecs::findOrFail($id) : new TechnicalSpecs();
-
-        $proTechnicalSpecs->title = $request->title;
-        $proTechnicalSpecs->product_id = $request->product_id;
-        $proTechnicalSpecs->lead_time_from = $request->lead_time_from ?? null;
-        $proTechnicalSpecs->lead_time_to    = $request->lead_time_to    ?? null;
-        $proTechnicalSpecs->tax             = $request->tax             ?? 0;
-        $proTechnicalSpecs->tax_type        = $request->tax_type        ?? 'none';
-        $proTechnicalSpecs->is_promo = $request->has('is_promo') ? 1 : 0;
-        $proTechnicalSpecs->is_featured = $request->has('is_featured') ? 1 : 0;
-        $proTechnicalSpecs->is_discounted = $request->has('is_discounted') ? 1 : 0;
-        $proTechnicalSpecs->is_trending = $request->has('is_trending') ? 1 : 0;
-        $proTechnicalSpecs->who_create = session('ADMIN_ID');
-        $proTechnicalSpecs->status = '1';
-        $proTechnicalSpecs->created_at = now();
-        if ($id) {
-            $proTechnicalSpecs->updated_at  = now();
+        $model = $id ? TechnicalSpecs::findOrFail($id) : new TechnicalSpecs();
+        $model->title           = $request->title;
+        $model->product_id      = $request->product_id;
+        $model->lead_time_from  = $request->lead_time_from ?? null;
+        $model->lead_time_to    = $request->lead_time_to    ?? null;
+        $model->tax             = $request->tax             ?? 0;
+        $model->tax_type        = $request->tax_type        ?? 'none';
+        if ($request->tax_type === 'other') {
+            $model->custom_tax_type = $request->custom_tax_type;
+        } else {
+            $model->custom_tax_type = null;
         }
-        $proTechnicalSpecs->save();
-
+        $model->is_promo        = $request->has('is_promo') ? 1 : 0;
+        $model->is_featured     = $request->has('is_featured') ? 1 : 0;
+        $model->is_discounted   = $request->has('is_discounted') ? 1 : 0;
+        $model->is_trending     = $request->has('is_trending') ? 1 : 0;
+        $model->status          = '1';
+        $model->is_vendor       = 'ADMIN';
+        if ($id) {
+            $model->who_edited  = $this->adminName();
+            $model->edited_by   =  $this->adminId();
+            $model->edited_at   = now();
+        } else {
+            $model->who_create  = $this->adminName();
+            $model->created_by  = $this->adminId();
+            $model->created_at  = now();
+        }
+        $model->save();
         return redirect()->route('product.tecnicalspacs')
             ->with('success', $id ? 'Technical Specs Updated Successfully' : 'Technical Specs Inserted Successfully');
     }
@@ -126,20 +152,22 @@ class TechnicalSpecsController extends Controller
         // // TecnicalSpecs delete
         $teschspecs = TechnicalSpecs::find($id);
         if (!$teschspecs) return redirect()->back()->with('error', 'Tecnical Specs not found');
-        $teschspecs->is_deleted = 1;
-        $teschspecs->deleted_at = now();
-        $teschspecs->who_delete = session('ADMIN_ID');
-        $teschspecs->save();
+        $teschspecs->update([
+            'is_deleted' => 1,
+            'who_delete' => $this->adminId(),
+            'deleted_at' => now(),
+        ]);
         return redirect()->back()->with('success', 'Tecnical Specs Deleted Successfully...');
     }
     public function restore($id)
     {
         $teschspecs = TechnicalSpecs::find($id);
         if (!$teschspecs) return redirect()->back()->with('error', 'Tecnical Specs not found');
-        $teschspecs->is_deleted = 0;
-        $teschspecs->deleted_at = null;
-        $teschspecs->who_delete = null;
-        $teschspecs->save();
+        $teschspecs->update([
+            'is_deleted' => 0,
+            'who_delete' => null,
+            'deleted_at' => null,
+        ]);
         return redirect()->back()->with('success', 'Tecnical Specs Restored Successfully...');
     }
     public function permanentDelete($id)
@@ -153,14 +181,17 @@ class TechnicalSpecsController extends Controller
      */
     public function status($id)
     {
-        $color = TechnicalSpecs::find($id);
-
-        // toggle between 1 and 0
-        $color->status = ($color->status == 1) ? 0 : 1;
-        $color->save();
-
+        $teschspecs = TechnicalSpecs::find($id);
+        if (!$teschspecs) {
+            return back()->with('error', 'Coupon not found');
+        }
+        $newStatus = $teschspecs->status == 0 ? 1 : 0;
+        $teschspecs->update([
+            'status'          => $newStatus,
+            'statusupdate_by' => $newStatus == 0 ? $this->adminId() : null,
+            'statusupdate_at' => $newStatus == 0 ? now() : null,
+        ]);
         return redirect()->back()->with('success', 'Status Updated');
-        // echo "this is for Color status";
     }
 
     /**
@@ -176,17 +207,30 @@ class TechnicalSpecsController extends Controller
         }
         switch ($action) {
             case 'activate':
-                TechnicalSpecs::whereIn('id', $ids)->update(['status' => 1]);
+                TechnicalSpecs::whereIn('id', $ids)->update([
+                    'status' => 1,
+                    'statusupdate_by' => $this->adminId(),
+                    'statusupdate_at' => now(),
+                ]);
                 break;
             case 'deactivate':
-                TechnicalSpecs::whereIn('id', $ids)->update(['status' => 0]);
+                TechnicalSpecs::whereIn('id', $ids)->update([
+                    'status' => 0,
+                    'statusupdate_by' => null,
+                    'statusupdate_at' => null,
+                ]);
                 break;
             case 'trash':
-                TechnicalSpecs::whereIn('id', $ids)->update([
-                    'is_deleted' => 1,
-                    'deleted_at' => now(),
-                    'who_delete' => session('ADMIN_ID')
-                ]);
+                TechnicalSpecs::whereIn('id', $ids)
+                    ->where(function ($q) {
+                        $q->where('is_vendor', '!=', 'VENDOR')
+                            ->orWhereNull('is_vendor');
+                    })
+                    ->update([
+                        'is_deleted' => 1,
+                        'deleted_at' => now(),
+                        'who_delete' => $this->adminId()
+                    ]);
                 // return back()->with('error', 'Delete action is not allowed ❌');
                 break;
             case 'restore':
@@ -197,7 +241,6 @@ class TechnicalSpecsController extends Controller
                 ]);
                 break;
             case 'permanent_delete':
-                // Color::whereIn('id', $ids)->delete();
                 return back()->with('error', 'Permanent delete is not allowed ❌');
                 break;
         }

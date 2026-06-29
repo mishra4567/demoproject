@@ -10,6 +10,8 @@ class Size extends Model
 
     protected $fillable = [
         'size',
+        'type',
+        'details',
         'status',
 
         'who_create',

@@ -9,28 +9,26 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
-class VendorCouponController extends Controller
+class VendorCouponController extends BaseVendorController
 {
-    private function vendorId()
-    {
-        return Auth::guard('vendor')->id();
-    }
-    private function vendorName()
-    {
-        return Auth::guard('vendor')->user()->name;
-    }
     private function authorise(Coupon $coupon): void
     {
-        abort_if((int) $coupon->created_by !== (int) $this->vendorId(), 403);
+        abort_if(
+            (int) $coupon->created_by !== (int) $this->vendorId()
+                || $coupon->is_vendor !== $this->vendor(),
+            403
+        );
     }
     public function index()
     {
-        $data = Coupon::where('created_by', $this->vendorId())
-            ->where('is_deleted', 0)
+        $data = Coupon::where('is_deleted', 0)
+            ->where('is_vendor', $this->vendor())
+            ->where('created_by', $this->vendorId())
             ->latest()->get();
 
-        $deletedData = Coupon::where('created_by', $this->vendorId())
-            ->where('is_deleted', 1)
+        $deletedData = Coupon::where('is_deleted', 1)
+            ->where('is_vendor', $this->vendor())
+            ->where('created_by', $this->vendorId())
             ->latest()->get();
 
         return Inertia::render('Pages/Coupons/Index', compact('data', 'deletedData'));
@@ -45,7 +43,10 @@ class VendorCouponController extends Controller
             'title' => 'required',
             'code'  => [
                 'required',
-                Rule::unique('coupons', 'code')->ignore($id),
+                Rule::unique('coupons', 'code')->where(fn($q) => $q
+                    ->where('created_by', $this->vendorId())
+                    ->where('is_vendor', $this->vendor()))
+                    ->ignore($id),
             ],
             'value' => 'required|numeric|min:1',
             'type'  => 'required|in:flat,percent',
@@ -54,14 +55,21 @@ class VendorCouponController extends Controller
             'code.unique' => 'This coupon code already exists',
         ]);
 
-        $model = $id ? Coupon::findOrFail($id) : new Coupon();
-
+        // $model = $id ? Coupon::findOrFail($id) : new Coupon();
+        if ($id) {
+            $model = Coupon::findOrFail($id);
+            $this->authorise($model);
+        } else {
+            $model = new Coupon();
+        }
         $model->title      = $request->title;
         $model->code       = strtoupper($request->code);
         $model->value      = $request->value;
         $model->type       = $request->type;
+        $model->min_order_amt = $request->min_order_amt;
+        $model->is_one_time = $request->is_one_time ? 1 : 0;
         $model->expiry     = $request->expiry;
-        $model->is_vendor   = 'VENDOR';
+        $model->is_vendor   = $this->vendor();
         if ($id) {
             // Update
             $model->who_edited  = $this->vendorName();
@@ -85,11 +93,11 @@ class VendorCouponController extends Controller
     public function status(Coupon $coupon)
     {
         $this->authorise($coupon);
-        $newStatus = $coupon->status == 1 ? 0 : 1;
+        $newStatus = $coupon->status == 0 ? 1 : 0;
         $coupon->update([
             'status'          => $newStatus,
-            'statusupdate_by' => $newStatus == 1 ? $this->vendorId() : null,
-            'statusupdate_at' => $newStatus == 1 ? now()             : null,
+            'statusupdate_by' => $newStatus == 0 ? $this->vendorId() : null,
+            'statusupdate_at' => $newStatus == 0 ? now()             : null,
         ]);
         return back()->with('success', 'Status updated!');
     }
@@ -132,6 +140,7 @@ class VendorCouponController extends Controller
         ]);
 
         $coupons = Coupon::where('created_by', $this->vendorId())
+            ->where('is_vendor', $this->vendor())
             ->whereIn('id', $request->ids);
 
         // match ($request->action) {

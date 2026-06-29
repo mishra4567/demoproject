@@ -13,6 +13,16 @@ class ViewProductController extends Controller
      */
     public function index(Request $request, $id = null)
     {
+        // ✅ Guard against missing/non-numeric id before hitting the DB
+        if (empty($id) || !is_numeric($id)) {
+            return view('admin.partials.not_found_page', [
+                'type'    => '404',
+                'title'   => 'Product Not Found',
+                'message' => 'The product you are looking for does not exist or has been removed.',
+                'btnText' => 'Back to Products',
+                'btnUrl'  => route('product'),
+            ]);
+        }
         $product = DB::table('products')
             ->leftJoin('create_media_tables', function ($join) {
                 $join->on('products.media_ids', '=', 'create_media_tables.id')

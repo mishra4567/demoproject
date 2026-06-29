@@ -46,6 +46,7 @@
                                 <tr>
                                     <th><input type="checkbox" id="select_all"></th>
                                     <th>Color ID</th>
+                                    <th>Added By</th>
                                     <th>Color</th>
                                     <th>Preview</th>
                                     <th>Action</th>
@@ -60,6 +61,11 @@
                                                 class="checkbox_ids">
                                         </td>
                                         <td>{{ $list->id }}</td>
+                                        <td>
+                                            <p class="small">By:- {{ $list->is_vendor }}</p>
+                                            <p class="small">created By:- {{ $list->who_create }}</p>
+                                            <p class="small">Edited By:- {{ $list->who_edited }}</p>
+                                        </td>
                                         <td>{{ $list->color_name }}</td>
                                         <td>
                                             <div
@@ -75,22 +81,26 @@
                                                 class="btn btn-outline-{{ $list->status == 1 ? 'info' : 'warning' }} btn-sm">
                                                 {{ $list->status == 1 ? 'Active' : 'Deactive' }}
                                             </a>
-                                            <a href="{{ route('color.edit_color', $list->id) }}">
-                                                <button type="button" class="btn btn-outline-success btn-sm">
-                                                    Edit
+                                            @if ($list->locked)
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" disabled>
+                                                    <i class="fa fa-lock"></i> Vendor Color
                                                 </button>
-                                            </a>
-                                            <a href="{{ route('color.delete', $list->id) }}"
-                                                onclick="return confirm('Move {{ $list->color }} to trash?')">
-                                                <button type="button" class="btn btn-outline-danger btn-sm">
-                                                    Delete
-                                                </button>
-                                            </a>
+                                            @else
+                                                <a href="{{ route('color.edit_color', $list->id) }}"
+                                                    class="btn btn-outline-success btn-sm">
+                                                    <i class="fa fa-pencil"></i> Edit
+                                                </a>
+
+                                                <a href="{{ route('color.delete', $list->id) }}"
+                                                    class="btn btn-outline-danger btn-sm">
+                                                    <i class="fa fa-trash"></i> Delete
+                                                </a>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty
                                     <tr class="active-row">
-                                        <td colspan="5">
+                                        <td colspan="6">
                                             @include('admin.partials.not_found', [
                                                 'type' => 'color',
                                                 'btnText' => 'Add Color',
@@ -108,6 +118,11 @@
                                         </td>
                                         <td>{{ $list->id }}</td>
                                         <td>
+                                            <p class="small">By:- {{ $list->is_vendor }}</p>
+                                            <p class="small">created By:- {{ $list->who_create }}</p>
+                                            <p class="small">Deleted By:- {{ $list->who_delete }}</p>
+                                        </td>
+                                        <td>
                                             <span class="text-muted text-decoration-line-through">
                                                 {{ $list->color_name }}
                                             </span>
@@ -124,16 +139,14 @@
                                         </td>
                                         <td>
                                             <a href="{{ route('color.restore', $list->id) }}"
-                                                onclick="return confirm('Restore {{ $list->color }}?')">
-                                                <button type="button" class="btn btn-success btn-sm">
-                                                    <i class="fa fa-undo me-1"></i> Restore
-                                                </button>
+                                                class="btn btn-success btn-sm"
+                                                onclick="return confirm('Restore {{ $list->color_name }}?')">
+                                                <i class="fa fa-undo me-1"></i> Restore
                                             </a>
                                             <a href="{{ route('color.permanent_delete', $list->id) }}"
+                                                class="btn btn-danger btn-sm"
                                                 onclick="return confirm('Permanently delete? Cannot be undone.')">
-                                                <button type="button" class="btn btn-danger btn-sm">
-                                                    <i class="fa fa-times me-1"></i> Remove
-                                                </button>
+                                                <i class="fa fa-times me-1"></i> Remove
                                             </a>
                                         </td>
                                     </tr>
@@ -145,36 +158,4 @@
             </div>
         </div>
     </div>
-
-    {{-- <script>
-        let trashVisible = false;
-
-        function toggleTrash() {
-            trashVisible = !trashVisible;
-            const btn = document.getElementById('trash_toggle_btn');
-            const trashRows = document.querySelectorAll('.trash-row');
-            const activeRows = document.querySelectorAll('.active-row');
-
-            if (trashVisible) {
-                trashRows.forEach(r => r.classList.remove('d-none'));
-                activeRows.forEach(r => r.classList.add('d-none'));
-                btn.innerHTML = '<i class="fa fa-list me-1"></i> Show Active';
-                btn.classList.replace('btn-secondary', 'btn-success');
-            } else {
-                trashRows.forEach(r => r.classList.add('d-none'));
-                activeRows.forEach(r => r.classList.remove('d-none'));
-                btn.innerHTML =
-                    '<i class="fa fa-trash me-1"></i> Show Deleted <span class="badge bg-danger ms-1">{{ count(${'deletedData'}) }}</span>';
-                btn.classList.replace('btn-success', 'btn-secondary');
-            }
-        }
-
-        // Select all checkboxes
-        document.getElementById('select_all').addEventListener('change', function() {
-            document.querySelectorAll('.checkbox_ids').forEach(function(checkbox) {
-                checkbox.checked = this.checked;
-            }, this);
-        });
-    </script> --}}
-
 @endsection

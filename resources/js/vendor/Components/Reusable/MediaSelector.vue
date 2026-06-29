@@ -16,7 +16,7 @@ const mediaList   = ref([])
 const mediaSearch = ref('')
 const loading     = ref(false)
 
-// Load media from admin endpoint
+// Load media from VENDOR endpoint
 async function loadMedia(query = '') {
     loading.value = true
     try {

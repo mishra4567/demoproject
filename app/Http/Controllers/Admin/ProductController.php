@@ -11,6 +11,15 @@ use Illuminate\Validation\Rule;
 
 class ProductController extends Controller
 {
+    protected function adminId()
+    {
+        return session('ADMIN_ID');
+    }
+
+    protected function adminName()
+    {
+        return session('ADMIN_NAME');
+    }
     /**
      * Generate Unique Barcode
      */
@@ -35,12 +44,18 @@ class ProductController extends Controller
             ->leftJoin('create_media_tables', 'products.media_ids', '=', 'create_media_tables.id')
             ->select('products.*', 'create_media_tables.file_name')
             ->where('products.is_deleted', 0)
-            ->get();
+            ->get()
+            ->each(function ($model) {
+                $model->locked = $model->is_vendor === 'VENDOR';
+            });
         $deletedData = DB::table('products')
             ->leftJoin('create_media_tables', 'products.media_ids', '=', 'create_media_tables.id')
             ->select('products.*', 'create_media_tables.file_name')
             ->where('products.is_deleted', 1)
-            ->get();
+            ->get()
+            ->each(function ($model) {
+                $model->locked = $model->is_vendor === 'VENDOR';
+            });
         $info = config('field_info.product');
         return view('admin.product.product', compact('data', 'deletedData', 'info'));
         // return view('admin.product.product', );
@@ -151,6 +166,10 @@ class ProductController extends Controller
 
         $request->validate([
             'name' => 'required',
+            'slug' => [
+                'required',
+                Rule::unique('products', 'slug')->ignore($id),
+            ],
             'media_id' => $id ? 'nullable' : 'required',
             'attr_image.*' => 'nullable|mimes:png,jpg,jpeg,webp',
         ], [
@@ -178,17 +197,17 @@ class ProductController extends Controller
         $product->technical_specification = $request->technical_specification;
         $product->uses = $request->uses;
         $product->warranty = $request->warranty;
-        if ($id) {
-            $product->is_vendor = 'ADMIN';
-            $product->who_edited = session('ADMIN_NAME');
-            $product->edited_by =  session('ADMIN_ID');
-        } else {
-            $product->is_vendor = 'ADMIN';
-            $product->who_create = session('ADMIN_NAME');
-            $product->created_by = session('ADMIN_ID');
-        }
-        $product->created_at = now();
+        $product->is_vendor = 'ADMIN';
         $product->status = 1;
+        if ($id) {
+            $product->who_edited = $this->adminName();
+            $product->edited_by =  $this->adminId();
+            $product->edited_at = now();
+        } else {
+            $product->who_create = $this->adminName();
+            $product->created_by = $this->adminId();
+            $product->created_at = now();
+        }
         // Auto Generate Barcode if not exists
         if (!$product->barcode) {
             $product->barcode = $this->generateBarcode();
@@ -242,10 +261,11 @@ class ProductController extends Controller
             return redirect('admin/product')
                 ->with('error', 'Product not found');
         }
-        $product->is_deleted = 1;
-        $product->deleted_at = now();
-        $product->who_delete = session('ADMIN_ID');
-        $product->save();
+        $product->update([
+            'is_deleted' => 1,
+            'who_delete' => $this->adminId(),
+            'deleted_at' => now(),
+        ]);
         return redirect('admin/product')
             ->with('success', 'Product moved to trash...');
     }
@@ -257,10 +277,11 @@ class ProductController extends Controller
             return redirect('admin/product')
                 ->with('error', 'Product not found');
         }
-        $product->is_deleted = 0;
-        $product->deleted_at = null;
-        $product->who_delete = null;
-        $product->save();
+        $product->update([
+            'is_deleted' => 0,
+            'who_delete' => null,
+            'deleted_at' => null,
+        ]);
         return redirect('admin/product')
             ->with('success', 'Product Restored Successfully');
     }
@@ -283,11 +304,16 @@ class ProductController extends Controller
     public function status($id)
     {
         $model = Product::find($id);
-
+        if (!$model) {
+            return back()->with('error', 'Product not found');
+        }
         // toggle between 1 and 0
-        $model->status = ($model->status == 1) ? 0 : 1;
-        $model->save();
-
+        $newStatus = $model->status == 0 ? 1 : 0;
+        $model->update([
+            'status'          => $newStatus,
+            'statusupdate_by' => $newStatus == 0 ? $this->adminId() : null,
+            'statusupdate_at' => $newStatus == 0 ? now() : null,
+        ]);
         return redirect()->back()->with('success', 'Status Updated');
     }
     /**
@@ -305,6 +331,7 @@ class ProductController extends Controller
 
         return redirect()->back()->with('success', $message);
     }
+
     public function bulkAction(Request $request)
     {
         // $ids = (array) $request->ids;
@@ -315,17 +342,30 @@ class ProductController extends Controller
         }
         switch ($action) {
             case 'activate':
-                Product::whereIn('id', $ids)->update(['status' => 1]);
+                Product::whereIn('id', $ids)->update([
+                    'status' => 1,
+                    'statusupdate_by' => $this->adminId(),
+                    'statusupdate_at' => now(),
+                ]);
                 break;
             case 'deactivate':
-                Product::whereIn('id', $ids)->update(['status' => 0]);
+                Product::whereIn('id', $ids)->update([
+                    'status' => 0,
+                    'statusupdate_by' => null,
+                    'statusupdate_at' => null,
+                ]);
                 break;
             case 'trash':
-                Product::whereIn('id', $ids)->update([
-                    'is_deleted' => 1,
-                    'deleted_at' => now(),
-                    'who_delete' => session('ADMIN_ID'),
-                ]);
+                Product::whereIn('id', $ids)
+                    ->where(function ($q) {
+                        $q->where('is_vendor', '!=', 'VENDOR')
+                            ->orWhereNull('is_vendor');
+                    })
+                    ->update([
+                        'is_deleted' => 1,
+                        'deleted_at' => now(),
+                        'who_delete' => session('ADMIN_ID'),
+                    ]);
                 // return back()->with('error', 'Delete action is not allowed ❌');
                 break;
             case 'restore':

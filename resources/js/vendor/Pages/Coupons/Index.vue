@@ -299,14 +299,43 @@ const {
                         </div>
 
                         <!-- Expiry -->
-                        <div>
-                            <label class="block text-xs mb-1.5" style="color:#6b6660;">
-                                Expiry Date
-                                <span style="color:#6b6660;">(optional)</span>
-                            </label>
-                            <input v-model="form.expiry" type="date"
-                                class="w-full rounded-lg px-3 py-2 text-sm outline-none"
-                                style="background:#111110;color:white;border:0.5px solid #2e2e2b;" />
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs mb-1.5" style="color:#6b6660;">
+                                    Expiry Date
+                                    <span style="color:#6b6660;">(optional)</span>
+                                </label>
+                                <input v-model="form.expiry" type="datetime-local"
+                                    class="w-full rounded-lg px-3 py-2 text-sm outline-none"
+                                    style="background:#111110;color:white;border:0.5px solid #2e2e2b;" />
+                            </div>
+                            <div>
+                                <label class="block text-xs mb-1.5" style="color:#6b6660;">
+                                    Minimum Order Amount
+                                    <span style="color:#6b6660;">(optional)</span>
+                                </label>
+                                <input
+                                    v-model="form.min_order_amt" type="number" min="0" placeholder="e.g. 500"
+                                    class="w-full rounded-lg px-3 py-2 text-sm outline-none"
+                                    style="background:#111110;color:white;border:0.5px solid #2e2e2b;"
+                                />
+                            </div>
+                            <div>
+                                <label class="flex items-center gap-2 text-sm cursor-pointer">
+                                    <input
+                                        v-model="form.is_one_time"
+                                        type="checkbox"
+                                        class="rounded"
+                                    >
+                                    <span style="color:white;">
+                                        One Time Use Coupon
+                                    </span>
+                                </label>
+
+                                <p class="text-xs mt-1" style="color:#6b6660;">
+                                    Customer can use this coupon only once.
+                                </p>
+                            </div>
                         </div>
 
                         <!-- Edit mode indicator -->

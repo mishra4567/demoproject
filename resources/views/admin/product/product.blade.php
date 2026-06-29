@@ -102,17 +102,20 @@
                                         class="btn btn-outline-{{ $list->status == 1 ? 'info' : 'warning' }} btn-sm ">
                                         {{ $list->status == 1 ? 'Active' : 'Deactive' }}
                                     </a>
-                                    <a
-                                        href="{{ $list->is_vendor !== 'VENDOR' ? route('product.manage', $list->id) : '#' }}">
-                                        <button type="button" class="btn btn-outline-success btn-sm"
-                                            @disabled($list->is_vendor === 'VENDOR')>
-                                            Edit
+                                    @if ($list->locked)
+                                        <button type="button" class="btn btn-outline-secondary btn-sm" disabled>
+                                            <i class="fa fa-lock"></i> Vendor Product
                                         </button>
-                                    </a>
-                                    <a href="{{ route('product.delete', $list->id) }}">
-                                        <button type="button" class="btn btn-outline-danger btn-sm">Delete
-                                        </button>
-                                    </a>
+                                    @else
+                                        <a href="{{ route('product.manage', $list->id) }}"
+                                            class="btn btn-outline-success btn-sm">
+                                            <i class="fa fa-pencil"></i> Edit
+                                        </a>
+                                        <a href="{{ route('product.delete', $list->id) }}"
+                                            class="btn btn-outline-danger btn-sm">
+                                            <i class="fa fa-trash"></i> Delete
+                                        </a>
+                                    @endif
                                 </td>
                             </tr>
                         @empty

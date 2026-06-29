@@ -9,32 +9,31 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
-class VendorSizeController extends Controller
+class VendorSizeController extends BaseVendorController
 {
-    private function vendorId()
-    {
-        return Auth::guard('vendor')->id();
-    }
-
-    private function vendorName()
-    {
-        return Auth::guard('vendor')->user()->name;
-    }
-
     private function authorise(Size $size): void
     {
-        abort_if((int) $size->created_by !== (int) $this->vendorId(), 403);
+        abort_if(
+            (int) $size->created_by !== (int) $this->vendorId()
+                || $size->is_vendor !== $this->vendor(),
+            403
+        );
     }
 
     public function index()
     {
-        $data = Size::where('is_deleted', 0)
-            ->where('created_by', $this->vendorId())
+        $data = Size::where('created_by', $this->vendorId())
+            ->where('is_vendor', $this->vendor())
+            ->where(function ($q) {
+                $q->where('is_deleted', 0)
+                    ->orWhereNull('is_deleted');
+            })
             ->latest()
             ->get();
 
         $deletedData = Size::where('is_deleted', 1)
             ->where('created_by', $this->vendorId())
+            ->where('is_vendor', $this->vendor())
             ->latest()
             ->get();
 
@@ -49,21 +48,34 @@ class VendorSizeController extends Controller
         $id = $request->id;
 
         $request->validate([
-            'size' => [
-                'required',
-                Rule::unique('sizes', 'size')->ignore($id),
-            ],
+            'size'    => 'required|string|max:255',
+            'type'    => 'nullable|string|max:50',
+            'details' => 'nullable|string|max:255',
         ], [
             'size.required' => 'Size is required',
-            'size.unique' => 'Size already exists',
         ]);
 
-        $model = $id
-            ? Size::findOrFail($id)
-            : new Size();
+        $type = $request->type;
+
+        if ($type === 'Other' && !empty($request->custom_type)) {
+            $type = $request->custom_type;
+        }
+
+        // $model = $id
+        //     ? Size::findOrFail($id)
+        //     : new Size();
+        if ($id) {
+            $model = Size::findOrFail($id);
+            $this->authorise($model);
+        } else {
+            $model = new Size();
+        }
 
         $model->size = $request->size;
-
+        $model->type    = $type;
+        $model->details = $request->details;
+        $model->is_vendor = $this->vendor();
+        $model->status     = 1;
         if ($id) {
             $model->who_edited = $this->vendorName();
             $model->edited_by  = $this->vendorId();
@@ -72,9 +84,7 @@ class VendorSizeController extends Controller
             $model->who_create = $this->vendorName();
             $model->created_by = $this->vendorId();
             $model->created_at = now();
-            $model->status     = 1;
         }
-
         $model->save();
 
         return back()->with(
@@ -88,10 +98,12 @@ class VendorSizeController extends Controller
     public function status(Size $size)
     {
         $this->authorise($size);
-
-        $size->status = $size->status ? 0 : 1;
-        $size->save();
-
+        $newStatus = $size->status == 0 ? 1 : 0;
+        $size->update([
+            'status'          => $newStatus,
+            'statusupdate_by' => $newStatus == 1 ? $this->vendorId() : null,
+            'statusupdate_at' => $newStatus == 1 ? now() : null,
+        ]);
         return back()->with('success', 'Status updated!');
     }
 

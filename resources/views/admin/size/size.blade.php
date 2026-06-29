@@ -53,7 +53,10 @@
                                         <input type="checkbox" id="select_all">
                                     </th>
                                     <th>Size ID</th>
+                                    <th>Added By</th>
                                     <th>Size</th>
+                                    <th>Type</th>
+                                    <th>Details</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -66,19 +69,33 @@
                                                 class="checkbox_ids">
                                         </td>
                                         <td>{{ $list->id }}</td>
+                                        <td>
+                                            <p class="small">By:- {{ $list->is_vendor }}</p>
+                                            <p class="small">created By:- {{ $list->who_create }}</p>
+                                            <p class="small">Edited By:- {{ $list->who_edited }}</p>
+                                        </td>
                                         <td>{{ $list->size }}</td>
+                                        <td>{{ $list->type }}</td>
+                                        <td>{{ $list->details }}</td>
                                         <td>
                                             <a href="{{ route('size.status', $list->id) }}"
                                                 class="btn btn-outline-{{ $list->status == 1 ? 'info' : 'warning' }} btn-sm ">
                                                 {{ $list->status == 1 ? 'Active' : 'Deactive' }}
                                             </a>
-                                            <a href="{{ route('size.add_size', $list->id) }}">
-                                                <button type="button" class="btn btn-outline-success btn-sm">Edit </button>
-                                            </a>
-                                            <a href="{{ route('size.delete', $list->id) }}">
-                                                <button type="button" class="btn btn-outline-danger btn-sm">Delete
+                                            @if ($list->locked)
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" disabled>
+                                                    <i class="fa fa-lock"></i> Vendor Size
                                                 </button>
-                                            </a>
+                                            @else
+                                                <a href="{{ route('size.add_size', $list->id) }}"
+                                                    class="btn btn-outline-success btn-sm">
+                                                    <i class="fa fa-pencil"></i> Edit
+                                                </a>
+                                                <a href="{{ route('size.delete', $list->id) }}"
+                                                    class="btn btn-outline-danger btn-sm">
+                                                    <i class="fa fa-trash"></i> Delete
+                                                </a>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty
@@ -99,6 +116,13 @@
                                                 class="checkbox_ids">
                                         </td>
                                         <td>{{ $list->id }}</td>
+                                        <td>{{ $list->type }}</td>
+                                        <td>{{ $list->details }}</td>
+                                        <td>
+                                            <p class="small">By:- {{ $list->is_vendor }}</p>
+                                            <p class="small">created By:- {{ $list->who_create }}</p>
+                                            <p class="small">Edited By:- {{ $list->who_edited }}</p>
+                                        </td>
                                         <td>{{ $list->size }}</td>
                                         <td>
                                             <a href="{{ route('size.restore', $list->id) }}"

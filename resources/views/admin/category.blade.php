@@ -47,6 +47,7 @@
                                 <tr>
                                     <th><input type="checkbox" id="select_all"></th>
                                     <th>ID</th>
+                                    <th>Added By</th>
                                     <th>Image</th>
                                     <th>Category Name</th>
                                     <th>Action</th>
@@ -63,6 +64,11 @@
                                         </td>
                                         <td>{{ $list->id }}</td>
                                         <td>
+                                            <p class="small">By:- {{ $list->is_vendor }}</p>
+                                            <p class="small">created By:- {{ $list->who_create }}</p>
+                                            <p class="small">Edited By:- {{ $list->who_edited }}</p>
+                                        </td>
+                                        <td>
                                             @if ($list->file_name)
                                                 <img src="{{ asset('storage/media/' . $list->file_name) }}" width="40"
                                                     height="40" class="rounded" style="object-fit:cover;">
@@ -76,22 +82,26 @@
                                                 class="btn btn-outline-{{ $list->status == 1 ? 'info' : 'warning' }} btn-sm">
                                                 {{ $list->status == 1 ? 'Active' : 'Deactive' }}
                                             </a>
-                                            <a href="{{ route('category.edit_category', $list->id) }}">
-                                                <button type="button" class="btn btn-outline-success btn-sm">
-                                                    Edit
+                                            @if ($list->locked)
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" disabled>
+                                                    <i class="fa fa-lock"></i> Vendor Category
                                                 </button>
-                                            </a>
-                                            <a href="{{ route('category.delete', $list->id) }}"
-                                                onclick="return confirm('Move {{ $list->category_name }} to trash?')">
-                                                <button type="button" class="btn btn-outline-danger btn-sm">
-                                                    Delete
-                                                </button>
-                                            </a>
+                                            @else
+                                                <a href="{{ route('category.edit_category', $list->id) }}"
+                                                    class="btn btn-outline-success btn-sm">
+                                                    <i class="fa fa-pencil"></i> Edit
+                                                </a>
+
+                                                <a href="{{ route('category.delete', $list->id) }}"
+                                                    class="btn btn-outline-danger btn-sm">
+                                                    <i class="fa fa-trash"></i> Delete
+                                                </a>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty
                                     <tr class="active-row">
-                                        <td colspan="5">
+                                        <td colspan="6">
                                             @include('admin.partials.not_found', [
                                                 'type' => 'category',
                                                 'btnText' => 'Add Category',
@@ -110,6 +120,11 @@
                                         </td>
                                         <td>{{ $list->id }}</td>
                                         <td>
+                                            <p class="small">By:- {{ $list->is_vendor }}</p>
+                                            <p class="small">created By:- {{ $list->who_create }}</p>
+                                            <p class="small">Deleted By:- {{ $list->who_delete }}</p>
+                                        </td>
+                                        <td>
                                             @if ($list->file_name)
                                                 <img src="{{ asset('storage/media/' . $list->file_name) }}" width="40"
                                                     height="40" class="rounded"
@@ -122,21 +137,15 @@
                                             {{ $list->category_name }}
                                         </td>
                                         <td>
-                                            <a href="
-                                            {{-- {{ route('category.restore', $list->id) }} --}}
-                                             "
+                                            <a href="{{ route('category.restore', $list->id) }}"
+                                                class="btn btn-success btn-sm"
                                                 onclick="return confirm('Restore {{ $list->category_name }}?')">
-                                                <button type="button" class="btn btn-success btn-sm">
-                                                    <i class="fa fa-undo me-1"></i> Restore
-                                                </button>
+                                                <i class="fa fa-undo me-1"></i> Restore
                                             </a>
-                                            <a href="
-                                            {{-- {{ route('category.permanent_delete', $list->id) }} --}}
-                                             "
+                                            <a href="{{ route('category.permanent_delete', $list->id) }}"
+                                                class="btn btn-danger btn-sm"
                                                 onclick="return confirm('Permanently delete? Cannot be undone.')">
-                                                <button type="button" class="btn btn-danger btn-sm">
-                                                    <i class="fa fa-times me-1"></i> Remove
-                                                </button>
+                                                <i class="fa fa-times me-1"></i> Remove
                                             </a>
                                         </td>
                                     </tr>

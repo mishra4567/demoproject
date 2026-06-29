@@ -4,31 +4,12 @@ import { Icons } from '@/vendor/Components'
 import { useSizes } from '@/vendor/Back'
 
 const {
-    displayed,
-    deletedData,
-
-    showDeleted,
-    showForm,
-    editTarget,
-
-    selected,
-    bulkAction,
-
-    form,
-
-    openCreate,
-    openEdit,
-    closeForm,
-
-    saveSize,
-
-    toggleStatus,
-    deleteSize,
-    restoreSize,
-    forceDeleteSize,
-
-    toggleAll,
-    applyBulk,
+    displayed,deletedData,showDeleted,
+    showForm,editTarget,selected,
+    bulkAction,form, openCreate,
+    openEdit, closeForm, saveSize,
+    toggleStatus,deleteSize,restoreSize,
+    forceDeleteSize, toggleAll, applyBulk,
 } = useSizes()
 </script>
 
@@ -159,6 +140,18 @@ const {
                                 >
                                     Size
                                 </th>
+                                <th
+                                    class="px-4 py-3 text-left text-xs"
+                                    style="color:#6b6660;"
+                                >
+                                    Type
+                                </th>
+                                <th
+                                    class="px-4 py-3 text-left text-xs"
+                                    style="color:#6b6660;"
+                                >
+                                    Details
+                                </th>
 
                                 <th
                                     class="px-4 py-3 text-left text-xs"
@@ -205,6 +198,18 @@ const {
                                     style="color:white;"
                                 >
                                     {{ item.size }}
+                                </td>
+                                <td
+                                    class="px-4 py-3 text-sm font-medium"
+                                    style="color:white;"
+                                >
+                                    {{ item.type }}
+                                </td>
+                                <td
+                                    class="px-4 py-3 text-sm font-medium"
+                                    style="color:white;"
+                                >
+                                    {{ item.details }}
                                 </td>
 
                                 <td class="px-4 py-3">
@@ -301,120 +306,202 @@ const {
         </div>
 
         <!-- Modal -->
-        <Transition name="fade">
+<Transition name="fade">
 
+    <div
+        v-if="showForm"
+        class="fixed inset-0 z-50 flex items-center justify-center px-4"
+        style="background:rgba(0,0,0,0.75);"
+        @click.self="closeForm"
+    >
+
+        <div
+            class="rounded-xl w-full max-w-md"
+            style="background:#1c1c1a;border:0.5px solid #2e2e2b;"
+        >
+
+            <!-- Header -->
             <div
-                v-if="showForm"
-                class="fixed inset-0 z-50 flex items-center justify-center px-4"
-                style="background:rgba(0,0,0,0.75);"
-                @click.self="closeForm"
+                class="flex items-center justify-between px-5 py-4"
+                style="border-bottom:0.5px solid #2e2e2b;"
+            >
+                <h2
+                    class="text-sm font-medium"
+                    style="color:white;"
+                >
+                    {{ editTarget ? 'Edit Size' : 'Add Size' }}
+                </h2>
+
+                <button
+                    @click="closeForm"
+                    style="color:#6b6660;"
+                >
+                    <Icons name="x" class="w-4 h-4" />
+                </button>
+            </div>
+
+            <!-- Form -->
+            <form
+                @submit.prevent="saveSize"
+                class="p-5 space-y-4"
             >
 
-                <div
-                    class="rounded-xl w-full max-w-md"
-                    style="background:#1c1c1a;border:0.5px solid #2e2e2b;"
+                <input
+                    type="hidden"
+                    v-model="form.id"
                 >
 
-                    <!-- Header -->
-                    <div
-                        class="flex items-center justify-between px-5 py-4"
-                        style="border-bottom:0.5px solid #2e2e2b;"
+                <!-- Type -->
+                <div>
+                    <label
+                        class="block text-xs mb-1.5"
+                        style="color:#6b6660;"
                     >
-                        <h2
-                            class="text-sm font-medium"
-                            style="color:white;"
-                        >
-                            {{ editTarget ? 'Edit Size' : 'Add Size' }}
-                        </h2>
+                        Type
+                    </label>
 
-                        <button
-                            @click="closeForm"
-                            style="color:#6b6660;"
-                        >
-                            <Icons name="x" class="w-4 h-4" />
-                        </button>
-                    </div>
+                    <select
+                        v-model="form.type"
+                        class="w-full rounded-lg px-3 py-2 text-sm outline-none"
+                        style="background:#111110;color:white;border:0.5px solid #2e2e2b;"
+                    >
+                        <option value="">Select Type</option>
+                        <option value="Clothing">Clothing</option>
+                        <option value="Shoes">Shoes</option>
+                        <option value="Other">Other</option>
+                    </select>
 
-                    <!-- Form -->
-                    <form
-                        @submit.prevent="saveSize"
-                        class="p-5 space-y-4"
+                    <p
+                        v-if="form.errors.type"
+                        class="text-xs mt-1"
+                        style="color:#ef4444;"
+                    >
+                        {{ form.errors.type }}
+                    </p>
+                </div>
+
+                <!-- Custom type (shown only when Type = Other) -->
+                <div v-if="form.type === 'Other'">
+                    <label
+                        class="block text-xs mb-1.5"
+                        style="color:#6b6660;"
+                    >
+                        Custom Type
+                    </label>
+
+                    <input
+                        v-model="form.custom_type"
+                        type="text"
+                        placeholder="e.g. Watch, Helmet, Bag"
+                        class="w-full rounded-lg px-3 py-2 text-sm outline-none"
+                        style="background:#111110;color:white;border:0.5px solid #2e2e2b;"
                     >
 
-                        <input
-                            type="hidden"
-                            v-model="form.id"
-                        >
+                    <p
+                        v-if="form.errors.custom_type"
+                        class="text-xs mt-1"
+                        style="color:#ef4444;"
+                    >
+                        {{ form.errors.custom_type }}
+                    </p>
+                </div>
 
-                        <div>
-                            <label
-                                class="block text-xs mb-1.5"
-                                style="color:#6b6660;"
-                            >
-                                Size
-                            </label>
+                <!-- Size -->
+                <div>
+                    <label
+                        class="block text-xs mb-1.5"
+                        style="color:#6b6660;"
+                    >
+                        Size <span style="color:#ef4444;">*</span>
+                    </label>
 
-                            <input
-                                v-model="form.size"
-                                type="text"
-                                placeholder="Enter size"
-                                class="w-full rounded-lg px-3 py-2 text-sm outline-none"
-                                style="background:#111110;color:white;border:0.5px solid #2e2e2b;"
-                            >
+                    <input
+                        v-model="form.size"
+                        type="text"
+                        placeholder="Enter size"
+                        class="w-full rounded-lg px-3 py-2 text-sm outline-none"
+                        style="background:#111110;color:white;border:0.5px solid #2e2e2b;"
+                    >
 
-                            <p
-                                v-if="form.errors.size"
-                                class="text-xs mt-1"
-                                style="color:#ef4444;"
-                            >
-                                {{ form.errors.size }}
-                            </p>
-                        </div>
+                    <p
+                        v-if="form.errors.size"
+                        class="text-xs mt-1"
+                        style="color:#ef4444;"
+                    >
+                        {{ form.errors.size }}
+                    </p>
+                </div>
 
-                        <div
-                            v-if="editTarget"
-                            class="text-xs px-3 py-2 rounded-lg"
-                            style="background:#1a1a2e;color:#818cf8;"
-                        >
-                            Editing:
-                            <strong>{{ editTarget.size }}</strong>
-                        </div>
+                <!-- Details -->
+                <div>
+                    <label
+                        class="block text-xs mb-1.5"
+                        style="color:#6b6660;"
+                    >
+                        Details
+                    </label>
 
-                        <div class="flex gap-3">
+                    <input
+                        v-model="form.details"
+                        type="text"
+                        placeholder="e.g. Chest 46-48 inch"
+                        class="w-full rounded-lg px-3 py-2 text-sm outline-none"
+                        style="background:#111110;color:white;border:0.5px solid #2e2e2b;"
+                    >
 
-                            <button
-                                type="submit"
-                                :disabled="form.processing"
-                                class="flex-1 py-2.5 rounded-lg text-sm font-medium"
-                                style="background:#d97706;color:#111110;"
-                            >
-                                {{
-                                    form.processing
-                                        ? 'Saving...'
-                                        : editTarget
-                                            ? 'Update'
-                                            : 'Create'
-                                }}
-                            </button>
+                    <p
+                        v-if="form.errors.details"
+                        class="text-xs mt-1"
+                        style="color:#ef4444;"
+                    >
+                        {{ form.errors.details }}
+                    </p>
+                </div>
 
-                            <button
-                                type="button"
-                                @click="closeForm"
-                                class="px-4 py-2.5 rounded-lg text-sm"
-                                style="color:#9e9890;border:0.5px solid #2e2e2b;"
-                            >
-                                Cancel
-                            </button>
+                <div
+                    v-if="editTarget"
+                    class="text-xs px-3 py-2 rounded-lg"
+                    style="background:#1a1a2e;color:#818cf8;"
+                >
+                    Editing:
+                    <strong>{{ editTarget.size }}</strong>
+                </div>
 
-                        </div>
+                <div class="flex gap-3">
 
-                    </form>
+                    <button
+                        type="submit"
+                        :disabled="form.processing"
+                        class="flex-1 py-2.5 rounded-lg text-sm font-medium"
+                        style="background:#d97706;color:#111110;"
+                    >
+                        {{
+                            form.processing
+                                ? 'Saving...'
+                                : editTarget
+                                    ? 'Update'
+                                    : 'Create'
+                        }}
+                    </button>
+
+                    <button
+                        type="button"
+                        @click="closeForm"
+                        class="px-4 py-2.5 rounded-lg text-sm"
+                        style="color:#9e9890;border:0.5px solid #2e2e2b;"
+                    >
+                        Cancel
+                    </button>
 
                 </div>
 
-            </div>
+            </form>
 
-        </Transition>
+        </div>
+
+    </div>
+
+</Transition>
 
     </VendorLayout>
 </template>

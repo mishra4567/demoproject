@@ -5,7 +5,7 @@
         <div class="container-fluid">
             <h3 class="title-5 m-b-35">Manage Category</h3>
             <a href="{{ route('category') }}">
-                <button type="button" class="btn btn-success " disabled="">Back to Category</button>
+                <button type="button" class="btn btn-success" disabled="">Back to Category</button>
             </a>
             <div class="card">
                 <div class="card-body">
@@ -20,26 +20,26 @@
                                         'info' => $info['category_name'] ?? '',
                                     ])
                                 </label>
-                                <input type="text" name="category_name" value="{{ $category_name ?? '' }}"
-                                    class="form-control" required>
+                                <input type="text" id="category_name" name="category_name"
+                                    value="{{ old('category_name', $category_name ?? '') }}" class="form-control" required>
                             </div>
 
                             <!-- Slug -->
                             <div class="col-md-6">
                                 <label class="form-label">Category Slug
-                                    @include('admin.partials.field_info',[
-                                        'info'=>$info['slug']
+                                    @include('admin.partials.field_info', [
+                                        'info' => $info['slug'],
                                     ])
                                 </label>
-                                <input type="text" name="category_slug" value="{{ $category_slug ?? '' }}"
-                                    class="form-control" required>
+                                <input type="text" id="category_slug" name="category_slug"
+                                    value="{{ old('category_slug', $category_slug ?? '') }}" class="form-control" required>
                             </div>
 
                             <!-- Parent Category -->
                             <div class="col-md-6">
                                 <label class="form-label">Parent Category
-                                    @include('admin.partials.field_info',[
-                                        'info'=>$info['parent_category']
+                                    @include('admin.partials.field_info', [
+                                        'info' => $info['parent_category'],
                                     ])
                                 </label>
                                 <select name="parent_id" class="form-control">
@@ -47,7 +47,7 @@
 
                                     @foreach ($parent_categories as $list)
                                         <option value="{{ $list->id }}"
-                                            {{ ($parent_id ?? 0) == $list->id ? 'selected' : '' }}>
+                                            {{ old('parent_id', $parent_id ?? 0) == $list->id ? 'selected' : '' }}>
                                             {{ $list->category_name }}
                                         </option>
                                     @endforeach
@@ -68,4 +68,13 @@
             </div>
         </div>
     </div>
+    <script>
+        document.getElementById('category_name').addEventListener('keyup', function() {
+            document.getElementById('category_slug').value = this.value
+                .toLowerCase()
+                .trim()
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/\s+/g, '-');
+        });
+    </script>
 @endsection

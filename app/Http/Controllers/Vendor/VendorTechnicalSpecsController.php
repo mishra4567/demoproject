@@ -10,21 +10,15 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
-class VendorTechnicalSpecsController extends Controller
+class VendorTechnicalSpecsController extends BaseVendorController
 {
-    private function vendorId()
-    {
-        return Auth::guard('vendor')->id();
-    }
-
-    private function vendorName()
-    {
-        return Auth::guard('vendor')->user()->name;
-    }
-
     private function authorise(TechnicalSpecs $spec): void
     {
-        abort_if((int) $spec->created_by !== (int) $this->vendorId(), 403);
+        abort_if(
+            (int) $spec->created_by !== (int) $this->vendorId()
+                || $spec->is_vendor !== $this->vendor(),
+            403
+        );
     }
 
     public function index()
@@ -32,22 +26,28 @@ class VendorTechnicalSpecsController extends Controller
         $data = DB::table('technical_specs')
             ->leftJoin('products', 'technical_specs.product_id', '=', 'products.id')
             ->select('technical_specs.*', 'products.name as product_name')
-            ->where('technical_specs.is_deleted', 0)
             ->where('technical_specs.created_by', $this->vendorId())
+            ->where('technical_specs.is_vendor', $this->vendor())
+            ->where(function ($q) {
+                $q->where('technical_specs.is_deleted', 0)
+                    ->orWhereNull('technical_specs.is_deleted');
+            })
             ->latest('technical_specs.created_at')
             ->get();
 
         $deletedData = DB::table('technical_specs')
             ->leftJoin('products', 'technical_specs.product_id', '=', 'products.id')
             ->select('technical_specs.*', 'products.name as product_name')
-            ->where('technical_specs.is_deleted', 1)
             ->where('technical_specs.created_by', $this->vendorId())
+            ->where('technical_specs.is_vendor', $this->vendor())
+            ->where('technical_specs.is_deleted', 1)
             ->latest('technical_specs.created_at')
             ->get();
 
         $products = DB::table('products')
             ->where('status', 1)
             ->where('created_by', $this->vendorId())
+            ->where('is_vendor', $this->vendor())
             ->select('id', 'name')
             ->get();
 
@@ -75,8 +75,13 @@ class VendorTechnicalSpecsController extends Controller
             'product_id.unique' => 'This product already has a technical specification.',
         ]);
 
-        $model = $id ? TechnicalSpecs::findOrFail($id) : new TechnicalSpecs();
-
+        // $model = $id ? TechnicalSpecs::findOrFail($id) : new TechnicalSpecs();
+        if ($id) {
+            $model = TechnicalSpecs::findOrFail($id);
+            $this->authorise($model);
+        } else {
+            $model = new TechnicalSpecs();
+        }
         $model->product_id     = $request->product_id;
         $model->title          = $request->title;
         $model->lead_time_from = $request->lead_time_from ?? null;
@@ -88,7 +93,7 @@ class VendorTechnicalSpecsController extends Controller
         $model->is_discounted  = $request->boolean('is_discounted') ? 1 : 0;
         $model->is_trending    = $request->boolean('is_trending')   ? 1 : 0;
         $model->status         = 1;
-
+        $model->is_vendor = $this->vendor();
         if ($id) {
             $model->who_edited = $this->vendorName();
             $model->edited_by  = $this->vendorId();
@@ -110,8 +115,13 @@ class VendorTechnicalSpecsController extends Controller
     public function status(TechnicalSpecs $technicalSpec)
     {
         $this->authorise($technicalSpec);
-        $technicalSpec->status = $technicalSpec->status == 1 ? 0 : 1;
-        $technicalSpec->save();
+        $newStatus = $technicalSpec->status == 0 ? 1 : 0;
+
+        $technicalSpec->update([
+            'status'          => $newStatus,
+            'statusupdate_by' => $newStatus == 1 ? $this->vendorId() : null,
+            'statusupdate_at' => $newStatus == 1 ? now() : null,
+        ]);
         return back()->with('success', 'Status updated!');
     }
 
@@ -150,6 +160,7 @@ class VendorTechnicalSpecsController extends Controller
         ]);
 
         $specs   = TechnicalSpecs::where('created_by', $this->vendorId())
+            ->where('is_vendor', $this->vendor())
             ->whereIn('id', $request->ids);
         $count   = $specs->count();
         $message = '';

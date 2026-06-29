@@ -10,21 +10,15 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
-class VendorBrandController extends Controller
+class VendorBrandController extends BaseVendorController
 {
-    private function vendorId()
-    {
-        return Auth::guard('vendor')->id();
-    }
-
-    private function vendorName()
-    {
-        return Auth::guard('vendor')->user()->name;
-    }
-
     private function authorise(Brands $brand): void
     {
-        abort_if((int) $brand->created_by !== (int) $this->vendorId(), 403);
+        abort_if(
+            (int) $brand->created_by !== (int) $this->vendorId()
+                || $brand->is_vendor !== $this->vendor(),
+            403
+        );
     }
 
     public function index()
@@ -33,6 +27,7 @@ class VendorBrandController extends Controller
             ->leftJoin('create_media_tables', 'brands.media_ids', '=', 'create_media_tables.id')
             ->select('brands.*', 'create_media_tables.file_name')
             ->where('brands.is_deleted', 0)
+            ->where('brands.is_vendor', $this->vendor())
             ->where('brands.created_by', $this->vendorId())
             ->latest('brands.created_at')
             ->get();
@@ -41,6 +36,7 @@ class VendorBrandController extends Controller
             ->leftJoin('create_media_tables', 'brands.media_ids', '=', 'create_media_tables.id')
             ->select('brands.*', 'create_media_tables.file_name')
             ->where('brands.is_deleted', 1)
+            ->where('brands.is_vendor', $this->vendor())
             ->where('brands.created_by', $this->vendorId())
             ->latest('brands.created_at')
             ->get();
@@ -63,11 +59,16 @@ class VendorBrandController extends Controller
             'name.unique'   => 'This brand already exists',
         ]);
 
-        $model = $id ? Brands::findOrFail($id) : new Brands();
-
+        // $model = $id ? Brands::findOrFail($id) : new Brands();
+        if ($id) {
+            $model = Brands::findOrFail($id);
+            $this->authorise($model);
+        } else {
+            $model = new Brands();
+        }
         $model->name      = $request->name;
         $model->media_ids = $request->media_ids;
-        $model->is_vendor = 'VENDOR';
+        $model->is_vendor = $this->vendor();
         $model->status    = 1;
 
         if ($id) {
@@ -137,6 +138,7 @@ class VendorBrandController extends Controller
         ]);
 
         $brands = Brands::where('created_by', $this->vendorId())
+            ->where('is_vendor', $this->vendor())
             ->whereIn('id', $request->ids);
         $count   = $brands->count();
         $message = '';

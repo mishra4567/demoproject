@@ -52,16 +52,13 @@
                                         <input type="checkbox" id="select_all">
                                     </th>
                                     <th>id</th>
+                                    <th>Added By</th>
                                     <th>Sku</th>
                                     <th>Product</th>
                                     <th>Image</th>
-                                    {{-- <th>Tag</th> --}}
-                                    {{-- <th>Description</th> --}}
                                     <th>Mrp</th>
                                     <th>Price</th>
                                     <th>Price</th>
-                                    {{-- <th>Size</th> --}}
-                                    {{-- <th>color</th> --}}
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -73,9 +70,15 @@
                                                 class="checkbox_ids">
                                         </td>
                                         <td>{{ $list->id }}</td>
+                                        <td>
+                                            <p class="small">By:- {{ $list->is_vendor }}</p>
+                                            <p class="small">created By:- {{ $list->who_create }}</p>
+                                            <p class="small">Edited By:- {{ $list->who_edited }}</p>
+                                        </td>
                                         <td>{{ $list->sku }}</td>
                                         <td>{{ $list->product_id }}</td>
-                                        <td><img src="{{ asset('storage/media/' . $list->file_name) }}" alt=""></td>
+                                        <td><img src="{{ asset('storage/media/' . $list->file_name) }}" alt="">
+                                        </td>
                                         <td>{{ $list->mrp }}</td>
                                         <td>{{ $list->price }}</td>
                                         <td>{{ $list->qty }}</td>
@@ -84,13 +87,27 @@
                                                 class="btn btn-outline-{{ $list->status == 1 ? 'info' : 'warning' }} btn-sm ">
                                                 {{ $list->status == 1 ? 'Active' : 'Deactive' }}
                                             </a>
-                                            <a href="{{ route('product.addlinkproduct', ['id' => $list->id]) }}">
+                                            {{-- <a href="{{ route('product.addlinkproduct', ['id' => $list->id]) }}">
                                                 <button type="button" class="btn btn-outline-success btn-sm">Edit </button>
                                             </a>
                                             <a href="{{ route('product.linkproductdelete', $list->id) }}">
                                                 <button type="button" class="btn btn-outline-danger btn-sm">Delete
                                                 </button>
-                                            </a>
+                                            </a> --}}
+                                            @if ($list->locked)
+                                                <button type="button" class="btn btn-outline-secondary btn-sm" disabled>
+                                                    <i class="fa fa-lock"></i> Vendor Link Product
+                                                </button>
+                                            @else
+                                                <a href="{{ route('product.addlinkproduct', ['id' => $list->id]) }}"
+                                                    class="btn btn-outline-success btn-sm">
+                                                    <i class="fa fa-pencil"></i> Edit
+                                                </a>
+                                                <a href="{{ route('product.linkproductdelete', $list->id) }}"
+                                                    class="btn btn-outline-danger btn-sm">
+                                                    <i class="fa fa-trash"></i> Delete
+                                                </a>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty
@@ -114,10 +131,21 @@
                                                 class="checkbox_ids">
                                         </td>
                                         <td>{{ $list->id }}</td>
+                                        <td>
+                                            <p class="small">By:- {{ $list->is_vendor }}</p>
+                                            <p class="small">Created By:- {{ $list->who_create }}</p>
+                                            <p class="small">Edited By:- {{ $list->who_edited }}</p>
+                                        </td>
                                         <td>{{ $list->sku }}</td>
                                         <td>{{ $list->product_id }}</td>
-                                        <td><img src="{{ asset('storage/media/' . $list->file_name) }}" alt="">
+                                        <td>
+                                            @if ($list->file_name)
+                                                <img src="{{ asset('storage/media/' . $list->file_name) }}">
+                                            @endif
                                         </td>
+                                        <td>{{ $list->mrp }}</td>
+                                        <td>{{ $list->price }}</td>
+                                        <td>{{ $list->qty }}</td>
                                         <td>
                                             <a href="{{ route('linkproduct.restore', $list->id) }}"
                                                 onclick="return confirm('Restore {{ $list->sku }}?')">

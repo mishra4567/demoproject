@@ -9,13 +9,36 @@ use Illuminate\Validation\Rule;
 
 class ColorController extends Controller
 {
+    protected function adminId()
+    {
+        return session('ADMIN_ID');
+    }
+
+    protected function adminName()
+    {
+        return session('ADMIN_NAME');
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $data = Color::where('is_deleted', 0)->get();
-        $deletedData = Color::where('is_deleted', 1)->get();
+        $data = Color::where(function ($q) {
+            $q->where('is_deleted', 0)
+                ->orWhereNull('is_deleted');
+        })
+            ->get()
+            ->each(function ($color) {
+                $color->locked = $color->is_vendor === 'VENDOR';
+            });
+        $deletedData = Color::where(function ($q) {
+            $q->where('is_deleted', 1)
+                ->orWhereNull('is_deleted');
+        })
+            ->get()
+            ->each(function ($color) {
+                $color->locked = $color->is_vendor === 'VENDOR';
+            });
         $info = config('field_info.color');
         // echo "<pre>";
         // print_r($result);
@@ -31,28 +54,26 @@ class ColorController extends Controller
     public function manageColor(Request $request, $id = null)
     {
         if (!empty($id) && is_numeric($id)) {
-
             $color = Color::where('id', $id)->first();
-
             if (!$color) {
                 abort(404);
             }
-
+            if ($color->is_vendor === 'VENDOR') {
+                return back()
+                    ->with('error', 'Vendor colors cannot be edited.');
+            }
             $result['color_name']  = $color->color_name;
             $result['hex_id'] = $color->hex_id;
             $result['status'] = $color->status;
             $result['id']     = $color->id;
         } else {
-
             $result['color_name']  = '';
             $result['hex_id'] = '';
             $result['status'] = '';
             $result['id']     = 0;
         }
-
         $result['info'] = config('field_info.color');
         return view('admin.color.manage_color', $result);
-
         // echo "This is for manage color";
     }
 
@@ -71,16 +92,27 @@ class ColorController extends Controller
             'color' => [
                 'required',
                 // Rule::unique('colors', 'color')->ignore($id),
+                'regex:/^#([A-Fa-f0-9]{6})$/'
             ],
+            'color_name' => 'required',
+
         ], [
             'color.unique' => 'This color already exists',
         ]);
         $model = $id ? Color::findOrFail($id) : new Color();
         $model->color_name = $request->color_name;
         $model->hex_id = $request->color;
-        $model->who_create = session('ADMIN_ID');
-        $model->created_at = now();
         $model->status = 1;
+        $model->is_vendor = 'ADMIN';
+        if ($id) {
+            $model->who_edited = $this->adminName();
+            $model->edited_by =  $this->adminId();
+            $model->edited_at = now();
+        } else {
+            $model->who_create = $this->adminName();
+            $model->created_by = $this->adminId();
+            $model->created_at = now();
+        }
         $model->save();
 
         return redirect('admin/color')
@@ -97,10 +129,17 @@ class ColorController extends Controller
     {
         $color = Color::find($id);
         if (!$color) return redirect('admin/color')->with('error', 'color not found');
-        $color->is_deleted = 1;
-        $color->deleted_at = now();
-        $color->who_delete = session('ADMIN_ID');
-        $color->save();
+        if ($color->is_vendor === 'VENDOR') {
+            return back()->with(
+                'error',
+                'Vendor colors cannot be deleted.'
+            );
+        }
+        $color->update([
+            'is_deleted' => 1,
+            'who_delete' => $this->adminId(),
+            'deleted_at' => now(),
+        ]);
         return redirect('admin/color')->with('success', 'Color moved to trash...');
         // echo "color deleted" ;
         // echo "this is for color delete";
@@ -110,12 +149,12 @@ class ColorController extends Controller
     {
         $color = Color::find($id);
         if (!$color) return redirect('admin/color')->with('error', 'color not found');
-        $color->is_deleted = 0;
-        $color->deleted_at = null;
-        $color->who_delete = null;
-        $color->save();
-        return redirect()->route('color')
-            ->with('success', 'Color restored successfully.');
+        $color->update([
+            'is_deleted' => 0,
+            'who_delete' => null,
+            'deleted_at' => null,
+        ]);
+        return back()->with('success', 'Color restored successfully.');
     }
     // ─── Permanent Delete ──────────────────────────────────
     public function permanentDelete($id)
@@ -132,10 +171,15 @@ class ColorController extends Controller
     public function status($id)
     {
         $color = Color::find($id);
-
-        // toggle between 1 and 0
-        $color->status = ($color->status == 1) ? 0 : 1;
-        $color->save();
+        if (!$color) {
+            return back()->with('error', 'Coupon not found');
+        }
+        $newStatus = $color->status == 0 ? 1 : 0;
+        $color->update([
+            'status'          => $newStatus,
+            'statusupdate_by' => $newStatus == 0 ? $this->adminId() : null,
+            'statusupdate_at' => $newStatus == 0 ? now() : null,
+        ]);
 
         return redirect()->back()->with('success', 'Status Updated');
         // echo "this is for Color status";
@@ -154,17 +198,30 @@ class ColorController extends Controller
         }
         switch ($action) {
             case 'activate':
-                Color::whereIn('id', $ids)->update(['status' => 1]);
+                Color::whereIn('id', $ids)->update([
+                    'status' => 1,
+                    'statusupdate_by' => $this->adminId(),
+                    'statusupdate_at' => now(),
+                ]);
                 break;
             case 'deactivate':
-                Color::whereIn('id', $ids)->update(['status' => 0]);
+                Color::whereIn('id', $ids)->update([
+                    'status' => 0,
+                    'statusupdate_by' => null,
+                    'statusupdate_at' => null,
+                ]);
                 break;
             case 'trash':
-                Color::whereIn('id', $ids)->update([
-                    'is_deleted' => 1,
-                    'deleted_at' => now(),
-                    'who_delete' => session('ADMIN_ID')
-                ]);
+                Color::whereIn('id', $ids)
+                    ->where(function ($q) {
+                        $q->where('is_vendor', '!=', 'VENDOR')
+                            ->orWhereNull('is_vendor');
+                    })
+                    ->update([
+                        'is_deleted' => 1,
+                        'deleted_at' => now(),
+                        'who_delete' => $this->adminId()
+                    ]);
                 // return back()->with('error', 'Delete action is not allowed ❌');
                 break;
             case 'restore':
