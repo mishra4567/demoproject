@@ -30,8 +30,17 @@ Route::get('/api-list', function () {
     ], 200, [], JSON_PRETTY_PRINT);
 });
 
-Route::get('report/new', [ReportController::class, 'index'])
-    ->name('report')->setDefaults(['label' => 'Report', 'role' => 1]);
+// ── Report routes (accessible by admin, vendor, customer) ────
+// routes/web.php
+
+// ── Report routes ────────────────────────────────────────────
+Route::prefix('report')->name('report.')->group(function () {
+
+    // Form — open to anyone, no auth required
+    Route::get('/new',   [ReportController::class, 'createReport'])->name('create');
+    Route::post('/store', [ReportController::class, 'store'])->name('store');
+    Route::get('/show',   [ReportController::class, 'show'])->name('show');
+});
 
 Route::get('/test-mail', function () {
     \Illuminate\Support\Facades\Mail::raw('Test email from Laravel!', function ($message) {
@@ -40,7 +49,9 @@ Route::get('/test-mail', function () {
     });
     return 'Mail sent!';
 });
-
+Route::get('/phpinfo', function () {
+    phpinfo();
+});
 
 require __DIR__ . '/adminWeb.php';
 require __DIR__ . '/api.php';

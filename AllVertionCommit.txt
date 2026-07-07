@@ -1,3 +1,15 @@
+30-7.7.26:-
+API version:- 1.0.6
+Vendor version:- 2.1.17
+Admin version:- 1.14.32
+Comment:- Vendor:- Adding new nav functionality, Fixing BUG,
+                   Adding Report but not fully function yet, need to work on it.
+                   Fixing BUG.
+Comment:- Admin:-  Adding Report fully function, Fixing BUG.
+Project Report:- Adding new Database PostegreSQL for report,
+                and add new table for report, and add new model for report,
+                and add new controller for report, and add new route for report,
+                and add new page for report.
 15-29.6.26:-
 API version:- 1.0.6
 Vendor version:- 2.0.16

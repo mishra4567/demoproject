@@ -127,30 +127,31 @@
             <h2 class="text-2xl font-bold mb-6 text-gray-800">
                 Quick Access
             </h2>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <a href="/admin/dashboard"
-                    class="bg-blue-600 hover:bg-blue-700 text-white p-5 rounded-xl transition duration-200 text-center font-semibold">
+                    class="bg-blue-600 hover:bg-blue-700 text-white p-5 rounded-xl
+                   transition duration-200 text-center font-semibold">
                     Open Admin Panel
                 </a>
-
                 <a href="/vendor"
-                    class="bg-green-600 hover:bg-green-700 text-white p-5 rounded-xl transition duration-200 text-center font-semibold">
+                    class="bg-green-600 hover:bg-green-700 text-white p-5 rounded-xl
+                   transition duration-200 text-center font-semibold">
                     Open Vendor Panel
                 </a>
-
                 <a href="/api-list"
-                    class="bg-purple-600 hover:bg-purple-700 text-white p-5 rounded-xl transition duration-200 text-center font-semibold">
+                    class="bg-purple-600 hover:bg-purple-700 text-white p-5 rounded-xl
+                   transition duration-200 text-center font-semibold">
                     API Routes
+                </a>
+                <a href="{{ route('report.create') }}" target="_blank"
+                    class="bg-amber-500 hover:bg-amber-600 text-white p-5 rounded-xl
+                   transition duration-200 text-center font-semibold">
+                    Add Report
                 </a>
             </div>
         </div>
-
     </div>
-
 </body>
-
 </html>
 {{-- ```
 

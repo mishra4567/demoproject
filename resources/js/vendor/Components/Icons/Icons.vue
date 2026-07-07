@@ -311,4 +311,19 @@ defineProps({
     d="M11.5 5.75a.75.75 0 011.5 0v1a.75.75 0 01-1.5 0v-1zM9.5 7.75a.75.75 0 011.5 0v1a.75.75 0 01-1.5 0v-1zM7.5 9.75a.75.75 0 011.5 0v1a.75.75 0 01-1.5 0v-1z"
   />
 </svg>
+<svg
+  v-else-if="name === 'report'"
+  viewBox="0 0 20 20"
+  fill="currentColor"
+  :class="$props.class"
+>
+  <path
+    fill-rule="evenodd"
+    d="M5 3a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V7.414A2 2 0 0016.414 6L14 3.586A2 2 0 0012.586 3H5zm7 1.5V7h2.5L12 4.5z"
+    clip-rule="evenodd"
+  />
+  <path
+    d="M7 14.5a.5.5 0 01-.5-.5v-2a.5.5 0 011 0v2a.5.5 0 01-.5.5zm3 0a.5.5 0 01-.5-.5V9a.5.5 0 011 0v5a.5.5 0 01-.5.5zm3 0a.5.5 0 01-.5-.5v-3.5a.5.5 0 011 0V14a.5.5 0 01-.5.5z"
+  />
+</svg>
 </template>

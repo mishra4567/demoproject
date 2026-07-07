@@ -146,9 +146,22 @@
                             <a href="{{ route('customer') }}">
                                 <i class="fa-solid fa-fill-drip"></i>Customers</a>
                         </li>
-                        <li class="has-sub @yield('customer_select')">
-                            <a href="{{ route('report') }}">
-                                <i class="fa-solid fa-fill-drip"></i>Report</a>
+                        <li class="has-sub">
+                            <a class="js-arrow" href="#">
+                                <i class="fas fa-copy"></i>Report
+                            </a>
+                            <ul class="list-unstyled navbar__sub-list js-sub-list ps-sm-5">
+                                <li>
+                                    <a href="{{ route('report.create') }}" target="_blank">
+                                        <i class="fas fa-sign-in-alt"></i>Add Report
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('admin.reportsView') }}">
+                                        <i class="fas fa-user"></i>Report View
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                     </ul>
                 </div>
@@ -295,7 +308,7 @@
                                             <i class="fas fa-sign-in-alt"></i>View</a>
                                     </li>
                                     <li>
-                                        <a href="{{ route('admin.reports') }}">
+                                        <a href="{{ route('report.show') }}" target="_blank">
                                             <i class="fas fa-user"></i>Add</a>
                                     </li>
                                 </ul>
@@ -374,7 +387,7 @@
                                                 </div>
                                             </div>
                                             <div class="account-dropdown__footer">
-                                                <a href="logout">
+                                                <a href="{{ route('admin.logout') }}">
                                                     <i class="zmdi zmdi-power"></i>Logout</a>
                                             </div>
                                         </div>

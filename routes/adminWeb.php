@@ -17,30 +17,30 @@ use App\Http\Controllers\Admin\ViewProductController;
 // use App\Http\Controllers\Admin\BarcodeController;
 // use App\Http\Controllers\Admin\BarcodeController;
 use App\Http\Controllers\Admin\CustomerController;
-use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\ReportdController;
 use App\Http\Controllers\Admin\TechnicalSpecsController;
 
-Route::prefix('admin')->group(function () {
+Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/',                          [AdminController::class, 'index'])
         ->name('admin.index');
     Route::post('/auth',                     [AdminController::class, 'auth'])
-        ->name('admin.auth');
+        ->name('auth');
     Route::get('/logout',                    [AdminController::class, 'logout'])
-        ->name('admin.logout');
+        ->name('logout');
     Route::get('/register',                  [AdminController::class, 'register'])
-        ->name('admin.register');
+        ->name('register');
     Route::post('/register',                 [AdminController::class, 'registerProcess'])
-        ->name('admin.register.process');
+        ->name('register.process');
     Route::get('/verify-email/{token}',      [AdminController::class, 'verifyEmail'])
-        ->name('admin.verify.email');
+        ->name('verify.email');
     Route::get('/forgot-password',           [AdminController::class, 'forgotPassword'])
-        ->name('admin.forgot.password');
+        ->name('forgot.password');
     Route::post('/forgot-password',          [AdminController::class, 'forgotPasswordSend'])
-        ->name('admin.forgot.password.send');
+        ->name('forgot.password.send');
     Route::get('/reset-password/{token}',    [AdminController::class, 'resetPasswordForm'])
-        ->name('admin.reset.password.form');
+        ->name('reset.password.form');
     Route::post('/reset-password',           [AdminController::class, 'resetPassword'])
-        ->name('admin.reset.password');
+        ->name('reset.password');
 });
 // Route::get('admin', [AdminController::class, 'index']);
 // Route::get('admin', [AdminController::class, 'index'])
@@ -104,7 +104,6 @@ Route::group(['middleware' => 'admin_auth'], function () {
 
     Route::get('admin/updatepassword', [AdminController::class, 'updatepassword']);
 
-    Route::get('/admin/logout', [AdminController::class, 'logout']);
     // Admin Profile view
     Route::get('admin/settings', [AdminController::class, 'settings'])
         ->middleware('role:settings,view')
@@ -522,11 +521,9 @@ Route::group(['middleware' => 'admin_auth'], function () {
         ->name('customer.address.permanent_delete')->setDefaults(['label' => '', 'role' => 1]);
 
     // ─── Reports ───────────────────────────────────
-    Route::get('admin/reports/view', [ReportController::class, 'index'])
-        ->middleware('role:dashboard,view')
+    // ReportdController => Admin Report Controller
+    Route::get('admin/reports/view', [ReportdController::class, 'show'])
+        ->middleware('role:report,view')
         ->name('admin.reportsView')->setDefaults(['label' => 'Add Report', 'role' => 0]);
-
-    Route::get('admin/report/new', [ReportController::class, 'create'])
-        ->middleware('role:dashboard,view')
-        ->name('admin.reports')->setDefaults(['label' => 'Add Report', 'role' => 0]);
+    // ReportController => Website Report Controller for save report
 });
