@@ -1,3 +1,13 @@
+8-15.7.26:-
+API version:- 1.2.1
+Vendor vertion:- 2.1.17
+Admin version:- 1.14.33
+Project vertion:- 1.1.33
+Comment:-
+        Admin:- Adding new functionality, Media Uploading added new features
+                    Add URL it download from URL link.
+        Vendor:- nothing chenges,
+        API:-   Adding auth expiresAt in sacntum, Adding Cart & Wishlist functionality( controller, model, migration, route )
 30-7.7.26:-
 API version:- 1.0.6
 Vendor version:- 2.1.17

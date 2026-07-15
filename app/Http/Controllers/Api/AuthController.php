@@ -68,13 +68,15 @@ class AuthController extends Controller
                 'message' => 'Invalid credentials'
             ], 401);
         }
+        $expiresAt = now()->addDays(7);
 
-        $token = $customer->createToken('customer-token')->plainTextToken;
+        $token = $customer->createToken('customer-token', ['*'], $expiresAt)->plainTextToken;
 
         return response()->json([
             'status' => true,
             'message' => 'Login successful',
             'token' => $token,
+            'expires_at'=>$expiresAt->toISOString(),
             'customer' => $customer
         ]);
     }

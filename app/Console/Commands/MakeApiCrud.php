@@ -15,7 +15,7 @@ class MakeApiCrud extends Command
     {
         $name = Str::studly($this->argument('name'));
 
-        // Artisan::call("make:model {$name}");
+        Artisan::call("make:model {$name}");
         Artisan::call("make:controller Api/{$name}Controller --api");
 
         $this->info("API CRUD created for {$name}");

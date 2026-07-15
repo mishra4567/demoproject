@@ -73,19 +73,29 @@ class CreateMediaTableController extends Controller
 
     public function store(Request $request)
     {
+        // ✅ Make media nullable — URL rows won't have a file
         $request->validate([
-            'media.*' => 'required|file|mimes:jpg,jpeg,png,webp,mp4,mov,avi|max:20480',
-            'tags.*' => 'nullable|max:10',
+            'media.*'       => 'nullable|file|mimes:jpg,jpeg,png,webp,mp4,mov,avi,webm|max:20480',
+            'media_url.*'   => 'nullable|url|max:2048',
+            'tags.*'        => 'nullable|max:10',
             'description.*' => 'nullable|max:500',
         ]);
+
+        $uploaded = 0;
+        $errors   = [];
+
+        // ✅ Handle file uploads
         if ($request->hasFile('media')) {
             foreach ($request->file('media') as $key => $file) {
+                if (!$file) continue;
+
                 $extension = strtolower($file->getClientOriginalExtension());
-                $fileName = time() . '_' . uniqid() . '.' . $extension;
-                $file->move(public_path('/storage/media'), $fileName);
-                $pAData = [
+                $fileName  = time() . '_' . uniqid() . '.' . $extension;
+                $file->move(public_path('storage/media'), $fileName);
+
+                CreateMediaTable::create([
                     'file_name'   => $fileName,
-                    'media_type'  => $extension, // saving only extension (as you want)
+                    'media_type'  => $extension,
                     'tags'        => $request->tags[$key] ?? null,
                     'description' => $request->description[$key] ?? null,
                     'is_vendor'   => 'ADMIN',
@@ -93,17 +103,114 @@ class CreateMediaTableController extends Controller
                     'who_create'  => $this->adminName(),
                     'status'      => 1,
                     'created_at'  => now(),
-                ];
-                CreateMediaTable::create($pAData);
+                ]);
+                $uploaded++;
             }
         }
+
+        // ✅ Handle URL imports
+        if ($request->filled('media_url')) {
+            foreach ($request->media_url as $key => $url) {
+                if (empty(trim($url))) continue;
+
+                try {
+                    // ✅ Download file from URL
+                    $context  = stream_context_create([
+                        'http' => [
+                            'timeout'       => 15,
+                            'user_agent'    => 'Mozilla/5.0',
+                            'ignore_errors' => true,
+                        ],
+                        'ssl' => [
+                            'verify_peer'      => false,
+                            'verify_peer_name' => false,
+                        ],
+                    ]);
+
+                    $contents = file_get_contents($url, false, $context);
+
+                    if (!$contents) {
+                        $errors[] = "Could not download: {$url}";
+                        continue;
+                    }
+
+                    // ✅ Detect extension from URL path
+                    $urlPath   = parse_url($url, PHP_URL_PATH);
+                    $extension = strtolower(pathinfo($urlPath, PATHINFO_EXTENSION));
+
+                    // ✅ Clean extension (remove query strings like ?v=1)
+                    $extension = explode('?', $extension)[0];
+
+                    // ✅ Fallback: detect from file content
+                    if (!in_array($extension, ['jpg', 'jpeg', 'png', 'webp', 'mp4', 'mov', 'avi', 'webm'])) {
+                        $finfo     = new \finfo(FILEINFO_MIME_TYPE);
+                        $mime      = $finfo->buffer($contents);
+                        $extension = match ($mime) {
+                            'image/jpeg'     => 'jpg',
+                            'image/png'      => 'png',
+                            'image/webp'     => 'webp',
+                            'image/gif'      => 'gif',
+                            'video/mp4'      => 'mp4',
+                            'video/quicktime' => 'mov',
+                            'video/x-msvideo' => 'avi',
+                            'video/webm'     => 'webm',
+                            default          => 'jpg',
+                        };
+                    }
+
+                    // ✅ Normalize jpeg → jpg
+                    if ($extension === 'jpeg') $extension = 'jpg';
+
+                    $fileName = time() . '_' . uniqid() . '.' . $extension;
+                    file_put_contents(public_path('storage/media/' . $fileName), $contents);
+
+                    CreateMediaTable::create([
+                        'file_name'   => $fileName,
+                        'media_type'  => $extension,
+                        'tags'        => $request->tags[$key] ?? null,
+                        'description' => $request->description[$key] ?? null,
+                        'is_vendor'   => 'ADMIN',
+                        'created_by'  => $this->adminId(),
+                        'who_create'  => $this->adminName(),
+                        'status'      => 1,
+                        'created_at'  => now(),
+                    ]);
+                    $uploaded++;
+                } catch (\Exception $e) {
+                    $errors[] = "Failed to import {$url}: " . $e->getMessage();
+                    continue;
+                }
+            }
+        }
+
+        // ✅ Nothing was uploaded
+        if ($uploaded === 0 && empty($errors)) {
+            $msg = 'No files or URLs provided.';
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'message' => $msg], 422);
+            }
+            return back()->with('error', $msg);
+        }
+
+        // ✅ Build response message
+        $message = "{$uploaded} file(s) uploaded successfully.";
+        if (!empty($errors)) {
+            $message .= ' ' . count($errors) . ' failed: ' . implode(', ', $errors);
+        }
+
         if ($request->ajax()) {
             return response()->json([
-                'success' => true,
-                'message' => 'Media Uploaded Successfully'
+                'success'  => true,
+                'uploaded' => $uploaded,
+                'errors'   => $errors,
+                'message'  => $message,
             ]);
         }
-        return redirect()->route('media')->with('success', 'Media Uploaded Successfully');
+
+        return redirect()->route('media')->with(
+            empty($errors) ? 'success' : 'warning',
+            $message
+        );
     }
 
     public function status($id)

@@ -74,8 +74,10 @@
                                         <td>{{ $list->name }}</td>
                                         <td>
                                             @if ($list->file_name)
-                                                <img src="{{ asset('storage/media/' . $list->file_name) }}" width="45"
-                                                    height="45" class="rounded" style="object-fit:cover;">
+                                                @include('admin.partials.media_preview', [
+                                                    'media' => $list,
+                                                    'size' => 'sm',
+                                                ])
                                             @else
                                                 <span class="text-muted small">No image</span>
                                             @endif
@@ -132,9 +134,10 @@
                                         </td>
                                         <td>
                                             @if ($list->file_name)
-                                                <img src="{{ asset('storage/media/' . $list->file_name) }}" width="45"
-                                                    height="45" class="rounded"
-                                                    style="object-fit:cover; filter:grayscale(100%);">
+                                                @include('admin.partials.media_preview', [
+                                                    'media' => $list,
+                                                    'size' => 'sm',
+                                                ])
                                             @else
                                                 <span class="text-muted small">No image</span>
                                             @endif

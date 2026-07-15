@@ -77,7 +77,16 @@
                                         </td>
                                         <td>{{ $list->sku }}</td>
                                         <td>{{ $list->product_id }}</td>
-                                        <td><img src="{{ asset('storage/media/' . $list->file_name) }}" alt="">
+                                        <td>
+                                            @if ($list->file_name)
+                                                @include('admin.partials.media_preview', [
+                                                    'media' => $list,
+                                                    'size' => 'sm',
+                                                ])
+                                            @else
+                                                <span class="text-muted small">No image</span>
+                                            @endif
+                                        </td>
                                         </td>
                                         <td>{{ $list->mrp }}</td>
                                         <td>{{ $list->price }}</td>
@@ -140,7 +149,12 @@
                                         <td>{{ $list->product_id }}</td>
                                         <td>
                                             @if ($list->file_name)
-                                                <img src="{{ asset('storage/media/' . $list->file_name) }}">
+                                                @include('admin.partials.media_preview', [
+                                                    'media' => $list,
+                                                    'size' => 'sm',
+                                                ])
+                                            @else
+                                                <span class="text-muted small">No image</span>
                                             @endif
                                         </td>
                                         <td>{{ $list->mrp }}</td>

@@ -109,23 +109,74 @@ function addMediaForm() {
     const newRow = firstRow.cloneNode(true);
     const newIndex = rows.length + 1;
 
-    // Update row number badge
+    // ✅ Update row number badge
     const badge = newRow.querySelector(".badge");
     if (badge) badge.textContent = `File ${newIndex}`;
 
-    // ✅ Always show remove button on added rows (only row 1 starts hidden)
+    // ✅ Always show remove button
     const removeCol = newRow.querySelector(".remove-col");
     if (removeCol) removeCol.classList.remove("d-none");
 
-    // Reset inputs
-    newRow.querySelector(".media-input").value = "";
+    // ✅ Update tab onclick attributes with new index
+    const fileTabBtn = newRow.querySelector(".tab-file-btn");
+    const urlTabBtn = newRow.querySelector(".tab-url-btn");
+    if (fileTabBtn)
+        fileTabBtn.setAttribute(
+            "onclick",
+            `switchTab(this, 'file', ${newIndex}); return false;`,
+        );
+    if (urlTabBtn)
+        urlTabBtn.setAttribute(
+            "onclick",
+            `switchTab(this, 'url',  ${newIndex}); return false;`,
+        );
+
+    // ✅ Rename tab content divs to new index
+    const fileContent = newRow.querySelector(`[class*="tab-file-content-"]`);
+    const urlContent = newRow.querySelector(`[class*="tab-url-content-"]`);
+    if (fileContent)
+        fileContent.className = fileContent.className.replace(
+            /tab-file-content-\d+/,
+            `tab-file-content-${newIndex}`,
+        );
+    if (urlContent)
+        urlContent.className = urlContent.className.replace(
+            /tab-url-content-\d+/,
+            `tab-url-content-${newIndex}`,
+        );
+
+    // ✅ Reset to file tab (in case URL was active on cloned row)
+    if (fileContent) fileContent.classList.remove("d-none");
+    if (urlContent) urlContent.classList.add("d-none");
+    if (fileTabBtn) fileTabBtn.classList.add("active");
+    if (urlTabBtn) urlTabBtn.classList.remove("active");
+
+    // ✅ Update file input ID + label
+    const fileInput = newRow.querySelector(".media-input");
+    const fileLabel = newRow.querySelector(".file-drop-zone");
+    if (fileInput) {
+        fileInput.id = `media-input-${newIndex}`;
+        fileInput.value = "";
+        fileInput.required = true;
+    }
+    if (fileLabel) fileLabel.setAttribute("for", `media-input-${newIndex}`);
+
+    // ✅ Update URL input ID + oninput + reset value
+    const urlInput = newRow.querySelector(".url-input");
+    if (urlInput) {
+        urlInput.id = `url-input-${newIndex}`;
+        urlInput.value = "";
+        urlInput.setAttribute("oninput", `previewUrl(this, ${newIndex})`);
+    }
+
+    // ✅ Reset tag + description
     newRow.querySelector('input[name="tags[]"]').value = "";
     newRow.querySelector('textarea[name="description[]"]').value = "";
 
-    // Reset drop zone
+    // ✅ Reset drop zone label + styles
     const dropLabel = newRow.querySelector(".file-drop-label");
     const dropZone = newRow.querySelector(".file-drop-zone");
-    if (dropLabel) dropLabel.textContent = "Click to choose file";
+    if (dropLabel) dropLabel.textContent = "Click or drag & drop";
     if (dropZone) {
         dropZone.classList.remove(
             "border-success",
@@ -136,17 +187,21 @@ function addMediaForm() {
         );
     }
 
-    // Reset preview
+    // ✅ Reset preview
     const previewContainer = newRow.querySelector(".preview-container");
     const previewImg = newRow.querySelector(".preview-img");
     const previewVideo = newRow.querySelector(".preview-video");
     const fileInfo = newRow.querySelector(".file-info");
 
-    previewImg.src = "";
-    previewVideo.src = "";
-    previewImg.classList.add("d-none");
-    previewVideo.classList.add("d-none");
-    previewContainer.classList.add("d-none");
+    if (previewImg) {
+        previewImg.src = "";
+        previewImg.classList.add("d-none");
+    }
+    if (previewVideo) {
+        previewVideo.src = "";
+        previewVideo.classList.add("d-none");
+    }
+    if (previewContainer) previewContainer.classList.add("d-none");
     if (fileInfo) fileInfo.textContent = "";
 
     wrapper.appendChild(newRow);
@@ -306,6 +361,139 @@ document.addEventListener("drop", function (e) {
         input.dispatchEvent(new Event("change", { bubbles: true }));
     }
 });
+// ============================================================
+// Upload Row — Tab switch (File | URL)
+// ============================================================
+
+function switchTab(btn, type, rowIndex) {
+    const row = btn.closest(".media-row");
+    const fileTab = row.querySelector(`.tab-file-content-${rowIndex}`);
+    const urlTab = row.querySelector(`.tab-url-content-${rowIndex}`);
+    const fileBtn = row.querySelector(".tab-file-btn");
+    const urlBtn = row.querySelector(".tab-url-btn");
+    const fileInput = row.querySelector(".media-input");
+    const urlInput = row.querySelector(".url-input");
+
+    if (type === "file") {
+        fileTab.classList.remove("d-none");
+        urlTab.classList.add("d-none");
+        fileBtn.classList.add("active");
+        urlBtn.classList.remove("active");
+
+        // ✅ Clear URL input so it doesn't submit
+        if (urlInput) urlInput.value = "";
+
+        // ✅ Make file input required again
+        if (fileInput) fileInput.required = true;
+    } else {
+        urlTab.classList.remove("d-none");
+        fileTab.classList.add("d-none");
+        urlBtn.classList.add("active");
+        fileBtn.classList.remove("active");
+
+        // ✅ Remove required from file input
+        if (fileInput) {
+            fileInput.required = false;
+            fileInput.value = "";
+        }
+
+        // Reset preview
+        resetPreview(row);
+    }
+}
+
+// ============================================================
+// URL Preview — show image/video from URL
+// ============================================================
+
+let urlPreviewTimers = {};
+
+function previewUrl(input, rowIndex) {
+    const url = input.value.trim();
+    const row = input.closest(".media-row");
+
+    // Debounce 600ms
+    clearTimeout(urlPreviewTimers[rowIndex]);
+    urlPreviewTimers[rowIndex] = setTimeout(() => {
+        if (!url) {
+            resetPreview(row);
+            return;
+        }
+
+        const ext = url.split(".").pop().split("?")[0].toLowerCase();
+        const imgExts = ["jpg", "jpeg", "png", "webp", "gif"];
+        const vidExts = ["mp4", "mov", "avi", "webm"];
+
+        const previewContainer = row.querySelector(".preview-container");
+        const previewImg = row.querySelector(".preview-img");
+        const previewVideo = row.querySelector(".preview-video");
+        const fileInfo = row.querySelector(".file-info");
+
+        // Reset
+        previewImg.classList.add("d-none");
+        previewVideo.classList.add("d-none");
+        previewImg.src = "";
+        previewVideo.src = "";
+
+        if (imgExts.includes(ext)) {
+            // ✅ Image URL preview
+            previewImg.src = url;
+            previewImg.onload = () => {
+                previewImg.classList.remove("d-none");
+                previewContainer.classList.remove("d-none");
+                if (fileInfo) fileInfo.textContent = `Image from URL`;
+            };
+            previewImg.onerror = () => {
+                if (fileInfo)
+                    fileInfo.textContent = "⚠ Cannot preview this URL";
+                previewContainer.classList.add("d-none");
+            };
+        } else if (vidExts.includes(ext)) {
+            // ✅ Video URL preview
+            previewVideo.src = url;
+            previewVideo.classList.remove("d-none");
+            previewContainer.classList.remove("d-none");
+            if (fileInfo) fileInfo.textContent = `Video from URL`;
+        } else {
+            // ✅ Unknown — try as image
+            previewImg.src = url;
+            previewImg.onload = () => {
+                previewImg.classList.remove("d-none");
+                previewContainer.classList.remove("d-none");
+                if (fileInfo) fileInfo.textContent = `Media from URL`;
+            };
+            previewImg.onerror = () => {
+                if (fileInfo)
+                    fileInfo.textContent = "⚠ Unsupported or unreachable URL";
+            };
+        }
+
+        updateCounter();
+    }, 600);
+}
+
+// ============================================================
+// Helper — reset preview in a row
+// ============================================================
+
+function resetPreview(row) {
+    const previewContainer = row.querySelector(".preview-container");
+    const previewImg = row.querySelector(".preview-img");
+    const previewVideo = row.querySelector(".preview-video");
+    const fileInfo = row.querySelector(".file-info");
+
+    if (previewContainer) previewContainer.classList.add("d-none");
+    if (previewImg) {
+        previewImg.classList.add("d-none");
+        previewImg.src = "";
+    }
+    if (previewVideo) {
+        previewVideo.classList.add("d-none");
+        previewVideo.src = "";
+    }
+    if (fileInfo) fileInfo.textContent = "";
+}
+
 // ============================================================
 // Media Modal — open / close
 // ============================================================
@@ -760,38 +948,60 @@ document
             });
     });
 
-function openMediaPreview(url, type) {
+function openMediaPreview(url, type, filename = "") {
     const image = document.getElementById("previewImage");
     const video = document.getElementById("previewVideo");
     const source = document.getElementById("previewVideoSource");
+    const nameEl = document.getElementById("mediaPreviewFilename");
+    const download = document.getElementById("mediaPreviewDownload");
+    const newTab = document.getElementById("mediaPreviewNewTab");
+
+    // Reset
     image.classList.add("d-none");
     video.classList.add("d-none");
+    image.src = "";
+    source.src = "";
+
+    // ✅ Set filename + links
+    const name = filename || url.split("/").pop();
+    if (nameEl) nameEl.textContent = name;
+    if (download) {
+        download.href = url;
+        download.setAttribute("download", name);
+    }
+    if (newTab) newTab.href = url;
+
     if (type === "image") {
         image.src = url;
         image.classList.remove("d-none");
     } else {
         source.src = url;
-        // Hide browser video options
         video.setAttribute(
             "controlsList",
             "nodownload noplaybackrate nofullscreen",
         );
         video.disablePictureInPicture = true;
-        // Optional: disable right click menu
-        video.oncontextmenu = function (e) {
+        video.oncontextmenu = (e) => {
             e.preventDefault();
             return false;
         };
         video.load();
         video.classList.remove("d-none");
     }
+
     new bootstrap.Modal(document.getElementById("mediaPreviewModal")).show();
 }
 
 document
     .getElementById("mediaPreviewModal")
-    .addEventListener("hidden.bs.modal", function () {
+    ?.addEventListener("hidden.bs.modal", function () {
         const video = document.getElementById("previewVideo");
+        const source = document.getElementById("previewVideoSource");
+        const image = document.getElementById("previewImage");
+
+        // ✅ Full cleanup
         video.pause();
         video.currentTime = 0;
+        source.src = "";
+        image.src = "";
     });

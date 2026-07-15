@@ -92,7 +92,14 @@
                                 </td>
                                 <td>{{ $list->name }}</td>
                                 <td>{{ $list->slug }}</td>
-                                <td><img src="{{ asset('storage/media/' . $list->file_name) }}" alt=""></td>
+                                {{-- <td><img src="{{ asset('storage/media/' . $list->file_name) }}" alt=""></td> --}}
+                                <td>
+                                    {{-- ✅ Use stream route + partial --}}
+                                    @include('admin.partials.media_preview', [
+                                        'media' => $list,
+                                        'size' => 'sm',
+                                    ])
+                                </td>
                                 <td>
                                     <a href="{{ route('product.productview', ['id' => $list->id]) }}" target="_blank"
                                         class="btn btn-outline-{{ $list->is_publish == 1 ? 'info' : 'warning' }} btn-sm ">
@@ -152,7 +159,16 @@
                                 </td>
                                 <td>{{ $list->name }}</td>
                                 <td>{{ $list->slug }}</td>
-                                <td><img src="{{ asset('storage/media/' . $list->file_name) }}" alt="">
+                                <td>
+                                    @if ($list->file_name)
+                                        @include('admin.partials.media_preview', [
+                                            'media' => $list,
+                                            'size' => 'sm',
+                                        ])
+                                    @else
+                                        <span class="text-muted small">No image</span>
+                                    @endif
+                                </td>
                                 </td>
                                 <td>
                                     <a href="{{ route('product.restore', $list->id) }}"
